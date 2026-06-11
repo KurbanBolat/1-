@@ -11,7 +11,7 @@ from starlette.requests import Request
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from app.main import app, http_exception_handler
+from app.main import app, http_exception_handler, _run_startup_migrations
 from app.api.payments import _verify_payment_webhook_signature
 from app.core.config import settings
 from app.core.security import create_access_token, get_password_hash
@@ -46,6 +46,7 @@ def test_request_id_header_is_echoed():
 
 
 def test_ops_status_for_admin():
+    _run_startup_migrations()
     db = SessionLocal()
     try:
         admin = db.query(User).filter(User.email == "ops-admin@example.test").first()
