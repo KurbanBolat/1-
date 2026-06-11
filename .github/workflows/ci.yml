@@ -1,0 +1,152 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Compile Python modules
+        run: python -m compileall app tests alembic
+
+      - name: Run tests
+        run: python -m pytest -q
+
+      - name: Check Alembic migrations on a clean database
+        run: |
+          mkdir -p ../.tmp
+          DATABASE_URL=sqlite:///../.tmp/alembic-ci.db python -m alembic upgrade head
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+
+  compose:
+    name: Production Config
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate production env example
+        run: |
+          python -m py_compile scripts/check_production_env.py scripts/smoke_production.py scripts/db_maintenance.py
+          python -m py_compile scripts/payment_webhook_probe.py scripts/preprod_gate.py
+          python scripts/check_production_env.py --file .env.production.example --allow-placeholders
+
+      - name: Validate production compose file
+        run: docker compose --env-file .env.production.example -f docker-compose.prod.yml config
+
+  e2e:
+    name: E2E Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: python -m pip install -r requirements.txt
+
+      - name: Prepare local test database
+        working-directory: backend
+        run: DATABASE_URL=sqlite:///./realestate.db python -m alembic upgrade head
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browser
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke tests
+        working-directory: frontend
+        run: npm run test:e2e
+        env:
+          PW_PYTHON_BIN: python
+          DATABASE_URL: sqlite:///./realestate.db
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+          NEXT_TELEMETRY_DISABLED: "1"

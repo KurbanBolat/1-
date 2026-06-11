@@ -1,0 +1,24 @@
+﻿services:
+  backend:
+    build:
+      context: ./backend
+    container_name: realestate-backend
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-change_me_now}
+      - DATABASE_URL=sqlite:///./realestate.db
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: realestate-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
