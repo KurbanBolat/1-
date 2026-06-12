@@ -26,6 +26,8 @@ npm run dev
 
 Open:
 - Frontend: http://localhost:3000
+- Hotel sales page: http://localhost:3000/for-hotels?lang=ru&currency=KZT
+- Legal/contact pages: `/privacy`, `/terms`, `/refund-policy`, `/contacts`
 - Backend docs: http://localhost:8000/docs
 - Health: http://localhost:8000/health/ready
 
@@ -94,3 +96,4 @@ python scripts/preprod_gate.py --env-file .env.production.example --allow-placeh
 - OpenAI live mode is intentionally disabled by default through `AI_CONCIERGE_MODE=stub`. Set `AI_CONCIERGE_MODE=live` and provide `OPENAI_API_KEY` only when you want real GPT calls.
 - Demo payments use `PAYMENT_PROVIDER=mock` and `NEXT_PUBLIC_PAYMENT_MODE=mock`. Real payment providers should call `POST /payments/webhook` using the normalized contract in `docs/payment-webhook.md`.
 - Production startup enforces secure cookies, CSRF, non-wildcard CORS, strong `SECRET_KEY`, and `PAYMENT_WEBHOOK_SECRET`.
+- Public legal pages are included as production templates. Replace operator contacts/legal details and run legal review before launch.

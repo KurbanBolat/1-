@@ -129,6 +129,11 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
       room: "Deluxe King Room",
       available: "Свободно: 4 номера",
       book: "Забронировать",
+      footerNote: "Шаблон продукта для демо, пилота и дальнейшей production-настройки.",
+      privacy: "Конфиденциальность",
+      terms: "Условия",
+      refunds: "Возвраты",
+      contacts: "Контакты",
     },
     en: {
       navProduct: "Product",
@@ -158,8 +163,20 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
       room: "Deluxe King Room",
       available: "Available: 4 rooms",
       book: "Book now",
+      footerNote: "Product template for demos, pilots, and production setup.",
+      privacy: "Privacy",
+      terms: "Terms",
+      refunds: "Refunds",
+      contacts: "Contacts",
     },
   }[lang];
+
+  const legalLinks = [
+    { href: `/privacy?lang=${lang}&currency=${currency}`, label: copy.privacy },
+    { href: `/terms?lang=${lang}&currency=${currency}`, label: copy.terms },
+    { href: `/refund-policy?lang=${lang}&currency=${currency}`, label: copy.refunds },
+    { href: `/contacts?lang=${lang}&currency=${currency}`, label: copy.contacts },
+  ];
 
   const valueCards = [
     {
@@ -416,6 +433,20 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
           <span aria-hidden="true">→</span>
         </Link>
       </section>
+
+      <footer className="hotel-site-footer">
+        <p>
+          <b>StayPilot</b>
+          <span>{copy.footerNote}</span>
+        </p>
+        <nav aria-label={lang === "ru" ? "Юридические страницы" : "Legal pages"}>
+          {legalLinks.map((item) => (
+            <Link href={item.href} key={item.href}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </footer>
     </main>
   );
 }

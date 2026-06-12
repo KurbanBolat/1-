@@ -439,6 +439,23 @@ test("hotel landing presents B2B product and opens demo", async ({ page }) => {
   );
 });
 
+test("public legal pages render localized content and footer links", async ({ page }) => {
+  const pages = [
+    { path: "/privacy", heading: "Политика конфиденциальности" },
+    { path: "/terms", heading: "Условия использования" },
+    { path: "/refund-policy", heading: "Политика отмены и возвратов" },
+    { path: "/contacts", heading: "Контакты StayPilot" },
+  ];
+
+  for (const item of pages) {
+    await page.goto(`${item.path}?lang=ru&currency=KZT`);
+    await expect(page.getByRole("heading", { level: 1, name: item.heading })).toBeVisible();
+    await expect(page.locator(".legal-updated")).toContainText("12 июня 2026");
+    await expect(page.locator(".site-footer")).toContainText("Для отелей");
+    await expect(page.locator(".site-footer a[href*='currency=KZT']").first()).toBeVisible();
+  }
+});
+
 test("home search preserves dates and opens available rooms", async ({ page }) => {
   await page.goto("/?lang=ru&currency=KZT");
   const candidateHrefs = await page

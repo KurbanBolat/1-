@@ -38,6 +38,7 @@ export default function TopNavBar() {
           search: "Поиск",
           stays: "Каталог",
           concierge: "AI-консьерж",
+          hotel: "Для отелей",
           account: "Кабинет",
           stay: "Объект",
           checkout: "Оформление",
@@ -47,6 +48,7 @@ export default function TopNavBar() {
           search: "Search",
           stays: "Catalog",
           concierge: "AI concierge",
+          hotel: "For hotels",
           account: "Account",
           stay: "Stay",
           checkout: "Checkout",
@@ -58,6 +60,7 @@ export default function TopNavBar() {
   const isCheckout = pathname.startsWith("/checkout");
   const isAccount = pathname.startsWith("/account");
   const isManager = pathname.startsWith("/manager") || pathname.startsWith("/login");
+  const isHotelSite = pathname.startsWith("/for-hotels");
   const [hash, setHash] = useState("");
 
   useEffect(() => {
@@ -98,6 +101,7 @@ export default function TopNavBar() {
           <Link href={`/?lang=${lang}&currency=${currency}`} className={`topnav-nav-link ${isHome && homeActiveTab === "search" ? "active" : ""}`}>{nav.search}</Link>
           <Link href={`/?lang=${lang}&currency=${currency}#results`} className={`topnav-nav-link ${isHome && homeActiveTab === "catalog" ? "active" : ""}`}>{nav.stays}</Link>
           <Link href={`/?lang=${lang}&currency=${currency}#ai`} className={`topnav-nav-link ${isHome && homeActiveTab === "ai" ? "active" : ""}`}>{nav.concierge}</Link>
+          <Link href={`/for-hotels?lang=${lang}&currency=${currency}`} className={`topnav-nav-link ${isHotelSite ? "active" : ""}`}>{nav.hotel}</Link>
           <Link href={`/account?lang=${lang}&currency=${currency}`} className={`topnav-nav-link ${isAccount ? "active" : ""}`}>{nav.account}</Link>
           {isStay ? <span className="topnav-nav-link active">{nav.stay}</span> : null}
           {isCheckout ? <span className="topnav-nav-link active">{nav.checkout}</span> : null}

@@ -14,15 +14,25 @@ export default function AppFooter() {
           search: "Поиск",
           catalog: "Каталог",
           concierge: "AI-консьерж",
+          hotel: "Для отелей",
           account: "Кабинет",
           partner: "Партнер",
+          privacy: "Конфиденциальность",
+          terms: "Условия",
+          refunds: "Возвраты",
+          contacts: "Контакты",
         }
       : {
           search: "Search",
           catalog: "Catalog",
           concierge: "AI concierge",
+          hotel: "For hotels",
           account: "Account",
           partner: "Partner",
+          privacy: "Privacy",
+          terms: "Terms",
+          refunds: "Refunds",
+          contacts: "Contacts",
         };
 
   return (
@@ -32,8 +42,13 @@ export default function AppFooter() {
         <Link href={`/?lang=${lang}&currency=${currency}#search`}>{labels.search}</Link>
         <Link href={`/?lang=${lang}&currency=${currency}#results`}>{labels.catalog}</Link>
         <Link href={`/?lang=${lang}&currency=${currency}#ai`}>{labels.concierge}</Link>
+        <Link href={`/for-hotels?lang=${lang}&currency=${currency}`}>{labels.hotel}</Link>
         <Link href={`/account?lang=${lang}&currency=${currency}`}>{labels.account}</Link>
         <Link href={`/login?lang=${lang}&currency=${currency}`}>{labels.partner}</Link>
+        <Link href={`/privacy?lang=${lang}&currency=${currency}`}>{labels.privacy}</Link>
+        <Link href={`/terms?lang=${lang}&currency=${currency}`}>{labels.terms}</Link>
+        <Link href={`/refund-policy?lang=${lang}&currency=${currency}`}>{labels.refunds}</Link>
+        <Link href={`/contacts?lang=${lang}&currency=${currency}`}>{labels.contacts}</Link>
       </div>
     </footer>
   );

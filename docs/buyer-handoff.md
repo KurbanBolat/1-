@@ -18,6 +18,10 @@ StayPilot is a booking-style hotel app with:
 Local development:
 - Guest app: `http://localhost:3000/?lang=ru&currency=KZT&city=Dubai&guests=2`
 - Hotel sales page: `http://localhost:3000/for-hotels?lang=ru&currency=KZT`
+- Privacy policy: `http://localhost:3000/privacy?lang=ru&currency=KZT`
+- Terms: `http://localhost:3000/terms?lang=ru&currency=KZT`
+- Refund policy: `http://localhost:3000/refund-policy?lang=ru&currency=KZT`
+- Contacts: `http://localhost:3000/contacts?lang=ru&currency=KZT`
 - Partner login: `http://localhost:3000/login?lang=ru&currency=KZT`
 - Backend docs: `http://localhost:8000/docs`
 - Readiness: `http://localhost:8000/health/ready`
@@ -60,13 +64,14 @@ Check:
 - Environment validators and pre-production gate scripts.
 - Local E2E suite covering search, booking, payment, account, manager, restaurant booking, room service, and hotel sales page.
 - GitHub Actions workflow for CI.
+- Public legal/contact page templates for privacy, terms, refund policy, and support contacts.
 
 ## Not Included Yet
 
 - Live OpenAI key and live GPT production prompt tuning.
 - Signed Stripe/Kaspi production account configuration.
 - Domain, TLS, reverse proxy, and hosted database credentials.
-- Legal documents: privacy policy, terms, refund policy, data-processing agreement.
+- Final legal counsel review, real operator legal details, and data-processing agreement.
 
 ## Go-Live Sequence
 
@@ -83,5 +88,6 @@ Check:
    ```
 6. Run migrations and health checks.
 7. Run the pre-production gate.
-8. Connect domain/TLS and payment provider webhook.
-9. Run one full booking and in-stay service smoke test before opening traffic.
+8. Replace legal/contact placeholders with the operator's real details and complete legal review.
+9. Connect domain/TLS and payment provider webhook.
+10. Run one full booking and in-stay service smoke test before opening traffic.
