@@ -927,6 +927,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             <Link href={currencyToggleHref}>{currency}<SpIcon name="chevron" /></Link>
             <Link href="#favorites"><SpIcon name="heart" />{lang === "ru" ? "Избранное" : "Favorites"}</Link>
             <Link href={`/account?lang=${lang}&currency=${currency}`}><SpIcon name="calendar" />{lang === "ru" ? "Мои бронирования" : "My bookings"}</Link>
+            <Link href={`/for-hotels?lang=${lang}&currency=${currency}`}><SpIcon name="briefcase" />{lang === "ru" ? "Для отелей" : "For hotels"}</Link>
           </div>
           <Link href="/login" className="sp-topbar-user" aria-label={tr.partnerLogin}>
             <span className="sp-user-avatar" />

@@ -4,7 +4,7 @@ export default function NotFound() {
   return (
     <div className="layout">
       <section className="not-found-shell">
-        <p className="kicker">FindApart</p>
+        <p className="kicker">StayPilot</p>
         <h1>404</h1>
         <p>Page not found. The link may be outdated or the listing was removed.</p>
         <div className="not-found-actions">

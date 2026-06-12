@@ -27,7 +27,7 @@ export default function AppFooter() {
 
   return (
     <footer className="site-footer">
-      <p>© {new Date().getFullYear()} FindApart</p>
+      <p>© {new Date().getFullYear()} StayPilot</p>
       <div className="site-footer-links">
         <Link href={`/?lang=${lang}&currency=${currency}#search`}>{labels.search}</Link>
         <Link href={`/?lang=${lang}&currency=${currency}#results`}>{labels.catalog}</Link>

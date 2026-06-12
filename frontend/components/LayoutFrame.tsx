@@ -18,8 +18,10 @@ export default function LayoutFrame({ children }: { children: React.ReactNode })
   const isAccount = pathname.startsWith("/account");
   const isLogin = pathname.startsWith("/login");
   const isManager = pathname.startsWith("/manager");
+  const isHotelSite = pathname.startsWith("/for-hotels");
   const isStayPilotRoute =
-    isHome || pathname.startsWith("/checkout") || isStayDetails || isStayRestaurant || isAccount || isLogin || isManager;
+    isHome || isHotelSite || pathname.startsWith("/checkout") || isStayDetails || isStayRestaurant || isAccount || isLogin || isManager;
+  const containerClassName = isHotelSite ? "container container-hotel-site" : isStayPilotRoute ? "container container-home" : "container";
 
   return (
     <>
@@ -28,7 +30,7 @@ export default function LayoutFrame({ children }: { children: React.ReactNode })
           <TopNavBar />
         </Suspense>
       ) : null}
-      <main className={isStayPilotRoute ? "container container-home" : "container"}>{children}</main>
+      <main className={containerClassName}>{children}</main>
       {!isStayPilotRoute ? (
         <Suspense fallback={null}>
           <AppFooter />

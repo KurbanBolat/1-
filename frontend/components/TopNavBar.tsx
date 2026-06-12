@@ -91,7 +91,7 @@ export default function TopNavBar() {
     <header className="topnav-wrap">
       <div className="topnav topnav-minimal">
         <Link href={`/?lang=${lang}&currency=${currency}`} className="topnav-brand-minimal">
-          FindApart
+          StayPilot
         </Link>
 
         <nav className="topnav-nav" aria-label={lang === "ru" ? "Навигация" : "Navigation"}>

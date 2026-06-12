@@ -428,6 +428,17 @@ test("city labels are localized for russian", async ({ page }) => {
   await expect(page.locator("body")).toContainText(/Алматы|Астана|Шымкент|Стамбул|Вена|Торонто|Милан|Тбилиси/);
 });
 
+test("hotel landing presents B2B product and opens demo", async ({ page }) => {
+  await page.goto("/for-hotels?lang=ru&currency=KZT");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("AI-консьерж для отелей");
+  await expect(page.locator(".hotel-site-product")).toContainText("AI-консьерж");
+  await expect(page.locator(".hotel-site-mini-proof")).toContainText("24 e2e flows");
+  await expect(page.locator(".hotel-site-hero a").filter({ hasText: "Открыть демо" }).first()).toHaveAttribute(
+    "href",
+    "/?lang=ru&currency=KZT&city=Dubai&guests=2",
+  );
+});
+
 test("home search preserves dates and opens available rooms", async ({ page }) => {
   await page.goto("/?lang=ru&currency=KZT");
   const candidateHrefs = await page

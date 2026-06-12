@@ -34,7 +34,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
         }}
       >
         <p style={{ margin: 0, fontSize: 12, letterSpacing: 1.2, textTransform: "uppercase", color: "#4d6788" }}>
-          FindApart
+          StayPilot
         </p>
         <h1 style={{ marginTop: 10, marginBottom: 10, fontSize: 28, lineHeight: 1.15 }}>Something went wrong</h1>
         <p style={{ marginTop: 0, marginBottom: 18, color: "#425d80" }}>

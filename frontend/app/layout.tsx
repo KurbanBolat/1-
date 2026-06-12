@@ -4,8 +4,8 @@ import React from "react";
 import LayoutFrame from "../components/LayoutFrame";
 
 export const metadata: Metadata = {
-  title: "FindApart - search and booking",
-  description: "Find and book apartments and hotels with transparent pricing.",
+  title: "StayPilot - AI concierge for hotels",
+  description: "Find, book, and manage hotel stays with an AI concierge.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -17,4 +17,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-
