@@ -12,6 +12,20 @@ Local URLs:
 - Partner login: `http://localhost:3000/login?lang=ru&currency=KZT`
 - Refund policy: `http://localhost:3000/refund-policy?lang=ru&currency=KZT`
 
+Seed polished local demo data before a buyer session:
+```bash
+cd backend
+python scripts/seed_demo_data.py --reset
+```
+
+This creates stable Dubai showcase data:
+- `Address Beach Resort`
+- `Jumeirah Al Naseem`
+- `Taj Dubai`
+- `SLS Dubai Hotel & Residences`
+
+Each demo property gets room types, cover/gallery photos, room availability signals, restaurants, room-service menu items, reservations, payment states, and sample in-stay service requests.
+
 ## 10-Minute Buyer Script
 
 1. Hotel value page, 0-2 minutes:
@@ -56,5 +70,5 @@ Do not expose these credentials in production. For hosted demos, create dedicate
 
 - Use a fresh browser profile or clear local storage if guest state looks stale.
 - If Next dev CSS breaks after `npm run build`, restart `npm run dev`.
-- If room availability is sparse, run backend seed scripts or use the first bookable listing found by e2e helpers.
+- If room availability is sparse, run `python scripts/seed_demo_data.py --reset`.
 - Keep `AI_CONCIERGE_MODE=stub` for sale demos unless live GPT has been reviewed.

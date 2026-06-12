@@ -24,6 +24,12 @@ npm install
 npm run dev
 ```
 
+Seed polished local demo data:
+```bash
+cd backend
+python scripts/seed_demo_data.py --reset
+```
+
 Open:
 - Frontend: http://localhost:3000
 - Hotel sales page: http://localhost:3000/for-hotels?lang=ru&currency=KZT

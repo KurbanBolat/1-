@@ -27,6 +27,14 @@ Local development:
 - Backend docs: `http://localhost:8000/docs`
 - Readiness: `http://localhost:8000/health/ready`
 
+Polished local demo data:
+```bash
+cd backend
+python scripts/seed_demo_data.py --reset
+```
+
+The demo seed creates stable Dubai hotels, room types, photos, availability signals, restaurants, menu items, reservations, payment states, and sample in-stay service requests.
+
 ## Current Production Modes
 
 OpenAI live mode is intentionally disabled for this package:
@@ -69,6 +77,7 @@ Check:
 - GitHub Actions workflow for CI.
 - Public legal/contact page templates for privacy, terms, refund policy, and support contacts.
 - Public demo guide plus buyer demo and seller pitch documentation.
+- Idempotent local demo seed for polished Dubai buyer demos.
 
 ## Not Included Yet
 
