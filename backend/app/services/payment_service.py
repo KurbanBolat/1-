@@ -5,6 +5,7 @@ from fastapi import BackgroundTasks, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.time import utc_now
 from app.db.session import SessionLocal
 from app.models.listing import Listing
@@ -174,14 +175,14 @@ def finalize_mock_payment_attempt(attempt_id: int) -> None:
         db.close()
 
 
-def queue_mock_payment_attempt(
+def _start_pending_payment_attempt(
     db: Session,
+    *,
     reservation_id: int,
     method: str,
     idempotency_key: str,
-    background_tasks: BackgroundTasks,
     force_fail: bool = False,
-) -> ReservationPaymentOut:
+) -> tuple[ReservationPayment, Reservation, ReservationPaymentAttempt | None, bool]:
     expire_stale_pending_reservations(db)
     reservation = db.get(Reservation, reservation_id)
     if not reservation:
@@ -213,12 +214,7 @@ def queue_mock_payment_attempt(
             payment.updated_at = utc_now()
             db.commit()
             db.refresh(payment)
-        return _build_payment_out(
-            payment,
-            reservation_status=reservation.status,
-            attempt_status=existing_attempt.status,
-            idempotency_reused=True,
-        )
+        return payment, reservation, existing_attempt, True
 
     # Prevent duplicate in-flight payment attempts created with different idempotency keys.
     # While a reservation is pending payment, we keep a single pending attempt and reuse it.
@@ -229,12 +225,7 @@ def queue_mock_payment_attempt(
             payment.updated_at = utc_now()
             db.commit()
             db.refresh(payment)
-        return _build_payment_out(
-            payment,
-            reservation_status=reservation.status,
-            attempt_status=latest_attempt.status,
-            idempotency_reused=True,
-        )
+        return payment, reservation, latest_attempt, True
 
     _ensure_payment_start_allowed(db, reservation)
 
@@ -258,23 +249,88 @@ def queue_mock_payment_attempt(
         db.commit()
     except IntegrityError:
         db.rollback()
+        reservation = db.get(Reservation, reservation_id)
+        if not reservation:
+            raise HTTPException(status_code=404, detail=_payment_error("RESERVATION_NOT_FOUND", "Reservation not found"))
         payment = db.query(ReservationPayment).filter(ReservationPayment.reservation_id == reservation_id).first()
         if not payment:
             payment = ensure_reservation_payment(db, reservation)
-        return _build_payment_out(
-            payment,
-            reservation_status=reservation.status,
-            attempt_status=None,
-            idempotency_reused=True,
-        )
+        return payment, reservation, None, True
 
     db.refresh(payment)
     db.refresh(attempt)
-    background_tasks.add_task(finalize_mock_payment_attempt, attempt.id)
+    db.refresh(reservation)
+    return payment, reservation, attempt, False
+
+
+def queue_mock_payment_attempt(
+    db: Session,
+    reservation_id: int,
+    method: str,
+    idempotency_key: str,
+    background_tasks: BackgroundTasks,
+    force_fail: bool = False,
+) -> ReservationPaymentOut:
+    payment, reservation, attempt, idempotency_reused = _start_pending_payment_attempt(
+        db,
+        reservation_id=reservation_id,
+        method=method,
+        idempotency_key=idempotency_key,
+        force_fail=force_fail,
+    )
+    if not idempotency_reused and attempt:
+        background_tasks.add_task(finalize_mock_payment_attempt, attempt.id)
     return _build_payment_out(
         payment,
         reservation_status=reservation.status,
-        attempt_status=attempt.status,
+        attempt_status=(attempt.status if attempt else None),
+        idempotency_reused=idempotency_reused,
+    )
+
+
+def start_provider_payment_attempt(
+    db: Session,
+    reservation_id: int,
+    method: str,
+    idempotency_key: str,
+) -> ReservationPaymentOut:
+    payment, reservation, attempt, idempotency_reused = _start_pending_payment_attempt(
+        db,
+        reservation_id=reservation_id,
+        method=method,
+        idempotency_key=idempotency_key,
+        force_fail=False,
+    )
+    return _build_payment_out(
+        payment,
+        reservation_status=reservation.status,
+        attempt_status=(attempt.status if attempt else None),
+        idempotency_reused=idempotency_reused,
+    )
+
+
+def start_configured_payment_attempt(
+    db: Session,
+    reservation_id: int,
+    method: str,
+    idempotency_key: str,
+    background_tasks: BackgroundTasks,
+    force_fail: bool = False,
+) -> ReservationPaymentOut:
+    if settings.normalized_payment_provider == "mock":
+        return queue_mock_payment_attempt(
+            db,
+            reservation_id=reservation_id,
+            method=method,
+            idempotency_key=idempotency_key,
+            background_tasks=background_tasks,
+            force_fail=force_fail,
+        )
+    return start_provider_payment_attempt(
+        db,
+        reservation_id=reservation_id,
+        method=method,
+        idempotency_key=idempotency_key,
     )
 
 

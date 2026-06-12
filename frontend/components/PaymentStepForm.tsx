@@ -102,7 +102,9 @@ export default function PaymentStepForm({
           stateFailed: "Ошибка",
           statePending: "В процессе",
           paymentFailedRedirect: "Оплата не прошла. Перенаправляем к результату...",
+          paymentPendingRedirect: "Оплата еще обрабатывается. Перенаправляем к результату...",
           paymentSuccessRedirect: "Оплата прошла. Перенаправляем к результату...",
+          providerPendingHint: "Финальный статус обновится после webhook от платежного провайдера.",
           reservationNotFound: "Бронирование не найдено.",
           stayHere: "Остаться на странице",
           goNow: "Перейти сейчас",
@@ -147,7 +149,9 @@ export default function PaymentStepForm({
           stateFailed: "Failed",
           statePending: "Pending",
           paymentFailedRedirect: "Payment failed. Redirecting to result...",
+          paymentPendingRedirect: "Payment is still processing. Redirecting to result...",
           paymentSuccessRedirect: "Payment successful. Redirecting to result...",
+          providerPendingHint: "The final status will update after the payment provider webhook arrives.",
           reservationNotFound: "Reservation not found.",
           stayHere: "Stay on page",
           goNow: "Go now",
@@ -271,9 +275,14 @@ export default function PaymentStepForm({
       if (effectiveAccessToken) query.set("access_token", effectiveAccessToken);
       const target = `/checkout/success?${query.toString()}`;
       scheduleResultRedirect(target);
-      if (payment.payment_status !== "paid") {
+      if (payment.payment_status === "failed") {
         setStatus(`${text.paymentFailedRedirect} ${text.declineHint}`);
         setStatusKind("error");
+        return;
+      }
+      if (payment.payment_status === "pending") {
+        setStatus(`${text.paymentPendingRedirect} ${isMockPaymentMode ? "" : text.providerPendingHint}`.trim());
+        setStatusKind("progress");
         return;
       }
       setStatus(text.paymentSuccessRedirect);

@@ -27,7 +27,7 @@ See `docs/production-secrets.md` for the full checklist and secret generation co
 
 OpenAI live mode is disabled by default. Keep `AI_CONCIERGE_MODE=stub` for sale demos and first deployments. Later, switch to `AI_CONCIERGE_MODE=live` and add `OPENAI_API_KEY` to allow GPT calls.
 
-Payment provider mode is explicit. Keep `PAYMENT_PROVIDER=mock` only for demo/staging. Use `manual`, `stripe`, or `kaspi` for real payment operations and connect provider callbacks to the normalized webhook contract.
+Payment provider mode is explicit. Keep `PAYMENT_PROVIDER=mock` only for demo/staging. Use `manual`, `stripe`, or `kaspi` for real payment operations. In non-mock modes checkout creates a pending payment attempt and the provider callback must finalize it through the normalized webhook contract.
 
 ## Build And Run
 ```bash

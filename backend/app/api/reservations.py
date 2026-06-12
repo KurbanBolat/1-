@@ -35,7 +35,7 @@ from app.schemas.reservation import (
     ReservationCreate,
     ReservationOut,
 )
-from app.services.payment_service import get_reservation_payment, queue_mock_payment_attempt
+from app.services.payment_service import get_reservation_payment, start_configured_payment_attempt
 from app.services.reservation_service import (
     build_partner_summary,
     calculate_cancellation_terms,
@@ -387,7 +387,7 @@ def get_payment_status(
 
 
 @router.post("/{reservation_id}/payment/attempt", response_model=ReservationPaymentOut)
-def make_mock_payment(
+def make_payment_attempt(
     reservation_id: int,
     payload: ReservationPaymentAttempt,
     background_tasks: BackgroundTasks,
@@ -398,7 +398,7 @@ def make_mock_payment(
     if not reservation:
         raise HTTPException(status_code=404, detail="Reservation not found")
     _require_reservation_guest_or_partner(db=db, reservation=reservation, access_token=payload.access_token, user=user)
-    return queue_mock_payment_attempt(
+    return start_configured_payment_attempt(
         db,
         reservation_id=reservation_id,
         method=payload.method,

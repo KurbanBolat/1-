@@ -47,7 +47,7 @@ Payments are demo-first by default:
 - `PAYMENT_PROVIDER=mock`
 - `NEXT_PUBLIC_PAYMENT_MODE=mock`
 
-For a real hotel deployment, switch provider mode to `manual`, `stripe`, or `kaspi`, configure provider credentials, and connect the provider callback to `POST /payments/webhook` using the normalized contract in `docs/payment-webhook.md`.
+For a real hotel deployment, switch provider mode to `manual`, `stripe`, or `kaspi`, configure provider credentials, and connect the provider callback to `POST /payments/webhook` using the normalized contract in `docs/payment-webhook.md`. Non-mock checkout starts a pending attempt and does not auto-confirm payment.
 
 ## What To Review Before Buying
 

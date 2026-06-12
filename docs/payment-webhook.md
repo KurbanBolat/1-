@@ -22,9 +22,9 @@ NEXT_PUBLIC_PAYMENT_MODE=mock
 
 Allowed values:
 - `mock`: demo/dev mode. The app uses the internal mock payment attempt flow.
-- `manual`: external/manual payment process. Your operator or adapter posts the normalized webhook after settlement.
-- `stripe`: Stripe Checkout/Payment Links adapter should map Stripe events to this normalized webhook.
-- `kaspi`: Kaspi adapter should map Kaspi payment events to this normalized webhook.
+- `manual`: checkout creates a pending payment attempt; your operator or adapter posts the normalized webhook after settlement.
+- `stripe`: checkout creates a pending payment attempt; Stripe Checkout/Payment Links adapter should map Stripe events to this normalized webhook.
+- `kaspi`: checkout creates a pending payment attempt; Kaspi adapter should map Kaspi payment events to this normalized webhook.
 
 Provider-specific credentials are validated by `scripts/check_production_env.py` when `PAYMENT_PROVIDER=stripe` or `PAYMENT_PROVIDER=kaspi`.
 
@@ -54,6 +54,7 @@ Fields:
 
 ## Behavior
 - Duplicate webhook events return `duplicate: true` and do not mutate state again.
+- In `manual`, `stripe`, and `kaspi` modes, checkout does not auto-confirm payment. It moves the reservation to `pending_payment` and waits for this webhook.
 - `paid` moves a `draft` reservation to `pending_payment`, then to `confirmed`.
 - `failed` marks the payment attempt failed. It does not override an already `paid` or `refunded` payment.
 - Amount or currency mismatch is rejected with HTTP 409 and a rejected webhook event is recorded.

@@ -9166,6 +9166,11 @@ body:has(.sp-shell) {
   background: #fff7f4;
 }
 
+.sp-transaction-page .success-result-card.pending {
+  border-color: #f8d98b;
+  background: #fffaf0;
+}
+
 .sp-transaction-page .success-result-mark {
   width: 48px;
   height: 48px;
@@ -9182,6 +9187,11 @@ body:has(.sp-shell) {
 .sp-transaction-page .success-result-card.failed .success-result-mark {
   background: #fff0ea;
   color: #b42318;
+}
+
+.sp-transaction-page .success-result-card.pending .success-result-mark {
+  background: #fff4d1;
+  color: #9a6700;
 }
 
 .sp-transaction-page .success-result-card h2,

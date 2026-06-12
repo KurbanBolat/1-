@@ -16,10 +16,14 @@ const t = {
     subtitle: "Your reservation has been created successfully.",
     titleFailed: "Payment failed",
     subtitleFailed: "Reservation draft is saved. You can retry payment.",
+    titlePending: "Payment pending",
+    subtitlePending: "Reservation is waiting for provider confirmation.",
     resultPaidTitle: "Payment completed",
     resultPaidCopy: "Your reservation, account access, and in-stay services are ready.",
     resultFailedTitle: "Payment needs attention",
     resultFailedCopy: "The reservation draft is still saved. Retry payment or adjust booking details.",
+    resultPendingTitle: "Waiting for payment confirmation",
+    resultPendingCopy: "Your payment attempt is pending. The final status will update after the provider webhook arrives.",
     summaryTitle: "Reservation summary",
     reservationId: "Reservation ID",
     stay: "Stay",
@@ -73,10 +77,14 @@ const t = {
     subtitle: "Ваше бронирование успешно создано.",
     titleFailed: "Оплата не прошла",
     subtitleFailed: "Черновик брони сохранен. Вы можете повторить оплату.",
+    titlePending: "Оплата ожидает подтверждения",
+    subtitlePending: "Бронь ждет подтверждение от платежного провайдера.",
     resultPaidTitle: "Оплата завершена",
     resultPaidCopy: "Бронь, доступ в кабинет и сервисы проживания готовы.",
     resultFailedTitle: "Оплата требует внимания",
     resultFailedCopy: "Черновик брони сохранен. Повторите оплату или измените параметры брони.",
+    resultPendingTitle: "Ждем подтверждение оплаты",
+    resultPendingCopy: "Платежная попытка в обработке. Финальный статус обновится после webhook от провайдера.",
     summaryTitle: "Сводка бронирования",
     reservationId: "Номер брони",
     stay: "Объект",
@@ -223,6 +231,12 @@ export default async function CheckoutSuccessPage({
 
   const tr = t[lang];
   const isPaid = paymentStatus === "paid";
+  const isPending = paymentStatus === "pending" || reservationStatus === "pending_payment";
+  const isFailed = paymentStatus === "failed";
+  const resultState = isPaid ? "paid" : isPending ? "pending" : "failed";
+  const resultMark = isPaid ? "OK" : isPending ? "..." : "!";
+  const resultTitle = isPaid ? tr.resultPaidTitle : isPending ? tr.resultPendingTitle : tr.resultFailedTitle;
+  const resultCopy = isPaid ? tr.resultPaidCopy : isPending ? tr.resultPendingCopy : tr.resultFailedCopy;
   const paymentStatusText = paymentStatus ? paymentStatusLabel(paymentStatus, tr) : "";
   const paymentMethodText = paymentMethod ? paymentMethodLabel(paymentMethod, tr) : "";
   const reservationStatusText = reservationStatus ? reservationStatusLabel(reservationStatus, tr) : "";
@@ -235,7 +249,7 @@ export default async function CheckoutSuccessPage({
   const draftActive = Boolean(reservationStatus || paymentStatus);
   const paymentActive = paymentStatus === "paid" || paymentStatus === "failed" || paymentStatus === "pending";
   const confirmedActive = isPaid || reservationStatus === "confirmed";
-  const failedActive = paymentStatus === "failed";
+  const failedActive = isFailed;
   const paymentRetryParams = new URLSearchParams({
     reservation_id: String(reservationId),
     listing_id: String(listingId),
@@ -314,16 +328,16 @@ export default async function CheckoutSuccessPage({
           variant={expVariant}
           paymentStatus={paymentStatus === "paid" || paymentStatus === "failed" || paymentStatus === "pending" ? paymentStatus : ""}
         />
-        <h1>{isPaid ? tr.title : tr.titleFailed}</h1>
-        <p className="desc">{isPaid ? tr.subtitle : tr.subtitleFailed}</p>
-        <section className={`success-result-card ${isPaid ? "paid" : "failed"}`}>
+        <h1>{isPaid ? tr.title : isPending ? tr.titlePending : tr.titleFailed}</h1>
+        <p className="desc">{isPaid ? tr.subtitle : isPending ? tr.subtitlePending : tr.subtitleFailed}</p>
+        <section className={`success-result-card ${resultState}`}>
           <div className="success-result-mark" aria-hidden="true">
-            {isPaid ? "OK" : "!"}
+            {resultMark}
           </div>
           <div>
             <p className="success-next-kicker">{tr.payment}</p>
-            <h2>{isPaid ? tr.resultPaidTitle : tr.resultFailedTitle}</h2>
-            <p className="desc">{isPaid ? tr.resultPaidCopy : tr.resultFailedCopy}</p>
+            <h2>{resultTitle}</h2>
+            <p className="desc">{resultCopy}</p>
           </div>
           <div className="success-result-meta">
             <span>{tr.reservationId}</span>
@@ -424,8 +438,8 @@ export default async function CheckoutSuccessPage({
         ) : null}
 
         <div className="actions actions-modern">
-          {!isPaid ? <Link href={`/checkout/payment?${paymentRetryQuery}`}>{tr.retryPayment}</Link> : null}
-          {!isPaid ? <Link href={`/checkout?${editBookingQuery}`}>{tr.editBooking}</Link> : null}
+          {isFailed ? <Link href={`/checkout/payment?${paymentRetryQuery}`}>{tr.retryPayment}</Link> : null}
+          {isFailed ? <Link href={`/checkout?${editBookingQuery}`}>{tr.editBooking}</Link> : null}
           <Link href={accountHref}>{tr.account}</Link>
           <Link href={stayHref}>{tr.backStay}</Link>
           <Link href={`/?lang=${lang}&currency=${currency}&exp_variant=${expVariant}`}>{tr.backHome}</Link>

@@ -60,7 +60,7 @@ Do not expose these credentials in production. For hosted demos, create dedicate
 - Search and AI concierge use the same guest context.
 - Room availability is shown as bookable room types, not only blocked dates.
 - Checkout can create a reservation and hand off to payment status.
-- Payment mode is explicit: `mock`, `manual`, `stripe`, or `kaspi`.
+- Payment mode is explicit: `mock` auto-confirms for demos; `manual`, `stripe`, and `kaspi` wait for webhook finalization.
 - Guest account can show confirmed booking and in-stay services.
 - Manager workspace controls reservations, inventory, availability, restaurants, and service orders.
 - Public pages cover hotel sales, privacy, terms, refund policy, contacts, and demo guide.

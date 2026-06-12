@@ -39,7 +39,7 @@ from app.schemas.chat import ChatRecommendIn
 from app.schemas.reservation import ReservationCreate
 from app.schemas.support_ticket import SupportTicketStatusUpdate
 from app.api.support import list_support_tickets, update_support_ticket_status
-from app.services.payment_service import attempt_mock_payment, process_payment_webhook, queue_mock_payment_attempt
+from app.services.payment_service import attempt_mock_payment, process_payment_webhook, queue_mock_payment_attempt, start_configured_payment_attempt
 from app.services.listing_service import get_cover_photo_map
 from app.services.pricing import dynamic_multiplier_for_range, quote_price
 from app.services.reservation_lifecycle import expire_stale_pending_reservations
@@ -1307,6 +1307,88 @@ def test_queue_payment_attempt_reuses_inflight_pending_attempt_for_different_key
     assert len(attempts) == 1
     assert first.idempotency_reused is False
     assert second.idempotency_reused is True
+
+
+def test_configured_non_mock_payment_attempt_waits_for_webhook(db_session: Session, monkeypatch):
+    monkeypatch.setattr(settings, "payment_provider", "manual")
+    listing = Listing(
+        title="Manual payment stay",
+        city="Shymkent",
+        district="Nauryz",
+        property_type="apartment",
+        nightly_price=28000,
+        cleaning_fee=5000,
+        service_fee_percent=10,
+        cancellation_policy="flexible",
+        rating=4.6,
+        max_guests=2,
+        bedrooms=1,
+        bathrooms=1,
+        amenities="WiFi",
+        description="desc",
+        is_active=True,
+        owner_id=1,
+    )
+    db_session.add(listing)
+    db_session.commit()
+    db_session.refresh(listing)
+
+    reservation = create_reservation(
+        db_session,
+        ReservationCreate(
+            listing_id=listing.id,
+            guest_name="Manual Pay User",
+            guest_email="manual-pay@example.com",
+            guest_phone="+77001239994",
+            check_in=date.today() + timedelta(days=7),
+            check_out=date.today() + timedelta(days=10),
+            guests=2,
+            tariff_plan="smart",
+        ),
+    )
+
+    background_tasks = BackgroundTasks()
+    started = start_configured_payment_attempt(
+        db_session,
+        reservation_id=reservation.id,
+        method="card",
+        idempotency_key="idem-manual-001",
+        force_fail=True,
+        background_tasks=background_tasks,
+    )
+
+    db_session.refresh(reservation)
+    attempts = list(
+        db_session.query(ReservationPaymentAttempt)
+        .filter(ReservationPaymentAttempt.reservation_id == reservation.id)
+        .all()
+    )
+    assert len(background_tasks.tasks) == 0
+    assert len(attempts) == 1
+    assert attempts[0].status == "pending"
+    assert attempts[0].force_fail is False
+    assert started.payment_status == "pending"
+    assert started.attempt_status == "pending"
+    assert started.reservation_status == "pending_payment"
+    assert reservation.status == "pending_payment"
+
+    webhook = process_payment_webhook(
+        db_session,
+        PaymentWebhookIn(
+            provider="manual",
+            event_id="evt-manual-paid-001",
+            reservation_id=reservation.id,
+            status="paid",
+            amount=started.amount,
+            currency="KZT",
+            method="card",
+            idempotency_key="idem-manual-001",
+        ),
+    )
+
+    assert webhook.process_status == "processed"
+    assert webhook.payment_status == "paid"
+    assert webhook.reservation_status == "confirmed"
 
 
 def test_payment_webhook_confirms_pending_payment_idempotently(db_session: Session):
