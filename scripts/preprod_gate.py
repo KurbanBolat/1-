@@ -31,6 +31,12 @@ def main() -> int:
     parser.add_argument("--backend-url", help="Backend API origin for smoke checks")
     parser.add_argument("--frontend-url", help="Frontend origin for smoke checks")
     parser.add_argument("--admin-token", help="Optional admin token for /ops/status smoke check")
+    parser.add_argument("--require-catalog", action="store_true", help="Require listing/detail/room-availability smoke checks")
+    parser.add_argument("--require-instay", action="store_true", help="Require menu and restaurant data in smoke checks")
+    parser.add_argument("--catalog-city", default="Dubai", help="City to use for catalog smoke checks")
+    parser.add_argument("--catalog-guests", type=int, default=2, help="Guest count to use for catalog smoke checks")
+    parser.add_argument("--catalog-check-in", help="YYYY-MM-DD check-in date for catalog smoke checks")
+    parser.add_argument("--catalog-check-out", help="YYYY-MM-DD check-out date for catalog smoke checks")
     parser.add_argument("--local-checks", action="store_true", help="Run backend tests and frontend typecheck/build")
     parser.add_argument("--e2e", action="store_true", help="Run Playwright E2E tests")
     parser.add_argument("--db-check", action="store_true", help="Run SELECT 1 through docker compose postgres")
@@ -84,6 +90,18 @@ def main() -> int:
                 smoke.extend(["--frontend-url", args.frontend_url])
             if args.admin_token:
                 smoke.extend(["--admin-token", args.admin_token])
+            if args.require_catalog:
+                smoke.append("--require-catalog")
+            if args.require_instay:
+                smoke.append("--require-instay")
+            if args.catalog_city:
+                smoke.extend(["--catalog-city", args.catalog_city])
+            if args.catalog_guests:
+                smoke.extend(["--catalog-guests", str(args.catalog_guests)])
+            if args.catalog_check_in:
+                smoke.extend(["--catalog-check-in", args.catalog_check_in])
+            if args.catalog_check_out:
+                smoke.extend(["--catalog-check-out", args.catalog_check_out])
             run(smoke)
 
         if args.payment_reservation_id:

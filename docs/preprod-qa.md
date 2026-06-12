@@ -9,7 +9,9 @@ python scripts/preprod_gate.py \
   --env-file .env.production.example \
   --allow-placeholders \
   --backend-url http://127.0.0.1:8000 \
-  --frontend-url http://127.0.0.1:3000
+  --frontend-url http://127.0.0.1:3000 \
+  --require-catalog \
+  --require-instay
 ```
 
 Full staging gate:
@@ -19,6 +21,8 @@ python scripts/preprod_gate.py \
   --backend-url https://api-staging.example.com \
   --frontend-url https://staging.example.com \
   --admin-token "$ADMIN_TOKEN" \
+  --require-catalog \
+  --require-instay \
   --db-check
 ```
 
@@ -29,8 +33,12 @@ python scripts/preprod_gate.py \
   --allow-placeholders \
   --backend-url http://127.0.0.1:8000 \
   --frontend-url http://127.0.0.1:3000 \
+  --require-catalog \
+  --require-instay \
   --local-checks
 ```
+
+For buyer demos, run `cd backend && python scripts/seed_demo_data.py --reset` first so the catalog smoke has stable Dubai properties, room inventory, menus, and restaurants.
 
 Manual Playwright E2E:
 ```bash
@@ -92,4 +100,4 @@ Do not promote if:
 - Webhook signature probe fails.
 - Checkout cannot reach success.
 - Manager cannot see or act on reservations/in-stay orders.
-- OpenAI live mode is required for launch but `OPENAI_API_KEY` quota is not available.
+- Launch scope explicitly requires live GPT, but `AI_CONCIERGE_MODE=live` cannot pass with a valid `OPENAI_API_KEY`.

@@ -118,7 +118,7 @@ export default function DemoPage({ searchParams }: { searchParams: PageSearchPar
       proofTitle: "Что демонстрировать",
       scriptTitle: "10-минутный сценарий показа",
       opsTitle: "Операционные заметки",
-      proofItems: ["64 backend теста", "24 e2e сценария", "CI на push", "OpenAI live заглушен", "Payment mock/manual ready"],
+      proofItems: ["Backend test suite", "E2E smoke suite", "CI на push", "OpenAI live заглушен", "Payment mock/manual ready"],
       opsItems: [
         "Для production заменить demo-контакты, платежного провайдера и юридические реквизиты.",
         "Партнерский доступ выдаёт владелец развертывания; публичная страница не показывает пароли.",
@@ -194,7 +194,7 @@ export default function DemoPage({ searchParams }: { searchParams: PageSearchPar
       proofTitle: "What to Show",
       scriptTitle: "10-Minute Demo Script",
       opsTitle: "Operational Notes",
-      proofItems: ["64 backend tests", "24 e2e scenarios", "CI on push", "OpenAI live disabled", "Payment mock/manual ready"],
+      proofItems: ["Backend test suite", "E2E smoke suite", "CI on push", "OpenAI live disabled", "Payment mock/manual ready"],
       opsItems: [
         "For production, replace demo contacts, payment provider, and legal entity details.",
         "Partner access is issued by the deployment owner; this public page does not expose passwords.",

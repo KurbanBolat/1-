@@ -98,7 +98,7 @@ GitHub Actions runs backend tests, a clean Alembic migration check, frontend typ
 
 Pre-production gate against a running environment:
 ```bash
-python scripts/preprod_gate.py --env-file .env.production.example --allow-placeholders --backend-url http://127.0.0.1:8000 --frontend-url http://127.0.0.1:3000
+python scripts/preprod_gate.py --env-file .env.production.example --allow-placeholders --backend-url http://127.0.0.1:8000 --frontend-url http://127.0.0.1:3000 --require-catalog --require-instay
 ```
 
 ## Notes

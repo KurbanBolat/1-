@@ -56,6 +56,7 @@ Run:
 python -m compileall backend/app backend/tests backend/alembic
 cd backend && python -m pytest -q
 cd ../frontend && npm run typecheck && npm run build && npm run test:e2e
+cd .. && python scripts/preprod_gate.py --env-file .env.production.example --allow-placeholders --backend-url http://127.0.0.1:8000 --frontend-url http://127.0.0.1:3000 --require-catalog --require-instay
 ```
 
 Check:

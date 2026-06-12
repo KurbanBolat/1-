@@ -64,6 +64,7 @@ Do not expose these credentials in production. For hosted demos, create dedicate
 - Guest account can show confirmed booking and in-stay services.
 - Manager workspace controls reservations, inventory, availability, restaurants, and service orders.
 - Public pages cover hotel sales, privacy, terms, refund policy, contacts, and demo guide.
+- Pre-production gate can require catalog, room availability, menu, and restaurant data through `--require-catalog --require-instay`.
 - CI, backend tests, frontend typecheck/build, and targeted e2e pass.
 
 ## Demo Reset Notes
