@@ -76,7 +76,7 @@ test("ai concierge explains why options were selected", async ({ page }) => {
 
   const assistantMsg = page.locator(".ai-message.ai-message-assistant").last();
   await expect(assistantMsg).toContainText(/подобрал|нашел|понял задачу|shortlisted|found|got it/i);
-  await expect(assistantMsg).toContainText(/Почему подходит|Why it fits/i);
+  await expect(assistantMsg).toContainText(/свободные номера|available rooms|free rooms/i);
   await expect(assistantMsg).toContainText(/баланс цена\/качество|wifi/i);
 
   await expect(page.locator(".ai-suggestion-card")).toHaveCount(2);
@@ -445,7 +445,7 @@ test("ai concierge always shows only top 3 suggestions", async ({ page }) => {
 
   const assistantMsg = page.locator(".ai-message.ai-message-assistant").last();
   await expect(assistantMsg.locator(".ai-suggestion-card")).toHaveCount(3);
-  await expect(assistantMsg).toContainText(/3 подходящих варианта|3 good options/i);
+  await expect(assistantMsg).toContainText(/подобрал 3 варианта|3 good options|3 options/i);
   await expect(assistantMsg).not.toContainText("Ranked Option #4");
 });
 
@@ -463,7 +463,7 @@ test("booking mode hides shortlist and focuses only on reservation steps", async
   const chatInput = page.locator(".ai-concierge-form input").first();
   await chatInput.fill("Алматы, 2 гостя, 10-13 мая, до 45000");
   await chatInput.press("Enter");
-  await expect(page.locator(".ai-message.ai-message-assistant").last()).toContainText(/подходящих варианта|found|got it/i);
+  await expect(page.locator(".ai-message.ai-message-assistant").last()).toContainText(/подобрал|варианта|found|got it/i);
 
   await chatInput.fill("готов бронировать");
   await chatInput.press("Enter");

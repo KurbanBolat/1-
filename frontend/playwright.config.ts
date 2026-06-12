@@ -8,6 +8,7 @@ const BACKEND_SERVER_CMD =
 export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 60_000,
+  workers: 1,
   retries: 1,
   expect: {
     timeout: 10_000,

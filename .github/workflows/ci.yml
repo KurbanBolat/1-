@@ -148,5 +148,5 @@ jobs:
         env:
           PW_PYTHON_BIN: python
           DATABASE_URL: sqlite:///./realestate.db
-          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+          NEXT_PUBLIC_API_URL: http://localhost:8000
           NEXT_TELEMETRY_DISABLED: "1"
