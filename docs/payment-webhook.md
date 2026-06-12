@@ -11,6 +11,23 @@ X-StayPilot-Signature: sha256=<hex_hmac_sha256>
 The signature is `HMAC_SHA256(raw_request_body, PAYMENT_WEBHOOK_SECRET)`.
 If `PAYMENT_WEBHOOK_SECRET` is empty, signature validation is skipped. Production startup refuses an empty secret.
 
+## Provider Modes
+
+Configure both backend and frontend mode:
+
+```env
+PAYMENT_PROVIDER=mock
+NEXT_PUBLIC_PAYMENT_MODE=mock
+```
+
+Allowed values:
+- `mock`: demo/dev mode. The app uses the internal mock payment attempt flow.
+- `manual`: external/manual payment process. Your operator or adapter posts the normalized webhook after settlement.
+- `stripe`: Stripe Checkout/Payment Links adapter should map Stripe events to this normalized webhook.
+- `kaspi`: Kaspi adapter should map Kaspi payment events to this normalized webhook.
+
+Provider-specific credentials are validated by `scripts/check_production_env.py` when `PAYMENT_PROVIDER=stripe` or `PAYMENT_PROVIDER=kaspi`.
+
 ## Normalized Payload
 ```json
 {

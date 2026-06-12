@@ -8502,6 +8502,34 @@ body:has(.sp-shell) {
   line-height: 1.45;
 }
 
+.sp-transaction-page .payment-provider-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #dfe7ff;
+  border-radius: 12px;
+  display: grid;
+  gap: 4px;
+  color: #34415a;
+  background: #f5f7ff;
+}
+
+.sp-transaction-page .payment-provider-note.demo {
+  border-color: #ead9ff;
+  background: #faf7ff;
+}
+
+.sp-transaction-page .payment-provider-note b {
+  color: #171b28;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.sp-transaction-page .payment-provider-note span {
+  color: #5f6b7d;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .sp-transaction-page .payment-method-panel {
   display: grid;
   gap: 10px;

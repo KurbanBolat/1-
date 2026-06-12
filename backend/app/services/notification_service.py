@@ -146,7 +146,7 @@ def _dispatch_email(payload: dict) -> dict:
     if not all(required):
         return {"status": "skipped", "reason": "email_not_configured"}
 
-    subject = f"[FindApart] {payload.get('event')} #{payload.get('reservation_id')}"
+    subject = f"[StayPilot] {payload.get('event')} #{payload.get('reservation_id')}"
     body = (
         f"Event: {payload.get('event')}\n"
         f"Reservation: #{payload.get('reservation_id')}\n"

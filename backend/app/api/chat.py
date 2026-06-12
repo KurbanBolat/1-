@@ -190,7 +190,7 @@ def _resolve_year(month: int, day: int) -> int:
 
 
 def _llm_extract_filters(message: str, lang: str, currency: str) -> ChatSuggestedFilters | None:
-    if not settings.openai_api_key or _openai_temporarily_unavailable():
+    if not settings.openai_live_enabled or _openai_temporarily_unavailable():
         return None
 
     system_prompt = (
@@ -248,7 +248,7 @@ def _llm_rank_suggestions(
     filters: ChatSuggestedFilters,
     suggestions: list[ChatSuggestion],
 ) -> tuple[list[int], dict[int, str]] | None:
-    if not settings.openai_api_key or _openai_temporarily_unavailable() or len(suggestions) < 2:
+    if not settings.openai_live_enabled or _openai_temporarily_unavailable() or len(suggestions) < 2:
         return None
 
     compact_items = [
@@ -352,7 +352,7 @@ def _llm_compose_sales_reply(
     alternatives: list[ChatAlternative],
     stage: str,
 ) -> tuple[str | None, str | None, list[str] | None]:
-    if not settings.openai_api_key or _openai_temporarily_unavailable():
+    if not settings.openai_live_enabled or _openai_temporarily_unavailable():
         return None, None, None
 
     schema_hint = {
@@ -361,7 +361,7 @@ def _llm_compose_sales_reply(
         "follow_up_prompts": ["string"],
     }
     system_prompt = (
-        "You are a live booking concierge for FindApart. "
+        "You are a live booking concierge for StayPilot. "
         "Goal: help user choose a stay and move to confirmed booking. "
         "Style: friendly, fast, confident, natural, concise, like a real travel manager. "
         "Act as if you can operate these platform functions: searchProperties, checkAvailability, calculatePrice, createBooking, sendPaymentLink, handoffToHuman. "
@@ -441,7 +441,7 @@ def _llm_tool_concierge_reply(
     stage: str,
     booking_state: ChatBookingState | None,
 ) -> tuple[str | None, str | None, list[str] | None, str | None] | None:
-    if not settings.openai_api_key or _openai_temporarily_unavailable():
+    if not settings.openai_live_enabled or _openai_temporarily_unavailable():
         return None
 
     candidate_by_id: dict[int, ChatSuggestion] = {item.listing_id: item for item in suggestions}
@@ -712,7 +712,7 @@ def _llm_tool_concierge_reply(
         {
             "role": "system",
             "content": (
-                "You are FindApart AI concierge. "
+                "You are StayPilot AI concierge. "
                 "Use tools when needed, then return strict JSON with keys: answer, reasoning, follow_up_prompts, next_action_type. "
                 "Tone: friendly, concise, professional, natural. "
                 "Ask at most one missing-detail question per turn. "
@@ -1396,7 +1396,7 @@ def chat_recommend(payload: ChatRecommendIn, db: Session = Depends(get_db), requ
     score = (Listing.rating * 3.0) + affordability + purpose_boost
     query = select(Listing).where(and_(*conditions))
     total_found = db.scalar(select(func.count()).select_from(query.subquery())) or 0
-    shortlist_limit = 12 if bool(settings.openai_api_key) else 3
+    shortlist_limit = 12 if settings.openai_live_enabled else 3
     rows = list(db.scalars(query.order_by(score.desc(), Listing.id.desc()).limit(shortlist_limit)).all())
     relax_groups = []
     if property_type_condition is not None:
@@ -1444,7 +1444,7 @@ def chat_recommend(payload: ChatRecommendIn, db: Session = Depends(get_db), requ
                 cover_photo_url=cover_map.get(listing.id),
             )
         )
-    if suggestions and settings.openai_api_key:
+    if suggestions and settings.openai_live_enabled:
         ranked_result = _llm_rank_suggestions(
             lang=reply_lang,
             user_message=payload.message,

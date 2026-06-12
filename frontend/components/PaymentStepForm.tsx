@@ -10,6 +10,7 @@ import { useSoftRedirect } from "../hooks/useSoftRedirect";
 
 type Lang = "en" | "ru";
 type Currency = "KZT" | "USD";
+const PAYMENT_MODE = (process.env.NEXT_PUBLIC_PAYMENT_MODE || "mock").trim().toLowerCase();
 
 export default function PaymentStepForm({
   reservationId,
@@ -65,6 +66,10 @@ export default function PaymentStepForm({
           method: "Способ оплаты",
           methodTitle: "Выберите способ оплаты",
           methodHint: "Платеж привязан к текущей брони и выбранной категории номера.",
+          demoPaymentTitle: "Демо-режим оплаты",
+          demoPaymentHint: "Провайдер оплаты пока заглушен: попытка проходит через внутренний mock и подтверждает бронь для демонстрации.",
+          livePaymentTitle: "Платежный провайдер",
+          livePaymentHint: "Платеж будет обработан через настроенный provider, а финальный статус придет через webhook.",
           card: "Банковская карта",
           cardHint: "Visa, Mastercard или локальная карта",
           kaspi: "Kaspi Pay",
@@ -106,6 +111,10 @@ export default function PaymentStepForm({
           method: "Payment method",
           methodTitle: "Choose payment method",
           methodHint: "Payment is attached to the current reservation and selected room category.",
+          demoPaymentTitle: "Demo payment mode",
+          demoPaymentHint: "The payment provider is stubbed: this attempt uses the internal mock flow and confirms the booking for demo use.",
+          livePaymentTitle: "Payment provider",
+          livePaymentHint: "Payment will be handled by the configured provider and finalized by webhook.",
           card: "Bank card",
           cardHint: "Visa, Mastercard, or local card",
           kaspi: "Kaspi Pay",
@@ -148,6 +157,7 @@ export default function PaymentStepForm({
     { value: "kaspi", label: text.kaspi, hint: text.kaspiHint },
     { value: "apple_pay", label: text.apple, hint: text.appleHint },
   ];
+  const isMockPaymentMode = PAYMENT_MODE === "mock";
 
   function generateIdempotencyKey(): string {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -286,6 +296,10 @@ export default function PaymentStepForm({
 
   return (
     <div className="booking-form">
+      <section className={`payment-provider-note ${isMockPaymentMode ? "demo" : "live"}`}>
+        <b>{isMockPaymentMode ? text.demoPaymentTitle : text.livePaymentTitle}</b>
+        <span>{isMockPaymentMode ? text.demoPaymentHint : text.livePaymentHint}</span>
+      </section>
       <fieldset className="payment-method-panel" disabled={processing}>
         <legend>{text.methodTitle}</legend>
         <p className="desc">{text.methodHint}</p>

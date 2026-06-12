@@ -15,6 +15,9 @@ Minimum required values:
 - `DATABASE_URL`: `postgresql+psycopg://...`.
 - `CORS_ORIGINS`: public frontend origin, no wildcard.
 - `NEXT_PUBLIC_API_URL`: public backend origin.
+- `AI_CONCIERGE_MODE=stub`: keeps OpenAI live calls disabled until explicitly enabled.
+- `PAYMENT_PROVIDER`: `mock`, `manual`, `stripe`, or `kaspi`.
+- `NEXT_PUBLIC_PAYMENT_MODE`: same value as `PAYMENT_PROVIDER`.
 - `AUTH_COOKIE_SECURE=true`.
 - `CSRF_ENFORCE=true`.
 - `PAYMENT_WEBHOOK_SECRET`: HMAC secret for `/payments/webhook`.
@@ -22,7 +25,9 @@ Minimum required values:
 
 See `docs/production-secrets.md` for the full checklist and secret generation commands.
 
-OpenAI is optional at deploy time. If `OPENAI_API_KEY` is empty or quota is exhausted, concierge endpoints use deterministic fallback mode.
+OpenAI live mode is disabled by default. Keep `AI_CONCIERGE_MODE=stub` for sale demos and first deployments. Later, switch to `AI_CONCIERGE_MODE=live` and add `OPENAI_API_KEY` to allow GPT calls.
+
+Payment provider mode is explicit. Keep `PAYMENT_PROVIDER=mock` only for demo/staging. Use `manual`, `stripe`, or `kaspi` for real payment operations and connect provider callbacks to the normalized webhook contract.
 
 ## Build And Run
 ```bash

@@ -11,6 +11,10 @@ Readiness response:
   "status": "ready",
   "checks": {
     "database": "ok"
+  },
+  "modes": {
+    "ai_concierge": "stub",
+    "payment_provider": "mock"
   }
 }
 ```
@@ -51,6 +55,7 @@ GET /ops/metrics
 - CORS
 - secure auth cookie
 - CSRF
+- payment provider mode
 - payment webhook HMAC secret
 - OpenAI mode
 - Sentry

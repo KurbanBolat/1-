@@ -552,7 +552,7 @@ def _valid_iso_date(value: str) -> bool:
 
 
 def _llm_concierge_reply(ctx: InStayConciergeContext, payload: AiConciergeMessageIn) -> tuple[str, AiConciergeActionOut | None, list[str]] | None:
-    if not settings.openai_api_key or _openai_temporarily_unavailable():
+    if not settings.openai_live_enabled or _openai_temporarily_unavailable():
         return None
 
     system_prompt = (

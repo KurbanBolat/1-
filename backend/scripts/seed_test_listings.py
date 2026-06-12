@@ -176,7 +176,7 @@ def seed_listings(target_count: int, reset: bool) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Seed 100-150 global test listings for FindApart.")
+    parser = argparse.ArgumentParser(description="Seed 100-150 global test listings for StayPilot.")
     parser.add_argument("--count", type=int, default=120, help="Target number of seeded listings (recommended 100-150).")
     parser.add_argument("--reset", action="store_true", help="Delete previous seeded listings before seeding.")
     args = parser.parse_args()

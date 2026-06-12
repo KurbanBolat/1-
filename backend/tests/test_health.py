@@ -35,7 +35,10 @@ def test_health_liveness_and_readiness():
     assert live_response.status_code == 200
     assert live_response.json()["status"] == "ok"
     assert ready_response.status_code == 200
-    assert ready_response.json() == {"status": "ready", "checks": {"database": "ok"}}
+    assert ready_response.json()["status"] == "ready"
+    assert ready_response.json()["checks"] == {"database": "ok"}
+    assert ready_response.json()["modes"]["ai_concierge"] in {"stub", "live"}
+    assert ready_response.json()["modes"]["payment_provider"] in {"mock", "manual", "stripe", "kaspi"}
 
 
 def test_request_id_header_is_echoed():
@@ -79,6 +82,8 @@ def test_ops_status_for_admin():
     assert payload["environment"]
     components = {item["key"]: item for item in payload["components"]}
     assert components["database"]["status"] == "ok"
+    assert components["payment_provider"]["detail"].startswith("provider=")
+    assert components["openai"]["status"] in {"ok", "warn", "disabled"}
     assert "alerts" in payload
 
 

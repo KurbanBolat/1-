@@ -11,11 +11,16 @@ Use `.env.production.example` as a template only. Never deploy with placeholder 
 - `AUTH_COOKIE_SECURE=true`
 - `CSRF_ENFORCE=true`
 - `CSRF_TRUSTED_ORIGINS`: frontend origin if it is not already covered by `CORS_ORIGINS`.
+- `AI_CONCIERGE_MODE=stub` until live GPT mode is intentionally enabled.
+- `PAYMENT_PROVIDER`: `mock`, `manual`, `stripe`, or `kaspi`.
+- `NEXT_PUBLIC_PAYMENT_MODE`: same value as `PAYMENT_PROVIDER`, so checkout UI describes the correct mode.
 - `PAYMENT_WEBHOOK_SECRET`: 32+ random characters for webhook HMAC.
 - `SENTRY_ENVIRONMENT=production`
 
 ## Optional
-- `OPENAI_API_KEY`: required only for live GPT concierge mode.
+- `OPENAI_API_KEY`: required only when `AI_CONCIERGE_MODE=live`.
+- `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`: required only when `PAYMENT_PROVIDER=stripe`.
+- `KASPI_MERCHANT_ID`, `KASPI_API_KEY`, and `KASPI_WEBHOOK_SECRET`: required only when `PAYMENT_PROVIDER=kaspi`.
 - `SENTRY_DSN`: required only if Sentry reporting is enabled.
 - `NOTIFICATION_WEBHOOK_URL`: outbound reservation notification webhook.
 - `SMTP_*`: required only when `NOTIFICATION_EMAIL_ENABLED=true`.

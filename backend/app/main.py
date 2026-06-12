@@ -229,6 +229,13 @@ def _ensure_inventory_columns(db) -> None:
 
 
 def _validate_security_settings() -> None:
+    ai_mode = settings.ai_concierge_mode.strip().lower()
+    if ai_mode not in {"stub", "live"}:
+        raise RuntimeError("AI_CONCIERGE_MODE must be stub or live.")
+    payment_provider = settings.payment_provider.strip().lower()
+    if payment_provider not in {"mock", "manual", "stripe", "kaspi"}:
+        raise RuntimeError("PAYMENT_PROVIDER must be mock, manual, stripe, or kaspi.")
+
     weak_values = {"change_me", "changeme", "secret", "default", "dev-secret", "test-secret"}
     normalized = settings.secret_key.strip().lower()
     weak_or_short = normalized in weak_values or len(settings.secret_key.strip()) < 32
@@ -336,7 +343,14 @@ def health_ready() -> dict[str, object]:
         ) from exc
     finally:
         db.close()
-    return {"status": "ready", "checks": {"database": "ok"}}
+    return {
+        "status": "ready",
+        "checks": {"database": "ok"},
+        "modes": {
+            "ai_concierge": settings.ai_concierge_mode.strip().lower(),
+            "payment_provider": settings.normalized_payment_provider,
+        },
+    }
 
 
 app.include_router(api_router)

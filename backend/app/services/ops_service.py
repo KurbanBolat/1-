@@ -148,6 +148,16 @@ def get_ops_status(db: Session) -> OpsStatusOut:
     else:
         components.append(_component("csrf", "ok", f"enforced={bool(settings.csrf_enforce)}", required=production))
 
+    payment_provider = settings.normalized_payment_provider
+    components.append(
+        _component(
+            "payment_provider",
+            "warn" if production and payment_provider == "mock" else "ok",
+            f"provider={payment_provider}",
+            required=production,
+        )
+    )
+
     if settings.payment_webhook_secret.strip():
         components.append(_component("payment_webhook", "ok", "HMAC secret configured", required=production))
     else:
@@ -160,10 +170,13 @@ def get_ops_status(db: Session) -> OpsStatusOut:
             )
         )
 
-    if settings.openai_api_key.strip():
-        components.append(_component("openai", "ok", f"model={settings.openai_chat_model}", required=False))
+    ai_mode = settings.ai_concierge_mode.strip().lower()
+    if settings.openai_live_enabled:
+        components.append(_component("openai", "ok", f"mode=live model={settings.openai_chat_model}", required=False))
+    elif ai_mode == "live":
+        components.append(_component("openai", "warn", "live mode requested but OPENAI_API_KEY is missing", required=False))
     else:
-        components.append(_component("openai", "disabled", "GPT mode disabled; deterministic fallback active", required=False))
+        components.append(_component("openai", "disabled", "mode=stub; deterministic fallback active", required=False))
 
     if settings.sentry_dsn.strip():
         components.append(_component("sentry", "ok", "SENTRY_DSN configured", required=False))

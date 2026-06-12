@@ -145,6 +145,33 @@ def validate(env: dict[str, str], *, allow_placeholders: bool) -> tuple[list[str
 
     production = env.get("SENTRY_ENVIRONMENT", "").strip().lower() == "production"
 
+    ai_mode = env.get("AI_CONCIERGE_MODE", "stub").strip().lower()
+    if ai_mode not in {"stub", "live"}:
+        errors.append("AI_CONCIERGE_MODE must be stub or live")
+    if ai_mode == "live" and not env.get("OPENAI_API_KEY", "").strip():
+        errors.append("OPENAI_API_KEY is required when AI_CONCIERGE_MODE=live")
+    if ai_mode == "stub" and env.get("OPENAI_API_KEY", "").strip():
+        warnings.append("OPENAI_API_KEY is set but AI_CONCIERGE_MODE=stub, so live GPT calls are disabled")
+
+    payment_provider = env.get("PAYMENT_PROVIDER", "mock").strip().lower()
+    if payment_provider not in {"mock", "manual", "stripe", "kaspi"}:
+        errors.append("PAYMENT_PROVIDER must be mock, manual, stripe, or kaspi")
+    public_payment_mode = env.get("NEXT_PUBLIC_PAYMENT_MODE", payment_provider).strip().lower()
+    if public_payment_mode not in {"mock", "manual", "stripe", "kaspi"}:
+        errors.append("NEXT_PUBLIC_PAYMENT_MODE must be mock, manual, stripe, or kaspi")
+    if public_payment_mode != payment_provider:
+        warnings.append("NEXT_PUBLIC_PAYMENT_MODE differs from PAYMENT_PROVIDER; checkout UI may describe the wrong payment mode")
+    if production and payment_provider == "mock":
+        warnings.append("PAYMENT_PROVIDER=mock is demo-only; use manual, stripe, or kaspi for real payments")
+    if payment_provider == "stripe":
+        for key in ("STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"):
+            if not env.get(key, "").strip():
+                errors.append(f"{key} is required when PAYMENT_PROVIDER=stripe")
+    if payment_provider == "kaspi":
+        for key in ("KASPI_MERCHANT_ID", "KASPI_API_KEY", "KASPI_WEBHOOK_SECRET"):
+            if not env.get(key, "").strip():
+                errors.append(f"{key} is required when PAYMENT_PROVIDER=kaspi")
+
     secret_key = env.get("SECRET_KEY", "").strip()
     if secret_key and not allow_placeholders and len(secret_key) < 64:
         errors.append("SECRET_KEY must be at least 64 characters")

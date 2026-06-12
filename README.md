@@ -6,6 +6,7 @@ Booking-style hotel and apartment app with AI concierge, room inventory, checkou
 - Backend: FastAPI, SQLAlchemy, Alembic, Postgres-ready.
 - Frontend: Next.js App Router, TypeScript.
 - Tests: pytest, Playwright.
+- Default production posture: AI concierge in deterministic stub mode, payment provider in explicit mock/manual/stripe/kaspi mode.
 
 ## Local Development
 Backend:
@@ -59,6 +60,7 @@ Read:
 - `docs/backup-restore.md`
 - `docs/preprod-qa.md`
 - `docs/payment-webhook.md`
+- `docs/buyer-handoff.md`
 
 ## Checks
 Backend:
@@ -89,6 +91,6 @@ python scripts/preprod_gate.py --env-file .env.production.example --allow-placeh
 ```
 
 ## Notes
-- OpenAI is optional at runtime. If `OPENAI_API_KEY` is missing or quota is exhausted, the concierge falls back to deterministic logic.
-- Real payment providers should call `POST /payments/webhook` using the normalized contract in `docs/payment-webhook.md`.
+- OpenAI live mode is intentionally disabled by default through `AI_CONCIERGE_MODE=stub`. Set `AI_CONCIERGE_MODE=live` and provide `OPENAI_API_KEY` only when you want real GPT calls.
+- Demo payments use `PAYMENT_PROVIDER=mock` and `NEXT_PUBLIC_PAYMENT_MODE=mock`. Real payment providers should call `POST /payments/webhook` using the normalized contract in `docs/payment-webhook.md`.
 - Production startup enforces secure cookies, CSRF, non-wildcard CORS, strong `SECRET_KEY`, and `PAYMENT_WEBHOOK_SECRET`.

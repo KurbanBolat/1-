@@ -1161,7 +1161,7 @@ export default function ManagerPage() {
     const link = document.createElement("a");
     const timestamp = new Date().toISOString().slice(0, 10);
     link.href = url;
-    link.download = `findapart-trend-${summary?.period_days ?? summaryPeriodDays}d-${trendMetric}-${timestamp}.csv`;
+    link.download = `staypilot-trend-${summary?.period_days ?? summaryPeriodDays}d-${trendMetric}-${timestamp}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

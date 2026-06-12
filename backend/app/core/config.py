@@ -20,12 +20,13 @@ def _default_dev_secret_key() -> str:
 
 
 class Settings(BaseSettings):
-    app_name: str = "FindApart Stays"
+    app_name: str = "StayPilot"
     secret_key: str = Field(default_factory=_default_dev_secret_key)
     allow_insecure_secret_for_dev: bool = False
     access_token_expire_minutes: int = 30
     database_url: str = "sqlite:///./realestate.db"
     cors_origins: str = "http://localhost:3000"
+    ai_concierge_mode: str = "stub"
     openai_api_key: str = ""
     openai_chat_model: str = "gpt-4o-mini"
     openai_chat_timeout_seconds: float = 12.0
@@ -37,7 +38,13 @@ class Settings(BaseSettings):
     chat_session_max_entries: int = 2000
     notification_webhook_url: str = ""
     notification_webhook_timeout_seconds: float = 4.0
+    payment_provider: str = "mock"
     payment_webhook_secret: str = ""
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    kaspi_merchant_id: str = ""
+    kaspi_api_key: str = ""
+    kaspi_webhook_secret: str = ""
     notification_retry_max_attempts: int = 3
     notification_retry_backoff_seconds: float = 0.35
     notification_log_rotate_max_bytes: int = 5_000_000
@@ -75,6 +82,15 @@ class Settings(BaseSettings):
     reservation_expire_scan_interval_seconds: int = 60
 
     model_config = SettingsConfigDict(env_file=tuple(str(path) for path in ENV_FILES), extra="ignore")
+
+    @property
+    def openai_live_enabled(self) -> bool:
+        return self.ai_concierge_mode.strip().lower() == "live" and bool(self.openai_api_key.strip())
+
+    @property
+    def normalized_payment_provider(self) -> str:
+        provider = self.payment_provider.strip().lower()
+        return provider if provider in {"mock", "manual", "stripe", "kaspi"} else "mock"
 
 
 settings = Settings()
