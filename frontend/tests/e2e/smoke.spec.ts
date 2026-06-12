@@ -456,6 +456,19 @@ test("public legal pages render localized content and footer links", async ({ pa
   }
 });
 
+test("demo guide presents buyer scenarios and working entry links", async ({ page }) => {
+  await page.goto("/demo?lang=ru&currency=KZT");
+  await expect(page.getByRole("heading", { level: 1, name: "Демо-сценарии StayPilot" })).toBeVisible();
+  await expect(page.locator(".demo-guide-grid")).toContainText("AI-подбор и поиск");
+  await expect(page.locator(".demo-guide-grid")).toContainText("Manager workspace");
+  await expect(page.locator(".demo-guide-script")).toContainText("10-минутный сценарий показа");
+  await expect(page.getByRole("link", { name: "Открыть гостевое демо" })).toHaveAttribute(
+    "href",
+    "/?lang=ru&currency=KZT&city=Dubai&guests=2",
+  );
+  await expect(page.locator(".site-footer")).toContainText("Демо");
+});
+
 test("home search preserves dates and opens available rooms", async ({ page }) => {
   await page.goto("/?lang=ru&currency=KZT");
   const candidateHrefs = await page

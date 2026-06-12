@@ -14,6 +14,7 @@ export default function AppFooter() {
           search: "Поиск",
           catalog: "Каталог",
           concierge: "AI-консьерж",
+          demo: "Демо",
           hotel: "Для отелей",
           account: "Кабинет",
           partner: "Партнер",
@@ -26,6 +27,7 @@ export default function AppFooter() {
           search: "Search",
           catalog: "Catalog",
           concierge: "AI concierge",
+          demo: "Demo",
           hotel: "For hotels",
           account: "Account",
           partner: "Partner",
@@ -42,6 +44,7 @@ export default function AppFooter() {
         <Link href={`/?lang=${lang}&currency=${currency}#search`}>{labels.search}</Link>
         <Link href={`/?lang=${lang}&currency=${currency}#results`}>{labels.catalog}</Link>
         <Link href={`/?lang=${lang}&currency=${currency}#ai`}>{labels.concierge}</Link>
+        <Link href={`/demo?lang=${lang}&currency=${currency}`}>{labels.demo}</Link>
         <Link href={`/for-hotels?lang=${lang}&currency=${currency}`}>{labels.hotel}</Link>
         <Link href={`/account?lang=${lang}&currency=${currency}`}>{labels.account}</Link>
         <Link href={`/login?lang=${lang}&currency=${currency}`}>{labels.partner}</Link>

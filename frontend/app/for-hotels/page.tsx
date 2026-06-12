@@ -98,6 +98,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
   const lang = normalizeLang(searchParams.lang);
   const currency = normalizeCurrency(searchParams.currency);
   const demoHref = `/?lang=${lang}&currency=${currency}&city=Dubai&guests=2`;
+  const demoGuideHref = `/demo?lang=${lang}&currency=${currency}`;
   const loginHref = `/login?lang=${lang}&currency=${currency}`;
 
   const copy = {
@@ -106,7 +107,9 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
       navHotel: "Для отелей",
       navFlow: "Как работает",
       navPackage: "Что получает покупатель",
+      navDemo: "Демо",
       demo: "Открыть демо",
+      demoGuide: "Демо-сценарии",
       partner: "Войти партнеру",
       eyebrow: "AI-консьерж нового поколения",
       title: "AI-консьерж для отелей, который доводит гостя до брони",
@@ -140,7 +143,9 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
       navHotel: "For hotels",
       navFlow: "How it works",
       navPackage: "Buyer package",
+      navDemo: "Demo",
       demo: "Open demo",
+      demoGuide: "Demo guide",
       partner: "Partner login",
       eyebrow: "Next-generation AI concierge",
       title: "AI concierge for hotels that moves guests from intent to booking",
@@ -172,6 +177,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
   }[lang];
 
   const legalLinks = [
+    { href: demoGuideHref, label: copy.demoGuide },
     { href: `/privacy?lang=${lang}&currency=${currency}`, label: copy.privacy },
     { href: `/terms?lang=${lang}&currency=${currency}`, label: copy.terms },
     { href: `/refund-policy?lang=${lang}&currency=${currency}`, label: copy.refunds },
@@ -271,6 +277,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
           <a href="#value">{copy.navHotel}</a>
           <a href="#flow">{copy.navFlow}</a>
           <a href="#buyer">{copy.navPackage}</a>
+          <Link href={demoGuideHref}>{copy.navDemo}</Link>
         </nav>
 
         <div className="hotel-site-header-actions">
@@ -291,10 +298,13 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
             <Link href={demoHref} className="hotel-site-primary">
               {copy.demo}
               <span aria-hidden="true">→</span>
-            </Link>
-            <a href="#value" className="hotel-site-secondary">
-              {copy.secondary}
-            </a>
+          </Link>
+          <Link href={demoGuideHref} className="hotel-site-secondary">
+            {copy.demoGuide}
+          </Link>
+          <a href="#value" className="hotel-site-secondary">
+            {copy.secondary}
+          </a>
           </div>
           <div className="hotel-site-mini-proof" aria-label={copy.proofTitle}>
             <span>64 backend tests</span>

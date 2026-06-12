@@ -17,6 +17,7 @@ StayPilot is a booking-style hotel app with:
 
 Local development:
 - Guest app: `http://localhost:3000/?lang=ru&currency=KZT&city=Dubai&guests=2`
+- Demo guide: `http://localhost:3000/demo?lang=ru&currency=KZT`
 - Hotel sales page: `http://localhost:3000/for-hotels?lang=ru&currency=KZT`
 - Privacy policy: `http://localhost:3000/privacy?lang=ru&currency=KZT`
 - Terms: `http://localhost:3000/terms?lang=ru&currency=KZT`
@@ -55,6 +56,8 @@ Check:
 - `docs/staging-deploy.md`
 - `docs/payment-webhook.md`
 - `docs/preprod-qa.md`
+- `docs/demo-scenarios.md`
+- `docs/seller-pitch.md`
 
 ## Assets Included
 
@@ -65,6 +68,7 @@ Check:
 - Local E2E suite covering search, booking, payment, account, manager, restaurant booking, room service, and hotel sales page.
 - GitHub Actions workflow for CI.
 - Public legal/contact page templates for privacy, terms, refund policy, and support contacts.
+- Public demo guide plus buyer demo and seller pitch documentation.
 
 ## Not Included Yet
 

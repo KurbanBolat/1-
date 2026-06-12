@@ -27,6 +27,7 @@ npm run dev
 Open:
 - Frontend: http://localhost:3000
 - Hotel sales page: http://localhost:3000/for-hotels?lang=ru&currency=KZT
+- Demo guide: http://localhost:3000/demo?lang=ru&currency=KZT
 - Legal/contact pages: `/privacy`, `/terms`, `/refund-policy`, `/contacts`
 - Backend docs: http://localhost:8000/docs
 - Health: http://localhost:8000/health/ready
@@ -63,6 +64,8 @@ Read:
 - `docs/preprod-qa.md`
 - `docs/payment-webhook.md`
 - `docs/buyer-handoff.md`
+- `docs/demo-scenarios.md`
+- `docs/seller-pitch.md`
 
 ## Checks
 Backend:
