@@ -30,6 +30,13 @@ type Labels = {
 };
 
 type Currency = "KZT" | "USD";
+type DateShortcut = {
+  key: string;
+  label: string;
+  checkIn: string;
+  nights: number;
+};
+
 const USD_RATE = 500;
 
 type InitialPricedQuote = {
@@ -112,6 +119,16 @@ export default function StayBookingCard({
   const text =
     lang === "ru"
       ? {
+          checkInStep: "1. Заезд",
+          checkOutStep: "2. Выезд",
+          guestsStep: "3. Гости",
+          roomsStep: "4. Номера",
+          quickDates: "Быстрый выбор",
+          tomorrow2: "Завтра на 2 ночи",
+          weekend: "Ближайшие выходные",
+          weekStay: "На неделю",
+          clearDates: "Очистить",
+          dateTip: "Выберите заезд — выезд подставится автоматически, если он был пустой.",
           requiredCheckIn: "Выберите дату заезда",
           requiredCheckOut: "Выберите дату выезда",
           invalidCheckOut: "Дата выезда должна быть позже даты заезда",
@@ -123,6 +140,16 @@ export default function StayBookingCard({
           dynamicPricingNotice: "Финальная сумма подтверждается на checkout и может включать динамическую цену.",
         }
       : {
+          checkInStep: "1. Check-in",
+          checkOutStep: "2. Check-out",
+          guestsStep: "3. Guests",
+          roomsStep: "4. Rooms",
+          quickDates: "Quick dates",
+          tomorrow2: "Tomorrow, 2 nights",
+          weekend: "Nearest weekend",
+          weekStay: "One week",
+          clearDates: "Clear",
+          dateTip: "Pick check-in. Check-out is filled automatically when empty.",
           requiredCheckIn: "Select check-in date",
           requiredCheckOut: "Select check-out date",
           invalidCheckOut: "Check-out must be after check-in",
@@ -175,6 +202,20 @@ export default function StayBookingCard({
 
   const dateLocale = lang === "ru" ? "ru-RU" : "en-GB";
   const [isApplyingSearch, setIsApplyingSearch] = useState(false);
+  const nearestSaturday = useMemo(() => {
+    const base = new Date(`${today}T00:00:00`);
+    const day = base.getDay();
+    const daysUntilSaturday = (6 - day + 7) % 7 || 7;
+    return addDays(today, daysUntilSaturday);
+  }, [today]);
+  const dateShortcuts: DateShortcut[] = useMemo(
+    () => [
+      { key: "tomorrow2", label: text.tomorrow2, checkIn: addDays(today, 1), nights: 2 },
+      { key: "weekend", label: text.weekend, checkIn: nearestSaturday, nights: 2 },
+      { key: "week", label: text.weekStay, checkIn: addDays(today, 7), nights: 7 },
+    ],
+    [nearestSaturday, text.tomorrow2, text.weekStay, text.weekend, today],
+  );
 
   function formatHumanDate(isoDate: string): string {
     if (!isoDate) return "";
@@ -187,6 +228,14 @@ export default function StayBookingCard({
       return new Intl.NumberFormat(locale, { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(valueKzt / USD_RATE);
     }
     return new Intl.NumberFormat(locale, { style: "currency", currency: "KZT", maximumFractionDigits: 0 }).format(valueKzt);
+  }
+
+  function applyDateRange(nextCheckIn: string, nextNights = 2) {
+    const safeNights = Math.min(MAX_STAY_NIGHTS, Math.max(1, nextNights));
+    const nextCheckOut = addDays(nextCheckIn, safeNights);
+    setCheckIn(nextCheckIn);
+    setCheckOut(nextCheckOut <= maxBookDate ? nextCheckOut : maxBookDate);
+    setSubmitted(false);
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -229,68 +278,100 @@ export default function StayBookingCard({
       <div className="booking-date-search">
         <p className="calendar-title">{labels.dateSearchTitle}</p>
         <small>{labels.dateSearchHint}</small>
+        <span>{text.dateTip}</span>
       </div>
 
-      <label className="field-stack">
-        <span>{labels.checkIn}</span>
-        <input
-          suppressHydrationWarning
-          ref={checkInRef}
-          type="date"
-          lang={dateLocale}
-          value={checkIn}
-          min={today}
-          max={maxBookDate}
-          onChange={(e) => {
-            const next = e.target.value;
-            if (!next || next < today || next > maxBookDate) {
-              setCheckIn("");
-              setCheckOut("");
-              return;
-            }
-            setCheckIn(next);
-            if (checkOut && (checkOut <= next || checkOut < today)) {
-              setCheckOut("");
-            }
+      <div className="date-shortcuts" aria-label={text.quickDates}>
+        <span>{text.quickDates}</span>
+        {dateShortcuts.map((shortcut) => (
+          <button
+            key={shortcut.key}
+            type="button"
+            className={checkIn === shortcut.checkIn && nights === shortcut.nights ? "active" : ""}
+            onClick={() => applyDateRange(shortcut.checkIn, shortcut.nights)}
+          >
+            {shortcut.label}
+          </button>
+        ))}
+        <button
+          type="button"
+          className="ghost"
+          onClick={() => {
+            setCheckIn("");
+            setCheckOut("");
+            setSubmitted(false);
           }}
-          className={submitted && errors.checkIn ? "input-error" : ""}
-          aria-invalid={submitted && Boolean(errors.checkIn)}
-          required
-        />
-        {submitted && errors.checkIn ? <p className="field-error">{errors.checkIn}</p> : null}
-      </label>
+        >
+          {text.clearDates}
+        </button>
+      </div>
 
-      <label className="field-stack">
-        <span>{labels.checkOut}</span>
-        <input
-          suppressHydrationWarning
-          ref={checkOutRef}
-          type="date"
-          lang={dateLocale}
-          value={checkOut}
-          min={checkIn || today}
-          max={maxBookDate}
-          onChange={(e) => {
-            const next = e.target.value;
-            if (!next) {
-              setCheckOut("");
-              return;
-            }
-            if (next < today || next > maxBookDate || !checkIn || next <= checkIn) {
-              setCheckOut("");
-              return;
-            }
-            setCheckOut(next);
-          }}
-          className={submitted && errors.checkOut ? "input-error" : ""}
-          aria-invalid={submitted && Boolean(errors.checkOut)}
-          required
-        />
-        {submitted && errors.checkOut ? <p className="field-error">{errors.checkOut}</p> : null}
-      </label>
+      <div className="booking-date-grid">
+        <label className={`field-stack date-field ${checkIn ? "is-complete" : ""}`}>
+          <span>{text.checkInStep}</span>
+          <b>{labels.checkIn}</b>
+          <input
+            suppressHydrationWarning
+            ref={checkInRef}
+            type="date"
+            lang={dateLocale}
+            value={checkIn}
+            min={today}
+            max={maxBookDate}
+            onChange={(e) => {
+              const next = e.target.value;
+              if (!next || next < today || next > maxBookDate) {
+                setCheckIn("");
+                setCheckOut("");
+                return;
+              }
+              setCheckIn(next);
+              if (!checkOut || checkOut <= next || checkOut < today) {
+                const autoCheckOut = addDays(next, 2);
+                setCheckOut(autoCheckOut <= maxBookDate ? autoCheckOut : "");
+              }
+            }}
+            className={submitted && errors.checkIn ? "input-error" : ""}
+            aria-invalid={submitted && Boolean(errors.checkIn)}
+            required
+          />
+          {submitted && errors.checkIn ? <p className="field-error">{errors.checkIn}</p> : null}
+        </label>
 
-      <label className="field-stack">
-        <span>{labels.guests}</span>
+        <label className={`field-stack date-field ${checkOut ? "is-complete" : ""}`}>
+          <span>{text.checkOutStep}</span>
+          <b>{labels.checkOut}</b>
+          <input
+            suppressHydrationWarning
+            ref={checkOutRef}
+            type="date"
+            lang={dateLocale}
+            value={checkOut}
+            min={checkIn || today}
+            max={maxBookDate}
+            onChange={(e) => {
+              const next = e.target.value;
+              if (!next) {
+                setCheckOut("");
+                return;
+              }
+              if (next < today || next > maxBookDate || !checkIn || next <= checkIn) {
+                setCheckOut("");
+                return;
+              }
+              setCheckOut(next);
+            }}
+            className={submitted && errors.checkOut ? "input-error" : ""}
+            aria-invalid={submitted && Boolean(errors.checkOut)}
+            required
+          />
+          {submitted && errors.checkOut ? <p className="field-error">{errors.checkOut}</p> : null}
+        </label>
+      </div>
+
+      <label className="field-stack guests-field">
+        <span>{text.guestsStep}</span>
+        <b>{labels.guests}</b>
         <input
           suppressHydrationWarning
           ref={guestsRef}
@@ -320,6 +401,9 @@ export default function StayBookingCard({
         </span>
         <span>
           <b>{labels.nights}:</b> {nights > 0 ? nights : "-"}
+        </span>
+        <span>
+          <b>{text.roomsStep}:</b> {labels.showRooms}
         </span>
       </div>
       <div className="stay-price-breakdown">

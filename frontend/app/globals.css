@@ -9667,6 +9667,7 @@ body:has(.sp-shell) {
   max-height: calc(100vh - 130px);
   padding: 18px;
   border-radius: 14px;
+  scroll-margin-top: 132px;
 }
 
 .sp-stay-page .stay-book-kicker {
@@ -9780,6 +9781,84 @@ body:has(.sp-shell) {
   font-weight: 800;
 }
 
+.sp-stay-page .field-stack b {
+  color: #171b28;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.sp-stay-page .booking-date-search span {
+  width: fit-content;
+  padding: 5px 8px;
+  border: 1px solid #e6e0ff;
+  border-radius: 999px;
+  background: #f7f4ff;
+  color: #5c43d9;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.sp-stay-page .date-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.sp-stay-page .date-shortcuts > span {
+  flex: 0 0 100%;
+  color: #747d8f;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.sp-stay-page .date-shortcuts button {
+  min-height: 32px;
+  width: auto;
+  padding: 0 10px;
+  border: 1px solid #e5e9f1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #425066;
+  font-size: 11px;
+  font-weight: 850;
+  box-shadow: none;
+}
+
+.sp-stay-page .date-shortcuts button.active,
+.sp-stay-page .date-shortcuts button:hover {
+  border-color: #cfc4ff;
+  background: #f5f1ff;
+  color: #6844ff;
+}
+
+.sp-stay-page .date-shortcuts button.ghost {
+  color: #747d8f;
+}
+
+.sp-stay-page .booking-date-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sp-stay-page .date-field,
+.sp-stay-page .guests-field {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #e8ecf3;
+  border-radius: 13px;
+  background: #fbfcff;
+}
+
+.sp-stay-page .date-field.is-complete,
+.sp-stay-page .guests-field:focus-within {
+  border-color: #d8d0ff;
+  background: #faf8ff;
+}
+
 .sp-stay-page input,
 .sp-stay-page select {
   min-height: 46px;
@@ -9802,6 +9881,11 @@ body:has(.sp-shell) {
 .sp-stay-page .booking-selection span,
 .sp-stay-page .stay-price-breakdown small {
   color: #6f7788;
+}
+
+.sp-stay-page .booking-selection {
+  border-style: solid;
+  background: #fbfcff;
 }
 
 .sp-stay-page .summary-row b,
@@ -13075,8 +13159,25 @@ body:has(.container-home .sp-shell:not(.sp-shell-workspace)) {
     scroll-margin-top: 232px;
   }
 
+  .sp-stay-page .stay-book {
+    scroll-margin-top: 170px;
+  }
+
   .sp-stay-page .available-room-list {
     padding: 8px;
+  }
+
+  .sp-stay-page .booking-date-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-stay-page .date-shortcuts {
+    gap: 6px;
+  }
+
+  .sp-stay-page .date-shortcuts button {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
   }
 
   .sp-stay-page .available-room-row {
