@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 export default function MobileBookBar({
   targetId,
   label,
+  hint,
   hideWhenIds = [],
 }: {
   targetId: string;
   label: string;
+  hint?: string;
   hideWhenIds?: string[];
 }) {
   const [isHidden, setIsHidden] = useState(false);
@@ -42,7 +44,8 @@ export default function MobileBookBar({
 
   return (
     <a href={`#${targetId}`} className={`mobile-bookbar ${isHidden ? "is-hidden" : ""}`}>
-      {label}
+      <span>{label}</span>
+      {hint ? <small>{hint}</small> : null}
     </a>
   );
 }

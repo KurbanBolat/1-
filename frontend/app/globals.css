@@ -5871,16 +5871,28 @@ button:hover {
     bottom: 10px;
     z-index: 80;
     display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
     justify-content: center;
     align-items: center;
     min-height: 48px;
+    padding: 7px 14px;
     border-radius: 12px;
     border: 1px solid #0f6d8b;
     background: linear-gradient(120deg, #0f5c8c 0%, #0b7aa1 100%);
     color: #f4fbff;
     font-weight: 800;
+    line-height: 1.12;
+    text-align: center;
     box-shadow: 0 10px 24px rgba(12, 56, 89, 0.38);
     transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .mobile-bookbar small {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.15;
   }
 
   .stay-book {
@@ -12572,6 +12584,18 @@ body:has(.container-home .sp-shell:not(.sp-shell-workspace)) {
   overflow: hidden;
 }
 
+.sp-stay-page .available-rooms-next-step {
+  margin: 0 0 10px;
+  padding: 9px 12px;
+  border: 1px solid #e6e0ff;
+  border-radius: 10px;
+  background: #f8f6ff;
+  color: #4b3bb8;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .sp-stay-page .available-room-card {
   min-width: 0;
   display: grid;
@@ -12931,6 +12955,10 @@ body:has(.container-home .sp-shell:not(.sp-shell-workspace)) {
     padding: 10px;
   }
 
+  .sp-stay-page .available-rooms-next-step {
+    margin-bottom: 0;
+  }
+
   .sp-stay-page .available-room-titleline {
     align-items: center;
     flex-direction: row;
@@ -13044,7 +13072,7 @@ body:has(.container-home .sp-shell:not(.sp-shell-workspace)) {
   }
 
   .sp-stay-page .available-rooms-card {
-    scroll-margin-top: 190px;
+    scroll-margin-top: 232px;
   }
 
   .sp-stay-page .available-room-list {
@@ -13078,7 +13106,14 @@ body:has(.container-home .sp-shell:not(.sp-shell-workspace)) {
   }
 
   .sp-stay-page .mobile-bookbar {
-    display: none;
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    display: inline-flex;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    z-index: 80;
+    width: auto;
+    min-height: 52px;
   }
 }
 

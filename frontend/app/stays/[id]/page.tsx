@@ -70,6 +70,9 @@ const t = {
     availableRoomsTitle: "Available rooms",
     availableRoomsLead: "Choose a room category with live availability",
     availableRoomsLeadSelected: "Rooms available for your selected dates",
+    availableRoomsNextStep: "Next: choose a room, review details, then pay securely.",
+    mobileRoomsCta: "See available rooms",
+    mobileRoomsHint: "Pick a room before checkout",
     dateSearchTitle: "Search available rooms",
     dateSearchHint: "Pick dates and guests, then choose a room below",
     showRooms: "Show rooms",
@@ -148,6 +151,9 @@ const t = {
     availableRoomsTitle: "Свободные номера",
     availableRoomsLead: "Выберите категорию номера с актуальной доступностью",
     availableRoomsLeadSelected: "Номера, доступные на выбранные даты",
+    availableRoomsNextStep: "Дальше: выберите номер, проверьте детали и оплатите безопасно.",
+    mobileRoomsCta: "Смотреть свободные номера",
+    mobileRoomsHint: "Сначала выберите номер",
     dateSearchTitle: "Поиск свободных номеров",
     dateSearchHint: "Выберите даты и гостей, затем забронируйте номер ниже",
     showRooms: "Показать номера",
@@ -514,6 +520,7 @@ export default async function StayDetails({
         </div>
         {roomOptions.length > 0 ? (
           <div className="available-room-list">
+            <p className="available-rooms-next-step">{tr.availableRoomsNextStep}</p>
             <div className="available-room-table-head" aria-hidden="true">
               <span>{tr.roomCategory}</span>
               <span>{tr.roomOccupancy}</span>
@@ -697,7 +704,7 @@ export default async function StayDetails({
           </aside>
         </section>
 
-        <MobileBookBar targetId="booking-panel" label={tr.bookNow} hideWhenIds={["available-rooms"]} />
+        <MobileBookBar targetId="available-rooms" label={tr.mobileRoomsCta} hint={tr.mobileRoomsHint} hideWhenIds={["booking-panel"]} />
 
         <section className="similar-grid">
           <h3>{tr.similar} {localizeCityName(listing.city, lang)}</h3>
