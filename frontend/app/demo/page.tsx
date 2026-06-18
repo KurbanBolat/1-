@@ -118,9 +118,9 @@ export default function DemoPage({ searchParams }: { searchParams: PageSearchPar
       proofTitle: "Что демонстрировать",
       scriptTitle: "10-минутный сценарий показа",
       opsTitle: "Операционные заметки",
-      proofItems: ["Backend test suite", "E2E smoke suite", "CI на push", "OpenAI live заглушен", "Payment mock/manual ready"],
+      proofItems: ["Backend test suite", "E2E smoke suite", "CI на push", "OpenAI live безопасно отключен", "Демо-оплата без реальных списаний"],
       opsItems: [
-        "Для production заменить demo-контакты, платежного провайдера и юридические реквизиты.",
+        "Для production подключите рабочие контакты, платежного провайдера и юридические реквизиты оператора.",
         "Партнерский доступ выдаёт владелец развертывания; публичная страница не показывает пароли.",
         "Live GPT включать только после настройки `AI_CONCIERGE_MODE=live`, ключа и privacy review.",
       ],
@@ -142,7 +142,7 @@ export default function DemoPage({ searchParams }: { searchParams: PageSearchPar
         {
           icon: "card" as const,
           title: "Бронирование и demo-оплата",
-          text: "Проведите гостя от выбора номера до checkout. Платежный экран явно показывает mock/manual режим для безопасной демонстрации.",
+          text: "Проведите гостя от выбора номера до checkout. Платежный экран показывает безопасный демо-режим и не выполняет реальные списания.",
           link: catalogHref,
           cta: "Начать бронь",
         },
@@ -194,9 +194,9 @@ export default function DemoPage({ searchParams }: { searchParams: PageSearchPar
       proofTitle: "What to Show",
       scriptTitle: "10-Minute Demo Script",
       opsTitle: "Operational Notes",
-      proofItems: ["Backend test suite", "E2E smoke suite", "CI on push", "OpenAI live disabled", "Payment mock/manual ready"],
+      proofItems: ["Backend test suite", "E2E smoke suite", "CI on push", "OpenAI live safely disabled", "Safe demo payment flow"],
       opsItems: [
-        "For production, replace demo contacts, payment provider, and legal entity details.",
+        "For production, connect real support contacts, payment provider, and operator legal details.",
         "Partner access is issued by the deployment owner; this public page does not expose passwords.",
         "Enable live GPT only after `AI_CONCIERGE_MODE=live`, API key setup, and privacy review.",
       ],
@@ -218,7 +218,7 @@ export default function DemoPage({ searchParams }: { searchParams: PageSearchPar
         {
           icon: "card" as const,
           title: "Booking and Demo Payment",
-          text: "Move the guest from room choice to checkout. The payment screen clearly shows mock/manual mode for safe demos.",
+          text: "Move the guest from room choice to checkout. The payment screen shows safe demo mode and does not make a real charge.",
           link: catalogHref,
           cta: "Start booking",
         },

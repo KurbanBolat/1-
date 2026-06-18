@@ -13,7 +13,7 @@ type PageSearchParams = {
 
 export const metadata: Metadata = {
   title: "Refund Policy - StayPilot",
-  description: "StayPilot cancellation and refund policy template for Basic, Smart, and Flex tariffs.",
+  description: "StayPilot cancellation and refund policy for Basic, Smart, and Flex tariffs.",
 };
 
 export default function RefundPolicyPage({ searchParams }: { searchParams: PageSearchParams }) {
@@ -144,7 +144,7 @@ export default function RefundPolicyPage({ searchParams }: { searchParams: PageS
           ? "Правила для тарифов Basic, Smart и Flex. Перед запуском оператор должен сверить их с договорами отелей и платежного провайдера."
           : "Rules for Basic, Smart, and Flex tariffs. Before launch, the operator should align them with hotel contracts and payment provider terms."
       }
-      updated={lang === "ru" ? "12 июня 2026" : "June 12, 2026"}
+      updated={lang === "ru" ? "18 июня 2026" : "June 18, 2026"}
       sections={sections}
       asideTitle={lang === "ru" ? "Операционный контроль" : "Operational Control"}
       asideItems={

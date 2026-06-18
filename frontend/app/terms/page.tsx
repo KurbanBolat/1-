@@ -13,7 +13,7 @@ type PageSearchParams = {
 
 export const metadata: Metadata = {
   title: "Terms of Use - StayPilot",
-  description: "StayPilot terms of use template for hotel booking, partner management, and in-stay services.",
+  description: "StayPilot terms for hotel booking, partner management, and in-stay services.",
 };
 
 export default function TermsPage({ searchParams }: { searchParams: PageSearchParams }) {
@@ -42,7 +42,7 @@ export default function TermsPage({ searchParams }: { searchParams: PageSearchPa
           {
             title: "Платежи",
             paragraphs: [
-              "В demo-поставке платежи работают в mock/manual mode. Реальные списания возможны только после подключения платежного провайдера владельцем развертывания.",
+              "В demo-поставке платежи работают в безопасном тестовом режиме без реальных списаний. Реальные списания возможны только после подключения платежного провайдера владельцем развертывания.",
               "Провайдер платежей может применять свои комиссии, проверки, лимиты, правила возврата и сроки зачисления.",
             ],
           },
@@ -102,7 +102,7 @@ export default function TermsPage({ searchParams }: { searchParams: PageSearchPa
           {
             title: "Payments",
             paragraphs: [
-              "The demo package uses mock/manual payment mode. Real charges are possible only after the deployment owner connects a payment provider.",
+              "The demo package uses a safe test payment mode with no real charges. Real charges are possible only after the deployment owner connects a payment provider.",
               "The payment provider may apply its own fees, checks, limits, refund rules, and settlement timing.",
             ],
           },
@@ -148,10 +148,10 @@ export default function TermsPage({ searchParams }: { searchParams: PageSearchPa
       title={lang === "ru" ? "Условия использования" : "Terms of Use"}
       subtitle={
         lang === "ru"
-          ? "Шаблон условий для сервиса бронирования, партнерского кабинета и AI-консьержа StayPilot."
-          : "Template terms for the StayPilot booking service, partner workspace, and AI concierge."
+          ? "Базовые условия для сервиса бронирования, партнерского кабинета и AI-консьержа StayPilot."
+          : "Baseline terms for the StayPilot booking service, partner workspace, and AI concierge."
       }
-      updated={lang === "ru" ? "12 июня 2026" : "June 12, 2026"}
+      updated={lang === "ru" ? "18 июня 2026" : "June 18, 2026"}
       sections={sections}
       asideTitle={lang === "ru" ? "Связанные документы" : "Related Documents"}
       asideItems={

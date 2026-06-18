@@ -168,7 +168,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
       room: "Deluxe King Room",
       available: "Available: 4 rooms",
       book: "Book now",
-      footerNote: "Product template for demos, pilots, and production setup.",
+      footerNote: "Product base for demos, pilots, and production setup.",
       privacy: "Privacy",
       terms: "Terms",
       refunds: "Refunds",

@@ -13,7 +13,7 @@ type PageSearchParams = {
 
 export const metadata: Metadata = {
   title: "Privacy Policy - StayPilot",
-  description: "StayPilot privacy policy template for guests, hotels, and deployment owners.",
+  description: "StayPilot privacy policy for guests, hotels, and deployment owners.",
 };
 
 export default function PrivacyPage({ searchParams }: { searchParams: PageSearchParams }) {
@@ -55,7 +55,7 @@ export default function PrivacyPage({ searchParams }: { searchParams: PageSearch
           {
             title: "AI-консьерж",
             paragraphs: [
-              "В текущей поставке live GPT отключен по умолчанию, а консьерж работает в deterministic stub mode. Если владелец развертывания включает live-режим, сообщения пользователя могут передаваться AI-провайдеру для генерации ответа.",
+              "В текущей поставке live GPT отключен по умолчанию, а консьерж работает в детерминированном fallback-режиме. Если владелец развертывания включает live-режим, сообщения пользователя могут передаваться AI-провайдеру для генерации ответа.",
               "Не отправляйте в чат паспортные данные, платежные реквизиты, медицинскую информацию и другие чувствительные данные, если оператор сервиса отдельно не подтвердил такую обработку.",
             ],
           },
@@ -107,7 +107,7 @@ export default function PrivacyPage({ searchParams }: { searchParams: PageSearch
           {
             title: "AI Concierge",
             paragraphs: [
-              "Live GPT is disabled by default in this package, and the concierge runs in deterministic stub mode. If the deployment owner enables live mode, user messages may be sent to the AI provider to generate a response.",
+              "Live GPT is disabled by default in this package, and the concierge runs in deterministic fallback mode. If the deployment owner enables live mode, user messages may be sent to the AI provider to generate a response.",
               "Do not send passport data, payment credentials, medical information, or other sensitive data into chat unless the service operator explicitly confirms that processing.",
             ],
           },
@@ -136,10 +136,10 @@ export default function PrivacyPage({ searchParams }: { searchParams: PageSearch
       title={lang === "ru" ? "Политика конфиденциальности" : "Privacy Policy"}
       subtitle={
         lang === "ru"
-          ? "Шаблонная политика для production-развертывания StayPilot. Перед публичным запуском оператор должен добавить свои реквизиты и проверить текст с юристом."
-          : "A production deployment template for StayPilot. Before public launch, the operator should add legal entity details and review the text with counsel."
+          ? "Политика для production-развертывания StayPilot. Перед публичным запуском оператор должен добавить свои реквизиты и проверить текст с юристом."
+          : "A production deployment policy for StayPilot. Before public launch, the operator should add legal entity details and review the text with counsel."
       }
-      updated={lang === "ru" ? "12 июня 2026" : "June 12, 2026"}
+      updated={lang === "ru" ? "18 июня 2026" : "June 18, 2026"}
       sections={sections}
       asideTitle={lang === "ru" ? "Важно перед запуском" : "Before Launch"}
       asideItems={
