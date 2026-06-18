@@ -13686,6 +13686,336 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
   box-shadow: 0 0 0 4px rgba(112, 74, 255, 0.12);
 }
 
+/* Aviasales-style native date range picker */
+.date-range-picker {
+  position: relative;
+  min-width: 0;
+}
+
+.date-range-fields {
+  min-width: 0;
+}
+
+.date-range-picker-booking .date-range-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.date-range-field {
+  min-width: 0;
+}
+
+.date-range-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #747d8f;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.date-range-label svg,
+.date-range-input-shell > svg,
+.date-range-month svg,
+.date-range-nav svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.date-range-input-shell {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.date-range-input-shell > svg {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  color: #172033;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.date-range-input-shell input {
+  width: 100%;
+  padding-right: 38px;
+  cursor: pointer;
+}
+
+.date-range-field.is-active {
+  border-color: #9f8cff !important;
+  background: #faf8ff !important;
+  box-shadow: 0 0 0 3px rgba(104, 68, 255, 0.12);
+}
+
+.date-range-popover {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  z-index: 70;
+  width: min(318px, calc(100vw - 36px));
+  border: 1px solid #d8e1ee;
+  border-radius: 0;
+  background: #ffffff;
+  color: #101828;
+  padding: 12px;
+  box-shadow: 0 18px 42px rgba(16, 24, 40, 0.18);
+}
+
+.date-range-popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.date-range-month,
+.date-range-nav button,
+.date-range-footer button,
+.date-range-day,
+.sp-hero-search .date-range-month,
+.sp-hero-search .date-range-nav button,
+.sp-hero-search .date-range-footer button,
+.sp-hero-search .date-range-day {
+  width: auto;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+  font-weight: inherit;
+  box-shadow: none;
+  cursor: pointer;
+  transform: none;
+}
+
+.date-range-month {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #101828;
+  font-size: 16px;
+  font-weight: 850;
+  text-transform: capitalize;
+}
+
+.date-range-month svg {
+  width: 14px;
+  height: 14px;
+}
+
+.date-range-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-range-nav button {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #344054;
+}
+
+.date-range-nav button:disabled {
+  color: #c6cfda;
+  cursor: default;
+}
+
+.date-range-weekdays,
+.date-range-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.date-range-weekdays {
+  gap: 0;
+  margin-bottom: 7px;
+}
+
+.date-range-weekdays span {
+  color: #101828;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1;
+  text-align: center;
+}
+
+.date-range-days {
+  gap: 1px;
+}
+
+.date-range-day {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 31px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  color: #101828;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.date-range-day:hover:not(:disabled),
+.date-range-day.is-focus-anchor {
+  border-color: #111827;
+}
+
+.date-range-day.is-outside {
+  color: #667085;
+}
+
+.date-range-day.is-in-range {
+  border-color: #d6ebff;
+  background: #eaf4ff;
+  color: #13599a;
+}
+
+.date-range-day.is-start,
+.date-range-day.is-end {
+  border-color: #166de0;
+  background: #166de0;
+  color: #ffffff;
+}
+
+.date-range-day.is-today:not(.is-start):not(.is-end) {
+  color: #166de0;
+  font-weight: 850;
+}
+
+.date-range-day:disabled {
+  color: #cbd5e1;
+  cursor: default;
+}
+
+.date-range-footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.date-range-footer button {
+  color: #166de0;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.date-range-footer button:hover {
+  color: #0d56b7;
+}
+
+.date-range-picker-hero {
+  grid-column: span 2;
+  align-self: stretch;
+  min-height: 46px;
+}
+
+.date-range-picker-hero .date-range-fields {
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.date-range-picker-hero .date-range-field {
+  min-height: 46px;
+  padding: 0 16px;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  border-right: 1px solid #e6e8ef;
+  transition: background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.date-range-picker-hero .date-range-field:last-child {
+  border-right: 0;
+}
+
+.date-range-picker-hero .date-range-field.is-active {
+  box-shadow: inset 0 0 0 1px rgba(104, 68, 255, 0.32);
+}
+
+.date-range-picker-hero .date-range-label {
+  color: #7b8799;
+  font-size: 12px;
+}
+
+.date-range-picker-hero .date-range-input-shell input {
+  min-height: 22px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0 30px 0 0;
+  color: #17273a;
+  font-size: 14px;
+  font-weight: 850;
+  box-shadow: none;
+}
+
+.date-range-picker-hero .date-range-input-shell input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.date-range-picker-hero .date-range-input-shell > svg {
+  right: 0;
+  width: 15px;
+  height: 15px;
+}
+
+.date-range-picker-hero .date-range-popover {
+  top: calc(100% + 8px);
+  left: 0;
+}
+
+.date-range-picker-booking .date-range-popover {
+  width: min(320px, 100%);
+}
+
+main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero {
+  position: relative;
+  z-index: 20;
+}
+
+.sp-stay-page .date-range-picker-booking .date-range-field.is-active {
+  border-color: #9f8cff;
+}
+
+.sp-stay-page .date-range-picker-booking .date-range-input-shell input {
+  color-scheme: light;
+}
+
+main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search .date-range-picker button:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search .date-range-picker button {
+  grid-column: auto;
+  align-self: auto;
+}
+
+main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search > button[type="submit"] {
+  align-self: stretch;
+}
+
 @media (max-width: 640px) {
   main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) {
     gap: 10px;
@@ -13781,6 +14111,16 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
     padding: 8px;
   }
 
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .date-range-picker-hero {
+    grid-column: 1 / -1;
+  }
+
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .date-range-picker-hero .date-range-popover {
+    position: static;
+    width: 100%;
+    margin-top: 8px;
+  }
+
   main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search label {
     min-height: 40px;
   }
@@ -13798,6 +14138,20 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
   main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search select {
     min-height: 24px;
     font-size: 12px;
+  }
+
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search > button[type="submit"] {
+    grid-column: 1 / -1;
+  }
+
+  .date-range-picker-booking .date-range-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .date-range-picker-booking .date-range-popover {
+    position: static;
+    width: 100%;
+    margin-top: 8px;
   }
 
   main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-categories {

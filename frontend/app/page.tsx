@@ -5,6 +5,7 @@ import AIConcierge from "../components/AIConcierge";
 import { SearchExposureTracker, TrackedStayLink } from "../components/AnalyticsTrackers";
 import CatalogPreviewLightbox from "../components/CatalogPreviewLightbox";
 import CityMapPanel from "../components/CityMapPanel";
+import DateRangePicker from "../components/DateRangePicker";
 import { resolveTrustVariant } from "../lib/explainability";
 
 type Lang = "en" | "ru";
@@ -987,14 +988,16 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
                 ))}
               </select>
             </label>
-            <label>
-              <span><SpIcon name="calendar" />{tr.checkIn}</span>
-              <input type="date" lang={lang === "ru" ? "ru-RU" : "en-GB"} name="check_in" defaultValue={heroCheckIn} />
-            </label>
-            <label>
-              <span><SpIcon name="calendar" />{tr.checkOut}</span>
-              <input type="date" lang={lang === "ru" ? "ru-RU" : "en-GB"} name="check_out" defaultValue={heroCheckOut} />
-            </label>
+            <DateRangePicker
+              lang={lang}
+              variant="hero"
+              defaultCheckIn={heroCheckIn}
+              defaultCheckOut={heroCheckOut}
+              checkInName="check_in"
+              checkOutName="check_out"
+              checkInLabel={tr.checkIn}
+              checkOutLabel={tr.checkOut}
+            />
             <label>
               <span><SpIcon name="users" />{lang === "ru" ? "Гости и номера" : "Guests and rooms"}</span>
               <input name="guests" type="number" min={1} max={12} placeholder="2" defaultValue={selectedGuestsInUi} />

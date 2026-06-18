@@ -2,6 +2,7 @@
 
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import DateRangePicker from "./DateRangePicker";
 
 const MAX_STAY_NIGHTS = 30;
 const MAX_BOOKING_HORIZON_DAYS = 365;
@@ -306,68 +307,27 @@ export default function StayBookingCard({
         </button>
       </div>
 
-      <div className="booking-date-grid">
-        <label className={`field-stack date-field ${checkIn ? "is-complete" : ""}`}>
-          <span>{text.checkInStep}</span>
-          <b>{labels.checkIn}</b>
-          <input
-            suppressHydrationWarning
-            ref={checkInRef}
-            type="date"
-            lang={dateLocale}
-            value={checkIn}
-            min={today}
-            max={maxBookDate}
-            onChange={(e) => {
-              const next = e.target.value;
-              if (!next || next < today || next > maxBookDate) {
-                setCheckIn("");
-                setCheckOut("");
-                return;
-              }
-              setCheckIn(next);
-              if (!checkOut || checkOut <= next || checkOut < today) {
-                const autoCheckOut = addDays(next, 2);
-                setCheckOut(autoCheckOut <= maxBookDate ? autoCheckOut : "");
-              }
-            }}
-            className={submitted && errors.checkIn ? "input-error" : ""}
-            aria-invalid={submitted && Boolean(errors.checkIn)}
-            required
-          />
-          {submitted && errors.checkIn ? <p className="field-error">{errors.checkIn}</p> : null}
-        </label>
-
-        <label className={`field-stack date-field ${checkOut ? "is-complete" : ""}`}>
-          <span>{text.checkOutStep}</span>
-          <b>{labels.checkOut}</b>
-          <input
-            suppressHydrationWarning
-            ref={checkOutRef}
-            type="date"
-            lang={dateLocale}
-            value={checkOut}
-            min={checkIn || today}
-            max={maxBookDate}
-            onChange={(e) => {
-              const next = e.target.value;
-              if (!next) {
-                setCheckOut("");
-                return;
-              }
-              if (next < today || next > maxBookDate || !checkIn || next <= checkIn) {
-                setCheckOut("");
-                return;
-              }
-              setCheckOut(next);
-            }}
-            className={submitted && errors.checkOut ? "input-error" : ""}
-            aria-invalid={submitted && Boolean(errors.checkOut)}
-            required
-          />
-          {submitted && errors.checkOut ? <p className="field-error">{errors.checkOut}</p> : null}
-        </label>
-      </div>
+      <DateRangePicker
+        lang={lang}
+        variant="booking"
+        value={{ checkIn, checkOut }}
+        onChange={(range) => {
+          setCheckIn(range.checkIn);
+          setCheckOut(range.checkOut);
+          setSubmitted(false);
+        }}
+        minDate={today}
+        maxDate={maxBookDate}
+        checkInLabel={labels.checkIn}
+        checkOutLabel={labels.checkOut}
+        checkInStep={text.checkInStep}
+        checkOutStep={text.checkOutStep}
+        submitted={submitted}
+        checkInError={errors.checkIn}
+        checkOutError={errors.checkOut}
+        checkInRef={checkInRef}
+        checkOutRef={checkOutRef}
+      />
 
       <label className="field-stack guests-field">
         <span>{text.guestsStep}</span>
