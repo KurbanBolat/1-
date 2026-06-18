@@ -6,6 +6,7 @@ import { SearchExposureTracker, TrackedStayLink } from "../components/AnalyticsT
 import CatalogPreviewLightbox from "../components/CatalogPreviewLightbox";
 import CityMapPanel from "../components/CityMapPanel";
 import DateRangePicker from "../components/DateRangePicker";
+import HomeChatRail from "../components/HomeChatRail";
 import { resolveTrustVariant } from "../lib/explainability";
 
 type Lang = "en" | "ru";
@@ -1178,21 +1179,15 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         </section>
       </div>
 
-      <aside id="ai" className="sp-right-rail">
-        <div className="sp-chat-head">
-          <div className="sp-chat-title">
-            <span className="sp-chat-avatar"><SpIcon name="sparkle" /></span>
-            <div>
-              <h3>{lang === "ru" ? "AI-консьерж" : "AI concierge"}</h3>
-              <span>{lang === "ru" ? "Онлайн" : "Online"}</span>
-            </div>
-          </div>
-          <div className="sp-chat-actions">
-            <button type="button" aria-label={lang === "ru" ? "Еще" : "More"}><SpIcon name="dots" /></button>
-            <button type="button" aria-label={lang === "ru" ? "Закрыть" : "Close"}><SpIcon name="x" /></button>
-          </div>
-        </div>
-
+      <HomeChatRail
+        title={lang === "ru" ? "AI-консьерж" : "AI concierge"}
+        status={lang === "ru" ? "Онлайн" : "Online"}
+        moreLabel={lang === "ru" ? "Еще" : "More"}
+        closeLabel={lang === "ru" ? "Закрыть" : "Close"}
+        openLabel={lang === "ru" ? "Открыть AI-консьерж" : "Open AI concierge"}
+        searchLabel={lang === "ru" ? "Изменить поиск" : "Adjust search"}
+        resultsLabel={lang === "ru" ? "Смотреть варианты" : "View stays"}
+      >
         <AIConcierge
           lang={lang}
           currency={currency}
@@ -1201,7 +1196,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           quickPrompts={rightRailQuickPrompts}
           initialUserPrompt={lang === "ru" ? "Нужен отель в Дубае на 3 ночи, 2 взрослых" : "Need a hotel in Dubai for 3 nights, 2 adults"}
         />
-      </aside>
+      </HomeChatRail>
     </div>
   );
 }

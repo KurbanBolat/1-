@@ -274,12 +274,17 @@ export default function DateRangePicker({
 
     if (field === "checkIn") {
       const autoCheckOut = addDays(isoDate, AUTO_NIGHTS);
+      const hasAutoCheckOut = autoCheckOut <= effectiveMaxDate;
       commitRange({
         checkIn: isoDate,
-        checkOut: checkOut && checkOut > isoDate ? checkOut : autoCheckOut <= effectiveMaxDate ? autoCheckOut : "",
+        checkOut: checkOut && checkOut > isoDate ? checkOut : hasAutoCheckOut ? autoCheckOut : "",
       });
+      if (variant === "hero" && closeOnComplete && hasAutoCheckOut) {
+        setIsOpen(false);
+        return;
+      }
       setActiveField("checkOut");
-      setCalendarMonth(monthKeyFromIso(autoCheckOut <= effectiveMaxDate ? autoCheckOut : isoDate));
+      setCalendarMonth(monthKeyFromIso(hasAutoCheckOut ? autoCheckOut : isoDate));
       return;
     }
 
