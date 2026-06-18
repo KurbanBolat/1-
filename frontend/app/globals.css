@@ -5156,6 +5156,106 @@ button:hover {
   white-space: pre-line;
 }
 
+.ai-date-picker-card {
+  max-width: 360px;
+  margin-top: 10px;
+  border: 1px solid #e1e7f3;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  box-shadow: 0 12px 28px rgba(22, 33, 57, 0.08);
+}
+
+.ai-date-picker-head {
+  display: grid;
+  gap: 2px;
+}
+
+.ai-date-picker-head strong {
+  color: #111827;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ai-date-picker-head span,
+.ai-date-picker-error {
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.ai-date-picker-card .date-range-picker-booking .date-range-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.ai-date-picker-card .date-range-field {
+  padding: 8px;
+  border: 1px solid #e7ebf3;
+  border-radius: 12px;
+  background: #fbfcff;
+}
+
+.ai-date-picker-card .date-range-label {
+  font-size: 10px;
+}
+
+.ai-date-picker-card .date-range-input-shell input {
+  min-height: 38px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.ai-date-picker-card .date-range-popover {
+  position: static;
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: none;
+}
+
+.ai-date-picker-card .date-range-month {
+  font-size: 14px;
+}
+
+.ai-date-picker-card .date-range-weekdays span {
+  font-size: 11px;
+}
+
+.ai-date-picker-card .date-range-day {
+  min-height: 28px;
+  font-size: 12px;
+}
+
+.ai-date-picker-card .date-range-footer {
+  margin-top: 10px;
+}
+
+.ai-date-picker-card .date-range-footer button {
+  font-size: 12px;
+}
+
+.ai-date-picker-apply {
+  min-height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: #704aff;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(112, 74, 255, 0.22);
+}
+
+.ai-date-picker-apply:disabled {
+  opacity: 0.58;
+  cursor: default;
+  box-shadow: none;
+}
+
 .ai-selection-summary-inline {
   margin-top: 8px;
 }
@@ -8414,8 +8514,30 @@ body:has(.sp-shell) {
 
 .ai-concierge-rail .ai-message-assistant > p,
 .ai-concierge-rail .ai-message-assistant .ai-next-action,
-.ai-concierge-rail .ai-message-assistant .ai-suggestions {
+.ai-concierge-rail .ai-message-assistant .ai-suggestions,
+.ai-concierge-rail .ai-message-assistant .ai-date-picker-card {
   grid-column: 2;
+}
+
+.ai-concierge-rail .ai-date-picker-card {
+  width: 100%;
+  max-width: 244px;
+  margin-top: 0;
+  padding: 9px;
+  gap: 7px;
+}
+
+.ai-concierge-rail .ai-date-picker-card .date-range-picker-booking .date-range-fields {
+  grid-template-columns: 1fr;
+}
+
+.ai-concierge-rail .ai-date-picker-card .date-range-popover {
+  padding: 9px;
+}
+
+.ai-concierge-rail .ai-date-picker-card .date-range-day {
+  min-height: 25px;
+  font-size: 11px;
 }
 
 .ai-concierge-rail .ai-message-user {

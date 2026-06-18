@@ -28,6 +28,7 @@ import {
 import { humanSuggestionReason } from "../lib/explainability";
 import { getReservationAccessToken, rememberReservationAccess } from "../lib/guestAccess";
 import { useSoftRedirect } from "../hooks/useSoftRedirect";
+import DateRangePicker from "./DateRangePicker";
 
 type Lang = "en" | "ru";
 type Currency = "KZT" | "USD";
@@ -143,6 +144,11 @@ type TariffQuoteBundle = {
   basic?: Quote;
   smart?: Quote;
   flex?: Quote;
+};
+
+type ChatDateRange = {
+  checkIn: string;
+  checkOut: string;
 };
 
 const USD_RATE = 500;
@@ -661,6 +667,89 @@ function parseNaturalDateRange(text: string): { checkIn: string; checkOut: strin
   }
 
   return null;
+}
+
+function ChatDatePicker({
+  lang,
+  initialCheckIn,
+  initialCheckOut,
+  loading,
+  onApply,
+}: {
+  lang: Lang;
+  initialCheckIn?: string | null;
+  initialCheckOut?: string | null;
+  loading: boolean;
+  onApply: (range: ChatDateRange) => void | Promise<void>;
+}) {
+  const today = useMemo(() => toIsoDate(new Date()), []);
+  const maxDate = useMemo(() => toIsoDate(addDays(new Date(`${today}T00:00:00`), 365)), [today]);
+  const [range, setRange] = useState<ChatDateRange>({
+    checkIn: initialCheckIn || "",
+    checkOut: initialCheckOut || "",
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const ready = Boolean(range.checkIn && range.checkOut && range.checkOut > range.checkIn);
+  const labels =
+    lang === "ru"
+      ? {
+          title: "Выберите даты",
+          hint: "Календарь подставит даты в чат.",
+          checkIn: "Заезд",
+          checkOut: "Выезд",
+          apply: "Применить даты",
+          required: "Выберите заезд и выезд",
+        }
+      : {
+          title: "Choose dates",
+          hint: "The calendar will send dates to chat.",
+          checkIn: "Check-in",
+          checkOut: "Check-out",
+          apply: "Apply dates",
+          required: "Choose check-in and check-out",
+        };
+
+  useEffect(() => {
+    setRange({ checkIn: initialCheckIn || "", checkOut: initialCheckOut || "" });
+    setSubmitted(false);
+  }, [initialCheckIn, initialCheckOut]);
+
+  return (
+    <section className="ai-date-picker-card" aria-label={labels.title}>
+      <div className="ai-date-picker-head">
+        <strong>{labels.title}</strong>
+        <span>{labels.hint}</span>
+      </div>
+      <button
+        type="button"
+        className="ai-date-picker-apply"
+        disabled={loading || !ready}
+        onClick={() => {
+          if (!ready) {
+            setSubmitted(true);
+            return;
+          }
+          void onApply(range);
+        }}
+      >
+        {labels.apply}
+      </button>
+      <DateRangePicker
+        lang={lang}
+        variant="booking"
+        value={range}
+        onChange={(nextRange) => {
+          setRange(nextRange);
+          setSubmitted(false);
+        }}
+        minDate={today}
+        maxDate={maxDate}
+        checkInLabel={labels.checkIn}
+        checkOutLabel={labels.checkOut}
+      />
+      {submitted && !ready ? <small className="ai-date-picker-error">{labels.required}</small> : null}
+    </section>
+  );
 }
 
 function parseGuestsCount(text: string): number | null {
@@ -1300,6 +1389,12 @@ function inferExpectedCollectSlot(lastAssistantText: string | undefined): Expect
   return null;
 }
 
+function assistantTextAsksForDates(text: string): boolean {
+  return /(подскажите|напишите|уточните|нужн|share|choose|select|what|which).*(даты|заезд|выезд|dates|check-in|check-out)/i.test(
+    text,
+  );
+}
+
 function enrichMessageByExpectedSlot(message: string, expected: ExpectedCollectSlot, lang: Lang): string {
   if (!expected) return message;
   const trimmed = message.trim();
@@ -1450,6 +1545,8 @@ export default function AIConcierge({
     }
     return [];
   }, [latestAnswer, lang, resultInteractionBlocked]);
+  const lastMessage = messages[messages.length - 1];
+  const chatDatePickerVisible = Boolean(lastMessage && shouldRenderChatDatePicker(lastMessage, messages.length - 1));
 
   const storageKey = useMemo(() => `findapart_ai_memory_${pathname}_${lang}_${currency}`, [pathname, lang, currency]);
   const {
@@ -2768,6 +2865,72 @@ async function enrichResponseWithRoomAvailability(response: ConciergeResponse): 
     }
   }
 
+  function shouldRenderChatDatePicker(msg: ChatMessage, index: number): boolean {
+    if (index !== messages.length - 1) return false;
+    if (msg.role !== "assistant") return false;
+    if (loading || assistantTyping || bookingDraft || paymentDraft) return false;
+
+    if (pendingBooking && (!pendingBooking.checkIn || !pendingBooking.checkOut)) return true;
+    if ((slots.check_in && slots.check_out) || (searchParams.get("check_in") && searchParams.get("check_out"))) return false;
+
+    if (inferExpectedCollectSlot(msg.text) !== "dates" && !assistantTextAsksForDates(msg.text)) return false;
+    if (msg.data?.filters.check_in && msg.data.filters.check_out) return false;
+    return true;
+  }
+
+  function initialChatDateRange(msg: ChatMessage): ChatDateRange {
+    return {
+      checkIn: pendingBooking?.checkIn || msg.data?.filters.check_in || slots.check_in || searchParams.get("check_in") || "",
+      checkOut: pendingBooking?.checkOut || msg.data?.filters.check_out || slots.check_out || searchParams.get("check_out") || "",
+    };
+  }
+
+  async function applyChatDateRange(range: ChatDateRange) {
+    if (loading) return;
+    const prompt =
+      lang === "ru"
+        ? `Даты: ${range.checkIn} -> ${range.checkOut}`
+        : `Dates: ${range.checkIn} -> ${range.checkOut}`;
+    const dateSlots: Partial<SlotState> = {
+      check_in: range.checkIn,
+      check_out: range.checkOut,
+    };
+    setSlots((prev) => mergeSlotState(prev, dateSlots));
+
+    if (pendingBooking) {
+      setMessages((prev) => [...prev, { role: "user", text: prompt }]);
+      const searchGuests = Number(searchParams.get("guests") || "");
+      const nextBooking: PendingBooking = {
+        ...pendingBooking,
+        checkIn: range.checkIn,
+        checkOut: range.checkOut,
+        guests:
+          pendingBooking.guests ||
+          latestAnswer?.data?.filters.guests ||
+          (Number.isFinite(searchGuests) && searchGuests > 0 ? searchGuests : null),
+      };
+
+      if (!nextBooking.guests) {
+        setPendingBooking(nextBooking);
+        setMessages((prev) => [...prev, { role: "assistant", text: tr.needGuestsFirst }]);
+        return;
+      }
+
+      startBooking({
+        listingId: nextBooking.listingId,
+        roomTypeId: nextBooking.roomTypeId ?? null,
+        roomTypeName: nextBooking.roomTypeName ?? null,
+        title: nextBooking.title,
+        checkIn: nextBooking.checkIn,
+        checkOut: nextBooking.checkOut,
+        guests: nextBooking.guests,
+      });
+      return;
+    }
+
+    await onFollowUp(prompt);
+  }
+
   function applyFilters(source?: ConciergeResponse) {
     const current = source ?? latestAnswer?.data;
     if (!current) return;
@@ -3761,6 +3924,15 @@ ${tr.bookingDetails}`;
         {messages.map((msg, index) => (
           <article key={`${msg.role}-${index}`} className={`ai-message ai-message-${msg.role}`}>
             <p>{assistantDisplayText(msg)}</p>
+            {shouldRenderChatDatePicker(msg, index) ? (
+              <ChatDatePicker
+                lang={lang}
+                initialCheckIn={initialChatDateRange(msg).checkIn}
+                initialCheckOut={initialChatDateRange(msg).checkOut}
+                loading={loading}
+                onApply={applyChatDateRange}
+              />
+            ) : null}
             {msg.role === "assistant" &&
             !resultInteractionBlocked &&
             msg.data?.next_action &&
@@ -3927,7 +4099,7 @@ ${tr.bookingDetails}`;
         </div>
       ) : null}
 
-      {isRail && quickPrompts.length > 0 && !pendingBooking && !bookingModeActive && !paymentDraft ? (
+      {isRail && quickPrompts.length > 0 && !chatDatePickerVisible && !pendingBooking && !bookingModeActive && !paymentDraft ? (
         <div className="ai-rail-quick-prompts">
           {quickPrompts.map((prompt) => (
             <button key={prompt} type="button" onClick={() => onFollowUp(prompt)} disabled={loading}>
