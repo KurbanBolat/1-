@@ -151,6 +151,25 @@ type ChatDateRange = {
   checkOut: string;
 };
 
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onstart: (() => void) | null;
+  onresult: ((event: { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort?: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+type SpeechRecognitionWindow = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
+
 const USD_RATE = 500;
 const MAX_FILTER_PRICE_KZT = 2_000_000;
 const API_MEDIA_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -1396,6 +1415,12 @@ function assistantTextAsksForDates(text: string): boolean {
   );
 }
 
+function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
+  if (typeof window === "undefined") return null;
+  const speechWindow = window as SpeechRecognitionWindow;
+  return speechWindow.webkitSpeechRecognition ?? speechWindow.SpeechRecognition ?? null;
+}
+
 function enrichMessageByExpectedSlot(message: string, expected: ExpectedCollectSlot, lang: Lang): string {
   if (!expected) return message;
   const trimmed = message.trim();
@@ -1459,6 +1484,9 @@ export default function AIConcierge({
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [assistantTyping, setAssistantTyping] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceListening, setVoiceListening] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [slots, setSlots] = useState<SlotState>(EMPTY_SLOTS);
@@ -1478,6 +1506,7 @@ export default function AIConcierge({
   const [lastGuestEmail, setLastGuestEmail] = useState("");
   const [tariffQuoteCache, setTariffQuoteCache] = useState<Record<string, TariffQuoteBundle>>({});
   const analyticsSentRef = useRef<Set<string>>(new Set());
+  const voiceRecognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const paymentModeActive = Boolean(paymentDraft);
   const bookingModeActive = Boolean(bookingDraft && !paymentDraft);
   const resultInteractionBlocked = bookingModeActive || paymentModeActive;
@@ -1840,6 +1869,14 @@ async function enrichResponseWithRoomAvailability(response: ConciergeResponse): 
   useEffect(() => {
     emitAnalytics("chat_open", { dedupeKey: `${pathname}|${lang}|${currency}` });
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setVoiceSupported(Boolean(getSpeechRecognitionConstructor()));
+    return () => {
+      voiceRecognitionRef.current?.abort?.();
+      voiceRecognitionRef.current = null;
+    };
   }, []);
 
   function quoteCacheKey(data: ConciergeResponse): string | null {
@@ -2574,6 +2611,70 @@ async function enrichResponseWithRoomAvailability(response: ConciergeResponse): 
 
   function wait(ms: number): Promise<void> {
     return new Promise((resolve) => window.setTimeout(resolve, ms));
+  }
+
+  function voiceErrorMessage(error?: string): string {
+    if (error === "not-allowed" || error === "service-not-allowed") {
+      return lang === "ru" ? "Разрешите доступ к микрофону в браузере." : "Allow microphone access in the browser.";
+    }
+    if (error === "no-speech") {
+      return lang === "ru" ? "Речь не распознана. Попробуйте ещё раз." : "No speech detected. Try again.";
+    }
+    return lang === "ru" ? "Голосовой ввод сейчас недоступен." : "Voice input is unavailable right now.";
+  }
+
+  function toggleVoiceInput() {
+    if (loading) return;
+
+    if (voiceListening) {
+      voiceRecognitionRef.current?.stop();
+      setVoiceListening(false);
+      return;
+    }
+
+    const Recognition = getSpeechRecognitionConstructor();
+    if (!Recognition) {
+      setVoiceSupported(false);
+      setVoiceError(lang === "ru" ? "Браузер не поддерживает голосовой ввод." : "This browser does not support voice input.");
+      return;
+    }
+
+    const recognition = new Recognition();
+    const baseQuery = query.trim();
+    recognition.lang = lang === "ru" ? "ru-RU" : "en-US";
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.onstart = () => {
+      setVoiceError(null);
+      setVoiceListening(true);
+    };
+    recognition.onresult = (event) => {
+      let transcript = "";
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        transcript += event.results[index][0].transcript;
+      }
+      const cleanTranscript = transcript.trim();
+      if (cleanTranscript) {
+        setQuery([baseQuery, cleanTranscript].filter(Boolean).join(" ").slice(0, 1000));
+      }
+    };
+    recognition.onerror = (event) => {
+      setVoiceError(voiceErrorMessage(event.error));
+      setVoiceListening(false);
+    };
+    recognition.onend = () => {
+      setVoiceListening(false);
+      voiceRecognitionRef.current = null;
+    };
+
+    voiceRecognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
+      setVoiceError(voiceErrorMessage());
+      setVoiceListening(false);
+      voiceRecognitionRef.current = null;
+    }
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -3785,10 +3886,48 @@ ${tr.bookingDetails}`;
 
       <form className="ai-concierge-form" onSubmit={onSubmit}>
         <input suppressHydrationWarning value={query} onChange={(event) => setQuery(event.target.value)} placeholder={placeholder} maxLength={1000} />
+        <button
+          type="button"
+          className={`ai-voice-btn${voiceListening ? " is-listening" : ""}`}
+          onClick={toggleVoiceInput}
+          disabled={loading || !voiceSupported}
+          aria-label={
+            voiceListening
+              ? lang === "ru"
+                ? "Остановить голосовой ввод"
+                : "Stop voice input"
+              : lang === "ru"
+                ? "Голосовой ввод"
+                : "Voice input"
+          }
+          title={
+            !voiceSupported
+              ? lang === "ru"
+                ? "Голосовой ввод не поддерживается этим браузером"
+                : "Voice input is not supported by this browser"
+              : voiceListening
+                ? lang === "ru"
+                  ? "Остановить запись"
+                  : "Stop recording"
+                : lang === "ru"
+                  ? "Сказать запрос"
+                  : "Speak request"
+          }
+        >
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M10 3.5a2.5 2.5 0 0 0-2.5 2.5v4a2.5 2.5 0 0 0 5 0V6A2.5 2.5 0 0 0 10 3.5Z" />
+            <path d="M5.5 9.5v.4a4.5 4.5 0 0 0 9 0v-.4M10 14.5v2M7.5 16.5h5" />
+          </svg>
+        </button>
         <button type="submit" disabled={loading}>
           {loading ? tr.thinking : tr.send}
         </button>
       </form>
+      {voiceListening || voiceError ? (
+        <p className={`ai-voice-status${voiceError ? " is-error" : ""}`}>
+          {voiceError || (lang === "ru" ? "Слушаю... говорите запрос." : "Listening... speak your request.")}
+        </p>
+      ) : null}
 
       {bookingModeActive ? (
         <section className="ai-booking-mode">

@@ -5049,7 +5049,7 @@ button:hover {
 
 .ai-concierge-form {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 10px;
 }
 
@@ -5063,6 +5063,51 @@ button:hover {
   border-radius: 12px;
   background: linear-gradient(120deg, #0f5c8c 0%, #0b7aa1 100%);
   box-shadow: 0 8px 18px rgba(16, 93, 139, 0.24);
+}
+
+.ai-concierge-form .ai-voice-btn {
+  min-width: 46px;
+  width: 46px;
+  padding: 0;
+  border: 1px solid #d8e2f0;
+  background: #ffffff;
+  color: #6844ff;
+  display: grid;
+  place-items: center;
+  box-shadow: none;
+}
+
+.ai-concierge-form .ai-voice-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ai-concierge-form .ai-voice-btn.is-listening {
+  border-color: #b8a8ff;
+  background: #f3edff;
+  color: #5f3ffc;
+  box-shadow: 0 0 0 4px rgba(112, 74, 255, 0.12);
+}
+
+.ai-concierge-form .ai-voice-btn:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.ai-voice-status {
+  margin: -4px 0 0;
+  color: #5c43d9;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.ai-voice-status.is-error {
+  color: #b42318;
 }
 
 .ai-concierge-log {
@@ -6038,9 +6083,13 @@ button:hover {
     grid-template-columns: 1fr;
   }
 
-  .ai-concierge-form button {
+  .ai-concierge-form button[type="submit"] {
     width: 100%;
     min-width: 0;
+  }
+
+  .ai-concierge-form .ai-voice-btn {
+    justify-self: start;
   }
 
   .ai-concierge {
@@ -7854,7 +7903,7 @@ body:has(.sp-shell) {
   background: #ffffff;
 }
 
-.sp-right-ai .ai-concierge-form button {
+.sp-right-ai .ai-concierge-form button[type="submit"] {
   min-width: 0;
   width: 38px;
   min-height: 38px;
@@ -7869,7 +7918,7 @@ body:has(.sp-shell) {
   position: relative;
 }
 
-.sp-right-ai .ai-concierge-form button::before {
+.sp-right-ai .ai-concierge-form button[type="submit"]::before {
   content: "➤";
   position: absolute;
   inset: 0;
@@ -8381,7 +8430,7 @@ body:has(.sp-shell) {
     font-size: 12px;
   }
 
-  .sp-right-ai .ai-concierge-form button {
+  .sp-right-ai .ai-concierge-form button[type="submit"] {
     width: 44px;
     min-height: 44px;
   }
@@ -8407,6 +8456,7 @@ body:has(.sp-shell) {
 
 .ai-concierge-rail .ai-concierge-form {
   order: 10;
+  position: relative;
   grid-template-columns: minmax(0, 1fr) 44px;
   gap: 10px;
   margin-top: auto;
@@ -8415,17 +8465,21 @@ body:has(.sp-shell) {
 }
 
 .ai-concierge-rail .ai-concierge-form input {
+  grid-column: 1;
+  grid-row: 1;
   min-height: 58px;
   border: 1px solid #e8ecf3;
   border-radius: 15px;
-  padding: 0 18px;
+  padding: 0 54px 0 18px;
   color: #171f2f;
   font-size: 12px;
   background: #ffffff;
   box-shadow: none;
 }
 
-.ai-concierge-rail .ai-concierge-form button {
+.ai-concierge-rail .ai-concierge-form button[type="submit"] {
+  grid-column: 2;
+  grid-row: 1;
   position: relative;
   align-self: center;
   width: 44px;
@@ -8440,7 +8494,7 @@ body:has(.sp-shell) {
   box-shadow: 0 10px 20px rgba(112, 74, 255, 0.28);
 }
 
-.ai-concierge-rail .ai-concierge-form button::before {
+.ai-concierge-rail .ai-concierge-form button[type="submit"]::before {
   content: "➤";
   position: absolute;
   inset: 0;
@@ -8449,6 +8503,41 @@ body:has(.sp-shell) {
   color: #ffffff;
   font-size: 16px;
   text-indent: 0;
+}
+
+.ai-concierge-rail .ai-concierge-form .ai-voice-btn {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  justify-self: end;
+  width: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  margin-right: 10px;
+  padding: 0;
+  border: 1px solid #e4dcff;
+  border-radius: 999px;
+  background: #f7f3ff;
+  color: #704aff;
+  text-indent: 0;
+  overflow: visible;
+  box-shadow: none;
+}
+
+.ai-concierge-rail .ai-concierge-form .ai-voice-btn.is-listening {
+  background: #efe8ff;
+  box-shadow: 0 0 0 4px rgba(112, 74, 255, 0.12);
+}
+
+.ai-concierge-rail .ai-voice-status {
+  order: 11;
+  margin: -8px 0 0;
+  color: #6844ff;
+  font-size: 10.5px;
+}
+
+.ai-concierge-rail .ai-voice-status.is-error {
+  color: #b42318;
 }
 
 .ai-concierge-rail .ai-concierge-log {
@@ -13737,12 +13826,13 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
 }
 
 main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search button,
-main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .ai-concierge-rail .ai-concierge-form button {
+main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .ai-concierge-rail .ai-concierge-form button[type="submit"],
+main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .ai-concierge-rail .ai-concierge-form .ai-voice-btn {
   transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
 }
 
 main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search button:hover,
-main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .ai-concierge-rail .ai-concierge-form button:hover {
+main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .ai-concierge-rail .ai-concierge-form button[type="submit"]:hover {
   transform: translateY(-1px);
   box-shadow: 0 14px 26px rgba(112, 74, 255, 0.34);
 }
