@@ -31,6 +31,7 @@ type DateRangePickerProps = {
   checkInRef?: RefObject<HTMLInputElement>;
   checkOutRef?: RefObject<HTMLInputElement>;
   className?: string;
+  defaultOpen?: boolean;
 };
 
 type CalendarDay = {
@@ -181,6 +182,7 @@ export default function DateRangePicker({
   checkInRef,
   checkOutRef,
   className,
+  defaultOpen = false,
 }: DateRangePickerProps) {
   const generatedId = useId();
   const fallbackToday = todayKey();
@@ -192,7 +194,7 @@ export default function DateRangePicker({
   const checkIn = currentRange.checkIn;
   const checkOut = currentRange.checkOut;
   const [activeField, setActiveField] = useState<DateField>("checkIn");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [calendarMonth, setCalendarMonth] = useState(() => monthKeyFromIso(checkIn || effectiveMinDate));
   const [drafts, setDrafts] = useState<Record<DateField, string>>({ checkIn: "", checkOut: "" });
   const pickerRef = useRef<HTMLDivElement | null>(null);
@@ -223,6 +225,10 @@ export default function DateRangePicker({
       setInnerRange({ checkIn: defaultCheckIn, checkOut: defaultCheckOut });
     }
   }, [defaultCheckIn, defaultCheckOut, isControlled]);
+
+  useEffect(() => {
+    if (defaultOpen) setIsOpen(true);
+  }, [defaultOpen]);
 
   useEffect(() => {
     setDrafts({ checkIn: "", checkOut: "" });

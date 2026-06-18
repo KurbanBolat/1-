@@ -738,6 +738,7 @@ function ChatDatePicker({
         lang={lang}
         variant="booking"
         value={range}
+        defaultOpen
         onChange={(nextRange) => {
           setRange(nextRange);
           setSubmitted(false);
