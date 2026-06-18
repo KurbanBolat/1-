@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_optional_current_user
 from app.core.config import settings
 from app.core.time import utc_now
 from app.core.security import create_access_token, get_password_hash, verify_password
@@ -29,6 +29,11 @@ LOGIN_LOCK_SECONDS = 15 * 60
 _login_attempts: dict[str, deque[float]] = {}
 _login_lockouts: dict[str, float] = {}
 _login_guard = Lock()
+
+
+class SessionStatusOut(BaseModel):
+    authenticated: bool
+    user: UserOut | None = None
 
 
 def _token_hash(raw_token: str) -> str:
@@ -198,6 +203,11 @@ def login(
 @router.get("/session", response_model=UserOut)
 def get_session(user: User = Depends(get_current_user)):
     return user
+
+
+@router.get("/session/status", response_model=SessionStatusOut)
+def get_session_status(user: User | None = Depends(get_optional_current_user)):
+    return SessionStatusOut(authenticated=user is not None, user=user)
 
 
 @router.post("/logout", response_model=MessageOut)

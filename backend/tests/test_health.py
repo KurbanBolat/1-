@@ -41,6 +41,48 @@ def test_health_liveness_and_readiness():
     assert ready_response.json()["modes"]["payment_provider"] in {"mock", "manual", "stripe", "kaspi"}
 
 
+def test_session_status_without_auth_is_quiet():
+    response = client.get("/auth/session/status")
+
+    assert response.status_code == 200
+    assert response.json() == {"authenticated": False, "user": None}
+
+
+def test_session_status_with_auth_returns_user():
+    _run_startup_migrations()
+    db = SessionLocal()
+    try:
+        admin = db.query(User).filter(User.email == "session-admin@staypilot.dev").first()
+        if not admin:
+            admin = User(
+                email="session-admin@staypilot.dev",
+                full_name="Session Admin",
+                hashed_password=get_password_hash("Admin12345!"),
+                role="admin",
+                email_verified=True,
+                token_version=0,
+            )
+            db.add(admin)
+            db.commit()
+            db.refresh(admin)
+        else:
+            admin.role = "admin"
+            admin.email_verified = True
+            db.commit()
+            db.refresh(admin)
+        token = create_access_token(str(admin.id), admin.role, token_version=admin.token_version)
+    finally:
+        db.close()
+
+    response = client.get("/auth/session/status", headers={"Authorization": f"Bearer {token}"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["authenticated"] is True
+    assert payload["user"]["email"] == "session-admin@staypilot.dev"
+    assert payload["user"]["role"] == "admin"
+
+
 def test_request_id_header_is_echoed():
     response = client.get("/health/live", headers={"x-request-id": "test-request-id"})
 

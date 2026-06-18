@@ -94,6 +94,10 @@ const initialForm: FormState = {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const disabledFlagValues = new Set(["0", "false", "off", "no"]);
 
+type SessionStatusResponse = {
+  authenticated: boolean;
+};
+
 function featureEnabled(value: string | undefined, fallback: boolean = true): boolean {
   if (value === undefined) return fallback;
   return !disabledFlagValues.has(value.toLowerCase());
@@ -201,12 +205,17 @@ export default function ManagerPage() {
     let active = true;
     const checkSession = async () => {
       try {
-        const response = await fetch(`${API_URL}/auth/session`, {
+        const response = await fetch(`${API_URL}/auth/session/status`, {
           credentials: "include",
           cache: "no-store",
         });
         if (!active) return;
-        setToken(response.ok ? "cookie" : "");
+        if (!response.ok) {
+          setToken("");
+          return;
+        }
+        const payload = (await response.json().catch(() => null)) as SessionStatusResponse | null;
+        setToken(payload?.authenticated ? "cookie" : "");
       } catch {
         if (!active) return;
         setToken("");
