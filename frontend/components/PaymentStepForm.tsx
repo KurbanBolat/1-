@@ -70,12 +70,22 @@ export default function PaymentStepForm({
           demoPaymentHint: "Безопасная демо-оплата: бронь подтверждается внутренним тестовым сценарием, реальные списания не выполняются.",
           livePaymentTitle: "Платежный провайдер",
           livePaymentHint: "Платеж будет обработан через настроенный provider, а финальный статус придет через webhook.",
+          routeTitle: "Маршрут оплаты",
+          routeHint: "Показываем, что происходит сейчас: способ, обработка и финальный результат.",
+          routeMethod: "Способ",
+          routeProcessing: "Обработка",
+          routeResult: "Результат",
+          redirectReadyTitle: "Страница результата готова",
+          redirectReadyHint: "Можно перейти сразу или дождаться автоматического перехода.",
           card: "Банковская карта",
           cardHint: "Visa, Mastercard или локальная карта",
+          cardBadge: "CARD",
           kaspi: "Kaspi Pay",
           kaspiHint: "Оплата через Kaspi для гостей из Казахстана",
+          kaspiBadge: "KASPI",
           apple: "Apple Pay",
           appleHint: "Быстрая оплата через сохраненный кошелек",
+          appleBadge: "APPLE",
           payNow: "Оплатить сейчас",
           paying: "Обработка платежа...",
           failed: "Оплата не прошла, попробуйте снова.",
@@ -117,12 +127,22 @@ export default function PaymentStepForm({
           demoPaymentHint: "Safe demo payment: the booking is confirmed through the internal test flow, and no real charge is made.",
           livePaymentTitle: "Payment provider",
           livePaymentHint: "Payment will be handled by the configured provider and finalized by webhook.",
+          routeTitle: "Payment route",
+          routeHint: "Shows the current step: method, processing, and final result.",
+          routeMethod: "Method",
+          routeProcessing: "Processing",
+          routeResult: "Result",
+          redirectReadyTitle: "Result page is ready",
+          redirectReadyHint: "Go now or wait for the automatic redirect.",
           card: "Bank card",
           cardHint: "Visa, Mastercard, or local card",
+          cardBadge: "CARD",
           kaspi: "Kaspi Pay",
           kaspiHint: "Kaspi payment for Kazakhstan guests",
+          kaspiBadge: "KASPI",
           apple: "Apple Pay",
           appleHint: "Fast payment through saved wallet",
+          appleBadge: "APPLE",
           payNow: "Pay now",
           paying: "Processing payment...",
           failed: "Payment failed, please retry.",
@@ -156,12 +176,31 @@ export default function PaymentStepForm({
           stayHere: "Stay on page",
           goNow: "Go now",
         };
-  const methodOptions: Array<{ value: "card" | "kaspi" | "apple_pay"; label: string; hint: string }> = [
-    { value: "card", label: text.card, hint: text.cardHint },
-    { value: "kaspi", label: text.kaspi, hint: text.kaspiHint },
-    { value: "apple_pay", label: text.apple, hint: text.appleHint },
+  const methodOptions: Array<{ value: "card" | "kaspi" | "apple_pay"; label: string; hint: string; badge: string }> = [
+    { value: "card", label: text.card, hint: text.cardHint, badge: text.cardBadge },
+    { value: "kaspi", label: text.kaspi, hint: text.kaspiHint, badge: text.kaspiBadge },
+    { value: "apple_pay", label: text.apple, hint: text.appleHint, badge: text.appleBadge },
   ];
   const isMockPaymentMode = PAYMENT_MODE === "mock";
+  const paymentIsFinal = paymentSnapshot?.payment_status === "paid" || paymentSnapshot?.payment_status === "failed";
+  const paymentIsFailed = paymentSnapshot?.payment_status === "failed";
+  const routeSteps = [
+    {
+      key: "method",
+      label: text.routeMethod,
+      state: processing || paymentSnapshot ? "done" : "active",
+    },
+    {
+      key: "processing",
+      label: text.routeProcessing,
+      state: paymentIsFinal ? "done" : processing || paymentSnapshot?.payment_status === "pending" ? "active" : "idle",
+    },
+    {
+      key: "result",
+      label: text.routeResult,
+      state: paymentIsFinal || hasPendingResultRedirect ? (paymentIsFailed ? "failed" : "done") : "idle",
+    },
+  ];
 
   function generateIdempotencyKey(): string {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -309,6 +348,20 @@ export default function PaymentStepForm({
         <b>{isMockPaymentMode ? text.demoPaymentTitle : text.livePaymentTitle}</b>
         <span>{isMockPaymentMode ? text.demoPaymentHint : text.livePaymentHint}</span>
       </section>
+      <section className="payment-route-card" aria-label={text.routeTitle}>
+        <div className="payment-route-head">
+          <b>{text.routeTitle}</b>
+          <span>{text.routeHint}</span>
+        </div>
+        <div className="payment-route-steps">
+          {routeSteps.map((step, index) => (
+            <span key={step.key} className={`payment-route-step ${step.state}`}>
+              <span className="payment-route-index">{index + 1}</span>
+              {step.label}
+            </span>
+          ))}
+        </div>
+      </section>
       <fieldset className="payment-method-panel" disabled={processing}>
         <legend>{text.methodTitle}</legend>
         <p className="desc">{text.methodHint}</p>
@@ -331,6 +384,9 @@ export default function PaymentStepForm({
               <span className="payment-method-copy">
                 <b>{option.label}</b>
                 <small>{option.hint}</small>
+              </span>
+              <span className="payment-method-badge" aria-hidden="true">
+                {option.badge}
               </span>
               <span className="payment-method-dot" aria-hidden="true" />
             </label>
@@ -357,16 +413,26 @@ export default function PaymentStepForm({
         </section>
       ) : null}
       {hasPendingResultRedirect ? (
-        <div className="ai-followups">
-          <button type="button" className="ai-followup-chip" onClick={cancelResultRedirect}>
-            {text.stayHere}
-          </button>
-          <button type="button" className="ai-followup-chip" onClick={redirectResultNow}>
-            {text.goNow}
-          </button>
-        </div>
+        <section className="payment-redirect-card" aria-live="polite">
+          <div>
+            <b>{text.redirectReadyTitle}</b>
+            <span>{text.redirectReadyHint}</span>
+          </div>
+          <div className="payment-redirect-actions">
+            <button type="button" onClick={cancelResultRedirect}>
+              {text.stayHere}
+            </button>
+            <button type="button" className="primary" onClick={redirectResultNow}>
+              {text.goNow}
+            </button>
+          </div>
+        </section>
       ) : null}
-      {status ? <p className={`form-status ${statusKind === "error" ? "error" : ""}`}>{status}</p> : null}
+      {status ? (
+        <p className={`form-status ${statusKind === "error" ? "error" : ""}`} role={statusKind === "error" ? "alert" : "status"} aria-live="polite">
+          {status}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -549,14 +549,17 @@ test("booking flow works end-to-end", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/checkout\/payment\?/);
   await expect(page.locator(".payment-booking-summary")).toContainText(/Payment summary/i);
+  await expect(page.locator(".payment-route-card")).toContainText(/Payment route/i);
+  await expect(page.locator(".payment-route-step")).toHaveCount(3);
   await expect(page.locator(".payment-method-card")).toHaveCount(3);
   const successParams = await payUntilConfirmed(page);
   expect(successParams.get("room_type_id")).toBeTruthy();
   await expect(page).toHaveURL(/\/checkout\/success\?/);
   await expect(page.locator("body")).toContainText(/booking confirmed/i);
   await expect(page.locator(".success-result-card")).toContainText(/Payment completed/i);
+  await expect(page.locator(".success-priority-card")).toContainText(/AI concierge/i);
+  await expect(page.locator(".success-priority-actions a").filter({ hasText: /Open AI concierge/i })).toBeVisible();
   await expect(page.locator(".success-booking-summary")).toContainText(/Room/i);
-  await expect(page.locator(".success-next-card")).toContainText(/AI concierge/i);
 });
 
 test("checkout shows required-field errors and then allows booking", async ({ page }) => {

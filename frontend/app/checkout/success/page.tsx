@@ -37,6 +37,9 @@ const t = {
     payment: "Payment",
     retryPayment: "Retry payment",
     editBooking: "Edit booking details",
+    resultActionsTitle: "Next step",
+    failedActionTitle: "Complete payment",
+    pendingActionTitle: "Track reservation",
     nextTitle: "During your stay",
     nextSubtitle: "Your AI concierge can help with hotel restaurants and room service using this confirmed reservation.",
     openConcierge: "Open AI concierge",
@@ -98,6 +101,9 @@ const t = {
     payment: "Оплата",
     retryPayment: "Повторить оплату",
     editBooking: "Изменить параметры брони",
+    resultActionsTitle: "Следующий шаг",
+    failedActionTitle: "Завершить оплату",
+    pendingActionTitle: "Следить за бронью",
     nextTitle: "Во время проживания",
     nextSubtitle: "AI-консьерж уже видит эту бронь и поможет с ресторанами отеля и room service.",
     openConcierge: "Открыть AI-консьержа",
@@ -344,6 +350,33 @@ export default async function CheckoutSuccessPage({
             <b>#{reservationId}</b>
           </div>
         </section>
+        <section className={`success-priority-card ${resultState}`} aria-label={tr.resultActionsTitle}>
+          <div>
+            <p className="success-next-kicker">{isPaid ? tr.nextTitle : tr.resultActionsTitle}</p>
+            <h2>{isPaid ? tr.openConcierge : isFailed ? tr.failedActionTitle : tr.pendingActionTitle}</h2>
+            <p className="desc">{isPaid ? tr.nextSubtitle : isFailed ? tr.resultFailedCopy : tr.resultPendingCopy}</p>
+          </div>
+          <div className="success-priority-actions">
+            {isPaid ? (
+              <>
+                <Link className="primary" href={conciergeHref}>{tr.openConcierge}</Link>
+                <Link href={accountHref}>{tr.account}</Link>
+                <Link href={restaurantsHref}>{tr.showRestaurants}</Link>
+              </>
+            ) : isFailed ? (
+              <>
+                <Link className="primary" href={`/checkout/payment?${paymentRetryQuery}`}>{tr.retryPayment}</Link>
+                <Link href={`/checkout?${editBookingQuery}`}>{tr.editBooking}</Link>
+                <Link href={accountHref}>{tr.account}</Link>
+              </>
+            ) : (
+              <>
+                <Link className="primary" href={accountHref}>{tr.account}</Link>
+                <Link href={stayHref}>{tr.backStay}</Link>
+              </>
+            )}
+          </div>
+        </section>
         <section className="booking-flow-card" style={{ marginTop: 8 }}>
           <p className="desc"><b>{tr.flowTitle}</b></p>
           <div className="pill-row">
@@ -420,20 +453,6 @@ export default async function CheckoutSuccessPage({
             <p className="desc" style={{ marginBottom: 0 }}>
               <b>{tr.cancellationRule}:</b> {cancellationReasonLabel(cancellationTerms.reason, tr)}
             </p>
-          </section>
-        ) : null}
-
-        {isPaid ? (
-          <section className="success-next-card">
-            <div>
-              <p className="success-next-kicker">{tr.nextTitle}</p>
-              <h2>{tr.openConcierge}</h2>
-              <p className="desc">{tr.nextSubtitle}</p>
-            </div>
-            <div className="success-next-actions">
-              <Link href={conciergeHref}>{tr.openConcierge}</Link>
-              <Link href={restaurantsHref}>{tr.showRestaurants}</Link>
-            </div>
           </section>
         ) : null}
 

@@ -1427,25 +1427,6 @@ button:hover {
   padding: 10px;
 }
 
-.success-next-card {
-  margin-top: 14px;
-  border: 1px solid #cfe0ef;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #f7fbff 0%, #eef8f5 100%);
-  padding: 14px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px;
-  align-items: center;
-}
-
-.success-next-card h2 {
-  margin: 2px 0 4px;
-  font-size: 22px;
-  line-height: 1.2;
-  color: #173a5a;
-}
-
 .success-next-kicker {
   margin: 0;
   color: #0f7b78;
@@ -1453,33 +1434,6 @@ button:hover {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-}
-
-.success-next-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.success-next-actions a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid #9fc8d4;
-  background: #ffffff;
-  color: #164764;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.success-next-actions a:first-child {
-  background: #0f766e;
-  border-color: #0f766e;
-  color: #ffffff;
 }
 
 .flow-pill {
@@ -5961,18 +5915,6 @@ button:hover {
     font-size: 14px;
   }
 
-  .success-next-card {
-    grid-template-columns: 1fr;
-  }
-
-  .success-next-actions {
-    justify-content: stretch;
-  }
-
-  .success-next-actions a {
-    flex: 1 1 100%;
-  }
-
   .map-panel {
     position: static;
   }
@@ -8995,6 +8937,9 @@ body:has(.sp-shell) {
 .sp-transaction-page .trust-layer-card,
 .sp-transaction-page .dynamic-pricing-note,
 .sp-transaction-page .payment-flow-state,
+.sp-transaction-page .payment-route-card,
+.sp-transaction-page .payment-redirect-card,
+.sp-transaction-page .success-priority-card,
 .sp-transaction-page .ui-card,
 .sp-transaction-page .cancellation-terms-card {
   border: 1px solid #edf0f6;
@@ -9009,6 +8954,9 @@ body:has(.sp-shell) {
 .sp-transaction-page .booking-flow-card,
 .sp-transaction-page .quote-lock-card,
 .sp-transaction-page .payment-flow-state,
+.sp-transaction-page .payment-route-card,
+.sp-transaction-page .payment-redirect-card,
+.sp-transaction-page .success-priority-card,
 .sp-transaction-page .ui-card,
 .sp-transaction-page .cancellation-terms-card {
   padding: 14px;
@@ -9170,7 +9118,7 @@ body:has(.sp-shell) {
 .sp-transaction-page .ghost-btn,
 .sp-transaction-page .booking-form button,
 .sp-transaction-page .actions-modern a,
-.sp-transaction-page .success-next-actions a {
+.sp-transaction-page .success-priority-actions a {
   min-height: 44px;
   border-radius: 12px;
   font-size: 13px;
@@ -9179,7 +9127,7 @@ body:has(.sp-shell) {
 
 .sp-transaction-page .booking-form button:not(.ghost-btn),
 .sp-transaction-page .actions-modern a:first-child,
-.sp-transaction-page .success-next-actions a:first-child {
+.sp-transaction-page .success-priority-actions a.primary {
   border: 0;
   background: linear-gradient(135deg, #6745ff 0%, #7e49fb 100%);
   color: #ffffff;
@@ -9188,7 +9136,7 @@ body:has(.sp-shell) {
 
 .sp-transaction-page .ghost-btn,
 .sp-transaction-page .actions-modern a:not(:first-child),
-.sp-transaction-page .success-next-actions a:not(:first-child) {
+.sp-transaction-page .success-priority-actions a:not(.primary) {
   border: 1px solid #e7dcff;
   background: #ffffff;
   color: #6844ff;
@@ -9374,6 +9322,106 @@ body:has(.sp-shell) {
   line-height: 1.45;
 }
 
+.sp-transaction-page .payment-route-card {
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+  background: linear-gradient(180deg, #fbfcff 0%, #f8f9fc 100%);
+}
+
+.sp-transaction-page .payment-route-head {
+  display: grid;
+  gap: 3px;
+}
+
+.sp-transaction-page .payment-route-head b,
+.sp-transaction-page .payment-redirect-card b,
+.sp-transaction-page .success-priority-card h2 {
+  color: #171b28;
+  line-height: 1.2;
+}
+
+.sp-transaction-page .payment-route-head b,
+.sp-transaction-page .payment-redirect-card b {
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.sp-transaction-page .payment-route-head span,
+.sp-transaction-page .payment-redirect-card span {
+  color: #6f7788;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.sp-transaction-page .payment-route-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sp-transaction-page .payment-route-step {
+  min-width: 0;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid #e7ebf2;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #747d8f;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.sp-transaction-page .payment-route-index {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #f2f4f8;
+  color: #778197;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.sp-transaction-page .payment-route-step.active {
+  border-color: #cfc4ff;
+  background: #f4f0ff;
+  color: #6844ff;
+}
+
+.sp-transaction-page .payment-route-step.done {
+  border-color: #ccebdc;
+  background: #f4fff9;
+  color: #057a45;
+}
+
+.sp-transaction-page .payment-route-step.failed {
+  border-color: #ffd4c8;
+  background: #fff7f4;
+  color: #b42318;
+}
+
+.sp-transaction-page .payment-route-step.active .payment-route-index {
+  background: #704aff;
+  color: #ffffff;
+}
+
+.sp-transaction-page .payment-route-step.done .payment-route-index {
+  background: #06a660;
+  color: #ffffff;
+}
+
+.sp-transaction-page .payment-route-step.failed .payment-route-index {
+  background: #d92d20;
+  color: #ffffff;
+}
+
 .sp-transaction-page .payment-method-panel {
   display: grid;
   gap: 10px;
@@ -9404,7 +9452,7 @@ body:has(.sp-shell) {
   min-width: 0;
   min-height: 92px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 18px;
+  grid-template-columns: minmax(0, 1fr) auto 18px;
   gap: 10px;
   align-items: start;
   padding: 12px;
@@ -9452,6 +9500,21 @@ body:has(.sp-shell) {
   line-height: 1.35;
 }
 
+.sp-transaction-page .payment-method-badge {
+  min-height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #f2f4f8;
+  color: #6f7788;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .sp-transaction-page .payment-method-dot {
   width: 18px;
   height: 18px;
@@ -9462,6 +9525,11 @@ body:has(.sp-shell) {
 
 .sp-transaction-page .payment-method-card.active .payment-method-dot {
   border: 5px solid #6844ff;
+}
+
+.sp-transaction-page .payment-method-card.active .payment-method-badge {
+  background: #ffffff;
+  color: #6844ff;
 }
 
 .sp-transaction-page .payment-method-panel:disabled .payment-method-card {
@@ -9475,6 +9543,46 @@ body:has(.sp-shell) {
   background: #ffffff;
   color: #6844ff;
   box-shadow: none;
+}
+
+.sp-transaction-page .payment-redirect-card {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-color: #d9f0e5;
+  background: linear-gradient(135deg, #f9fffc 0%, #f6fbff 100%);
+}
+
+.sp-transaction-page .payment-redirect-card > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.sp-transaction-page .payment-redirect-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.sp-transaction-page .payment-redirect-actions button {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid #e7dcff !important;
+  border-radius: 12px;
+  background: #ffffff !important;
+  color: #6844ff !important;
+  box-shadow: none !important;
+}
+
+.sp-transaction-page .payment-redirect-actions button.primary {
+  border: 0 !important;
+  background: linear-gradient(135deg, #6745ff 0%, #7e49fb 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 24px rgba(104, 68, 255, 0.22) !important;
 }
 
 .sp-transaction-page .success-result-card {
@@ -9541,17 +9649,51 @@ body:has(.sp-shell) {
   gap: 4px;
 }
 
-.sp-transaction-page .success-next-card {
-  border: 1px solid #d9f0e5;
-  border-radius: 14px;
+.sp-transaction-page .success-priority-card {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border-color: #d9f0e5;
   background: linear-gradient(135deg, #f9fffc 0%, #f6fbff 100%);
-  box-shadow: none;
 }
 
-.sp-transaction-page .success-next-card h2 {
-  color: #171b28;
-  font-size: 22px;
+.sp-transaction-page .success-priority-card.failed {
+  border-color: #ffd4c8;
+  background: #fff7f4;
+}
+
+.sp-transaction-page .success-priority-card.pending {
+  border-color: #f8d98b;
+  background: #fffaf0;
+}
+
+.sp-transaction-page .success-priority-card h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 880;
   letter-spacing: 0;
+}
+
+.sp-transaction-page .success-priority-card .desc {
+  margin: 5px 0 0;
+}
+
+.sp-transaction-page .success-priority-actions {
+  min-width: 220px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.sp-transaction-page .success-priority-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  white-space: nowrap;
 }
 
 .sp-transaction-page .success-next-kicker {
@@ -9746,13 +9888,31 @@ body:has(.sp-shell) {
   .sp-transaction-page .checkout-room-summary-grid,
   .sp-transaction-page .payment-booking-grid,
   .sp-transaction-page .payment-method-grid,
+  .sp-transaction-page .payment-route-steps,
   .sp-transaction-page .success-booking-grid {
     grid-template-columns: 1fr;
   }
 
   .sp-transaction-page .payment-booking-summary-head,
-  .sp-transaction-page .success-result-card {
+  .sp-transaction-page .success-result-card,
+  .sp-transaction-page .success-priority-card {
     grid-template-columns: 1fr;
+  }
+
+  .sp-transaction-page .payment-redirect-card {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .sp-transaction-page .payment-redirect-actions,
+  .sp-transaction-page .success-priority-actions {
+    min-width: 0;
+    justify-content: stretch;
+  }
+
+  .sp-transaction-page .payment-redirect-actions button,
+  .sp-transaction-page .success-priority-actions a {
+    width: 100%;
   }
 
   .sp-transaction-page .payment-booking-summary-head {
