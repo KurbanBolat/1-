@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 
 import { getListingQuote, type Quote } from "../lib/api";
 import { CheckoutExposureTracker } from "./AnalyticsTrackers";
+import DateRangePicker from "./DateRangePicker";
 import ReservationForm from "./ReservationForm";
 import TrustLayerCard from "./TrustLayerCard";
 
@@ -63,6 +64,25 @@ type Copy = {
 };
 
 const TZ_SUFFIX_PATTERN = /[zZ]|[+\-]\d{2}:\d{2}$/;
+const MAX_BOOKING_HORIZON_DAYS = 365;
+
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+function isoFromDate(date: Date): string {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function todayKey(): string {
+  return isoFromDate(new Date());
+}
+
+function addDays(isoDate: string, days: number): string {
+  const date = new Date(`${isoDate}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return isoFromDate(date);
+}
 
 function parseQuoteTimeToMs(value: string | null): number {
   if (!value) return Number.NaN;
@@ -133,6 +153,26 @@ export default function CheckoutShell({
     );
   const checkInBadge = formatBadgeDate(quote.check_in);
   const checkOutBadge = formatBadgeDate(quote.check_out);
+  const minBookDate = useMemo(() => todayKey(), []);
+  const maxBookDate = useMemo(() => addDays(minBookDate, MAX_BOOKING_HORIZON_DAYS), [minBookDate]);
+  const mobileCopy =
+    lang === "ru"
+      ? {
+          total: "Итого",
+          cta: "Продолжить",
+          unavailable: "Номер недоступен",
+        }
+      : {
+          total: "Total",
+          cta: "Continue",
+          unavailable: "Room unavailable",
+        };
+  const mobileTotal = useMemo(() => {
+    if (currency === "USD") {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(quote.total / 500);
+    }
+    return new Intl.NumberFormat("ru-RU", { style: "currency", currency: "KZT", maximumFractionDigits: 0 }).format(Math.round(quote.total));
+  }, [currency, quote.total]);
   const adjustValid =
     Boolean(stayCheckIn) &&
     Boolean(stayCheckOut) &&
@@ -295,28 +335,19 @@ export default function CheckoutShell({
 
         <section className="checkout-adjust-card">
           <h3>{copy.adjustTitle}</h3>
-          <div className="booking-row">
-            <label className="field-stack">
-              <span>{copy.checkInLabel}</span>
-              <input
-                type="date"
-                lang={lang === "ru" ? "ru-RU" : "en-GB"}
-                value={stayCheckIn}
-                suppressHydrationWarning
-                onChange={(event) => setStayCheckIn(event.target.value)}
-              />
-            </label>
-            <label className="field-stack">
-              <span>{copy.checkOutLabel}</span>
-              <input
-                type="date"
-                lang={lang === "ru" ? "ru-RU" : "en-GB"}
-                value={stayCheckOut}
-                suppressHydrationWarning
-                onChange={(event) => setStayCheckOut(event.target.value)}
-              />
-            </label>
-          </div>
+          <DateRangePicker
+            lang={lang}
+            variant="booking"
+            value={{ checkIn: stayCheckIn, checkOut: stayCheckOut }}
+            onChange={(range) => {
+              setStayCheckIn(range.checkIn);
+              setStayCheckOut(range.checkOut);
+            }}
+            minDate={minBookDate}
+            maxDate={maxBookDate}
+            checkInLabel={copy.checkInLabel}
+            checkOutLabel={copy.checkOutLabel}
+          />
           <label className="field-stack">
             <span>{copy.guestsLabel}</span>
             <input
@@ -369,22 +400,24 @@ export default function CheckoutShell({
           </button>
         </div>
 
-        <ReservationForm
-          listingId={listingId}
-          listingTitle={listingTitle}
-          lang={lang}
-          currency={currency}
-          lockedBooking={{ checkIn: quote.check_in, checkOut: quote.check_out, guests: quote.guests }}
-          roomTypeId={quote.room_type_id || undefined}
-          tariffPlan={quote.tariff_plan}
-          quoteToken={quote.quote_token || undefined}
-          expVariant={expVariant}
-          quoteExpired={quoteExpired}
-          bookingUnavailable={!quote.available}
-          bookingUnavailableMessage={copy.unavailable}
-          quoteRefreshing={isPending || autoRefreshing}
-          onRefreshQuote={() => refreshQuote("retry")}
-        />
+        <div id="checkout-reservation">
+          <ReservationForm
+            listingId={listingId}
+            listingTitle={listingTitle}
+            lang={lang}
+            currency={currency}
+            lockedBooking={{ checkIn: quote.check_in, checkOut: quote.check_out, guests: quote.guests }}
+            roomTypeId={quote.room_type_id || undefined}
+            tariffPlan={quote.tariff_plan}
+            quoteToken={quote.quote_token || undefined}
+            expVariant={expVariant}
+            quoteExpired={quoteExpired}
+            bookingUnavailable={!quote.available}
+            bookingUnavailableMessage={copy.unavailable}
+            quoteRefreshing={isPending || autoRefreshing}
+            onRefreshQuote={() => refreshQuote("retry")}
+          />
+        </div>
       </article>
 
       <aside className="checkout-summary">
@@ -420,6 +453,14 @@ export default function CheckoutShell({
           </ul>
         </div>
       </aside>
+
+      <a href="#checkout-reservation" className="checkout-mobile-action">
+        <span>
+          <small>{quote.available ? mobileCopy.total : mobileCopy.unavailable}</small>
+          <b>{mobileTotal}</b>
+        </span>
+        <strong>{mobileCopy.cta}</strong>
+      </a>
     </section>
   );
 }
