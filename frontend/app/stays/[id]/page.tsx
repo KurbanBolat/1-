@@ -704,7 +704,7 @@ export default async function StayDetails({
           </aside>
         </section>
 
-        <MobileBookBar targetId="available-rooms" label={tr.mobileRoomsCta} hint={tr.mobileRoomsHint} hideWhenIds={["booking-panel"]} />
+        <MobileBookBar targetId="available-rooms" label={tr.mobileRoomsCta} hint={tr.mobileRoomsHint} hideWhenIds={["booking-panel", "in-stay-concierge"]} />
 
         <section className="similar-grid">
           <h3>{tr.similar} {localizeCityName(listing.city, lang)}</h3>

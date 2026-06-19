@@ -18,28 +18,37 @@ export default function MobileBookBar({
 
   useEffect(() => {
     const extraIds = hideWhenIdsKey ? hideWhenIdsKey.split("|") : [];
-    const targets = [targetId, ...extraIds]
-      .map((id) => document.getElementById(id))
-      .filter((target): target is HTMLElement => Boolean(target));
-    if (targets.length === 0) return;
+    const watchedIds = [targetId, ...extraIds];
+    let frameId: number | null = null;
 
-    const visibleTargets = new Map<string, boolean>();
+    const updateHiddenState = () => {
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        const hasVisibleTarget = watchedIds
+          .map((id) => document.getElementById(id))
+          .filter((target): target is HTMLElement => Boolean(target))
+          .some((target) => {
+            const rect = target.getBoundingClientRect();
+            return rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
+          });
+        setIsHidden(hasVisibleTarget);
+      });
+    };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          visibleTargets.set((entry.target as HTMLElement).id, entry.isIntersecting);
-        });
-        setIsHidden(Array.from(visibleTargets.values()).some(Boolean));
-      },
-      { threshold: 0.2 },
-    );
-
-    targets.forEach((target) => {
-      visibleTargets.set(target.id, false);
-      observer.observe(target);
-    });
-    return () => observer.disconnect();
+    updateHiddenState();
+    window.addEventListener("scroll", updateHiddenState, { passive: true });
+    window.addEventListener("resize", updateHiddenState);
+    window.addEventListener("hashchange", updateHiddenState);
+    const mutationObserver = new MutationObserver(updateHiddenState);
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", updateHiddenState);
+      window.removeEventListener("resize", updateHiddenState);
+      window.removeEventListener("hashchange", updateHiddenState);
+      mutationObserver.disconnect();
+    };
   }, [targetId, hideWhenIdsKey]);
 
   return (

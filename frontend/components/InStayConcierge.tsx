@@ -241,8 +241,12 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           chatSend: "Отправить",
           chatIntro: "Помогу с заказом еды в номер и бронью столика в ресторане.",
           postPaymentIntro: "Бронь подтверждена. Я уже вижу эту бронь: могу показать рестораны отеля, забронировать столик или собрать room service.",
+          chatHeadHint: "Выберите быстрый сценарий или напишите запрос.",
+          postPaymentHeadHint: "Сервисы уже привязаны к подтвержденной брони.",
           transferUnavailable: "Трансфер пока не подключен к API. Сейчас могу помочь с рестораном отеля или заказом в номер.",
           roomService: "Room service",
+          activeRequests: "Заявки в работе",
+          activeRequestsHint: "заказы и брони",
           orderDraft: "Черновик заказа",
           orderHistory: "История заказов",
           bookingForm: "Бронь столика",
@@ -302,8 +306,12 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           chatSend: "Send",
           chatIntro: "I can help with room service and table booking.",
           postPaymentIntro: "Booking confirmed. I can see this reservation and can help with hotel restaurants, table booking, or room service.",
+          chatHeadHint: "Pick a quick flow or write your request.",
+          postPaymentHeadHint: "Services are attached to the confirmed reservation.",
           transferUnavailable: "Transfer is not connected to the API yet. I can help with hotel restaurants or room service now.",
           roomService: "Room service",
+          activeRequests: "Active requests",
+          activeRequestsHint: "orders and bookings",
           orderDraft: "Order draft",
           orderHistory: "Order history",
           bookingForm: "Table booking",
@@ -450,6 +458,7 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
       restaurantCount: restaurants.length,
       activeOrders,
       activeTableBookings,
+      activeRequests: activeOrders + activeTableBookings,
     };
   }, [menu.length, restaurants.length, orders, tableBookings]);
   const sortedMenuItems = useMemo(() => sortMenuItemsForDisplay(menu), [menu]);
@@ -1113,13 +1122,18 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           <b>{serviceSummary.restaurantCount}</b>
           <small>{serviceSummary.activeTableBookings} {lang === "ru" ? "активных броней" : "active bookings"}</small>
         </article>
+        <article>
+          <span>{text.activeRequests}</span>
+          <b>{serviceSummary.activeRequests}</b>
+          <small>{text.activeRequestsHint}</small>
+        </article>
       </div>
 
       <section className="ai-concierge in-stay-chat">
         <div className="in-stay-chat-head">
           <div>
             <h4>{text.chatTitle}</h4>
-            <p>{postPayment ? text.postPaymentIntro : text.chatIntro}</p>
+            <p>{postPayment ? text.postPaymentHeadHint : text.chatHeadHint}</p>
           </div>
           <button type="button" className="ghost-btn" onClick={() => void refresh()} disabled={loading}>
             {loading ? text.actionBusy : text.refresh}

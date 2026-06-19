@@ -1061,6 +1061,8 @@ test("room service order moves from guest to manager and back to guest status", 
   const guestInStay = page.locator("#in-stay-concierge");
   await expect(guestInStay).toBeVisible({ timeout: 15000 });
   await expect(guestInStay).toContainText(menuItemName);
+  await expect(guestInStay.locator(".in-stay-service-summary article")).toHaveCount(3);
+  await expect(guestInStay.locator(".in-stay-chat-head")).toContainText("Сервисы уже привязаны к подтвержденной брони.");
   const chatForm = guestInStay.locator(".in-stay-chat-form");
   await chatForm.locator("input").fill(`закажи ${menuItemName} в номер`);
   await chatForm.getByRole("button", { name: /Отправить/i }).click();
