@@ -2629,6 +2629,92 @@ button:hover {
   margin: 0;
 }
 
+.manager-reservation-command {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d9e4ef;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.manager-reservation-command > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.manager-reservation-command > div:first-child span {
+  color: #6844ff;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.manager-reservation-command > div:first-child b {
+  color: #111827;
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.manager-reservation-command > div:first-child small {
+  color: #64758a;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.manager-reservation-queue {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 8px;
+}
+
+.manager-reservation-queue button {
+  min-width: 0;
+  min-height: 68px;
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 1px solid #dfe7f1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #293246;
+  text-align: left;
+  box-shadow: none;
+}
+
+.manager-reservation-queue button span {
+  color: #293246;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.manager-reservation-queue button b {
+  color: #111827;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.manager-reservation-queue button small {
+  color: #64758a;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.manager-reservation-queue button.active {
+  border-color: #cfc4ff;
+  background: #f4f0ff;
+  color: #6844ff;
+}
+
+.manager-reservation-queue button.active span,
+.manager-reservation-queue button.active b {
+  color: #6844ff;
+}
+
 .manager-period-toggle {
   display: flex;
   justify-content: space-between;
@@ -3003,6 +3089,14 @@ button:hover {
   gap: 8px;
 }
 
+.manager-filter-summary {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #d9e4ef;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
 .manager-reservation-item {
   border: 1px solid #d9e4ef;
   border-radius: 10px;
@@ -3147,6 +3241,28 @@ button:hover {
   color: #182334;
   font-size: 12px;
   overflow-wrap: anywhere;
+}
+
+.manager-guest-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.manager-guest-actions a {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border: 1px solid #e7dcff;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #6844ff;
+  font-size: 11px;
+  font-weight: 850;
+  text-decoration: none;
 }
 
 .manager-action-note {
@@ -12090,6 +12206,8 @@ body:has(.sp-shell) {
 .sp-manager-page .manager-ops-card,
 .sp-manager-page .manager-fin-card,
 .sp-manager-page .manager-funnel-card,
+.sp-manager-page .manager-reservation-command,
+.sp-manager-page .manager-filter-summary,
 .sp-manager-page .manager-item,
 .sp-manager-page .manager-reservation-item,
 .sp-manager-page .manager-performance-item,
@@ -12115,8 +12233,37 @@ body:has(.sp-shell) {
 .sp-manager-page .manager-funnel-card span,
 .sp-manager-page .manager-item span,
 .sp-manager-page .manager-item-meta,
-.sp-manager-page .manager-period-toggle span {
+.sp-manager-page .manager-period-toggle span,
+.sp-manager-page .manager-filter-summary {
   color: #747d8f;
+}
+
+.sp-manager-page .manager-reservation-command {
+  background: linear-gradient(135deg, #ffffff 0%, #fbfcff 54%, #f6f2ff 100%);
+}
+
+.sp-manager-page .manager-reservation-queue button {
+  border-color: #edf0f6;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(27, 37, 63, 0.04);
+}
+
+.sp-manager-page .manager-reservation-queue button.active {
+  border-color: #cfc4ff;
+  background: #f4f0ff;
+  box-shadow: 0 10px 20px rgba(104, 68, 255, 0.08);
+}
+
+.sp-manager-page .manager-guest-actions a {
+  border-color: #e7dcff;
+  color: #6844ff;
+}
+
+.sp-manager-page .manager-item-actions .manager-reservation-primary {
+  border-color: #6844ff;
+  background: #6844ff;
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(104, 68, 255, 0.18);
 }
 
 .sp-manager-page .manager-sla-panel {
@@ -12359,6 +12506,7 @@ body:has(.sp-shell) {
   .sp-manager-page .manager-ops-grid,
   .sp-manager-page .manager-fin-grid,
   .sp-manager-page .manager-availability-controls,
+  .sp-manager-page .manager-reservation-queue,
   .sp-manager-page .manager-room-type-actions,
   .sp-manager-page .manager-room-type-item,
   .sp-manager-page .manager-photo-order {
@@ -12378,7 +12526,8 @@ body:has(.sp-shell) {
   .sp-account-page .account-booking-actions button,
   .sp-manager-page .manager-toolbar .ghost-btn,
   .sp-manager-page .manager-availability-controls .ghost-btn,
-  .sp-manager-page .manager-item-actions .ghost-btn {
+  .sp-manager-page .manager-item-actions .ghost-btn,
+  .sp-manager-page .manager-guest-actions a {
     width: 100%;
   }
 

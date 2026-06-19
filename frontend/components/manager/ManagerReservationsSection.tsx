@@ -10,6 +10,7 @@ type Currency = "KZT" | "USD";
 type ReservationPaymentFilter = "all" | "pending" | "paid" | "failed" | "refunded";
 type ReservationListingFilter = "all" | number;
 type SummaryPeriodDays = 7 | 30 | 90;
+type ReservationQueueKey = "all" | "needs_payment" | "paid" | "confirmed" | "refunded";
 
 const cancellableStatuses = new Set<PartnerReservation["status"]>(["draft", "pending_payment", "confirmed", "checked_in"]);
 const reopenableStatuses = new Set<PartnerReservation["status"]>(["cancelled", "expired"]);
@@ -41,6 +42,11 @@ function nightsBetween(checkIn: string, checkOut: string): number {
   const end = new Date(`${checkOut}T00:00:00`);
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
   return Math.max(0, Math.round((end.getTime() - start.getTime()) / 86_400_000));
+}
+
+function phoneHref(value: string): string {
+  const normalized = value.replace(/[^\d+]/g, "");
+  return normalized ? `tel:${normalized}` : `tel:${value}`;
 }
 
 type Props = {
@@ -119,6 +125,7 @@ export default function ManagerReservationsSection({
           if (reservation.payment_status === "pending" || reservation.status === "pending_payment") acc.pendingPayment += 1;
           if (reservation.payment_status === "failed") acc.failedPayment += 1;
           if (reservation.payment_status === "refunded") acc.refunded += 1;
+          if (reservation.status === "confirmed") acc.confirmed += 1;
           if (reservation.room_type_id) acc.withRoomType += 1;
           return acc;
         },
@@ -130,6 +137,7 @@ export default function ManagerReservationsSection({
           pendingPayment: 0,
           failedPayment: 0,
           refunded: 0,
+          confirmed: 0,
           withRoomType: 0,
         },
       ),
@@ -137,6 +145,82 @@ export default function ManagerReservationsSection({
   );
   const visibleReservations = useMemo(() => reservations.slice(0, visibleCount), [reservations, visibleCount]);
   const hiddenReservationsCount = Math.max(0, reservations.length - visibleReservations.length);
+  const activeFilterCount = [
+    reservationStatusFilter !== "all",
+    reservationPaymentFilter !== "all",
+    reservationListingFilter !== "all",
+    reservationGuestQuery.trim().length > 0,
+    reservationCheckInFrom.length > 0,
+    reservationCheckOutTo.length > 0,
+  ].filter(Boolean).length;
+  const allQueueActive =
+    reservationStatusFilter === "all" &&
+    reservationPaymentFilter === "all" &&
+    reservationListingFilter === "all" &&
+    !reservationGuestQuery.trim() &&
+    !reservationCheckInFrom &&
+    !reservationCheckOutTo;
+  const queueItems: Array<{ key: ReservationQueueKey; label: string; hint: string; count: number; active: boolean }> = [
+    {
+      key: "all",
+      label: "Все",
+      hint: "Полный список",
+      count: filteredSummary.total,
+      active: allQueueActive,
+    },
+    {
+      key: "needs_payment",
+      label: "Нужна оплата",
+      hint: "Ожидают платеж",
+      count: filteredSummary.pendingPayment + filteredSummary.failedPayment,
+      active: reservationPaymentFilter === "pending",
+    },
+    {
+      key: "paid",
+      label: "Оплаченные",
+      hint: "Можно готовить заезд",
+      count: filteredSummary.paid,
+      active: reservationPaymentFilter === "paid",
+    },
+    {
+      key: "confirmed",
+      label: "Подтвержденные",
+      hint: "Активные брони",
+      count: filteredSummary.confirmed,
+      active: reservationStatusFilter === "confirmed",
+    },
+    {
+      key: "refunded",
+      label: "Возвраты",
+      hint: "После отмен",
+      count: filteredSummary.refunded,
+      active: reservationPaymentFilter === "refunded",
+    },
+  ];
+
+  function applyQueue(key: ReservationQueueKey) {
+    if (key === "all") {
+      onResetFilters();
+      return;
+    }
+    if (key === "needs_payment") {
+      setReservationStatusFilter("all");
+      setReservationPaymentFilter("pending");
+      return;
+    }
+    if (key === "paid") {
+      setReservationStatusFilter("all");
+      setReservationPaymentFilter("paid");
+      return;
+    }
+    if (key === "confirmed") {
+      setReservationStatusFilter("confirmed");
+      setReservationPaymentFilter("all");
+      return;
+    }
+    setReservationStatusFilter("all");
+    setReservationPaymentFilter("refunded");
+  }
 
   useEffect(() => {
     setVisibleCount(RESERVATION_BATCH_SIZE);
@@ -165,6 +249,29 @@ export default function ManagerReservationsSection({
       </div>
       {!expanded ? null : (
         <>
+          <div className="manager-reservation-command">
+            <div>
+              <span>Рабочие очереди</span>
+              <b>{filteredSummary.active} активных броней</b>
+              <small>
+                {activeFilterCount > 0 ? `${activeFilterCount} активн. фильтр.` : "Фильтры не применены"} • {filteredSummary.paid} оплачено
+              </small>
+            </div>
+            <div className="manager-reservation-queue" aria-label="Быстрые очереди броней">
+              {queueItems.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={item.active ? "active" : ""}
+                  onClick={() => applyQueue(item.key)}
+                >
+                  <span>{item.label}</span>
+                  <b>{item.count}</b>
+                  <small>{item.hint}</small>
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="booking-row">
             <label>
               Статус
@@ -261,7 +368,9 @@ export default function ManagerReservationsSection({
               ))}
             </div>
           </div>
-          <p className="desc">Отмен за период: {summary?.cancellations_period ?? 0}</p>
+          <p className="desc manager-filter-summary">
+            <b>Показано по фильтру:</b> {reservations.length} • <b>Отмен за период:</b> {summary?.cancellations_period ?? 0}
+          </p>
           <div className="manager-reservation-kpis" aria-label="Сводка по текущему фильтру">
             <article>
               <span>В фильтре</span>
@@ -354,6 +463,10 @@ export default function ManagerReservationsSection({
                     <b>{reservation.guest_name}</b>
                     <a href={`mailto:${reservation.guest_email}`}>{reservation.guest_email}</a>
                     <small>{reservation.guest_phone}</small>
+                    <div className="manager-guest-actions">
+                      <a href={`mailto:${reservation.guest_email}`}>Написать</a>
+                      <a href={phoneHref(reservation.guest_phone)}>Позвонить</a>
+                    </div>
                   </div>
 
                   <div className="reservation-cancel-preview">
@@ -378,7 +491,7 @@ export default function ManagerReservationsSection({
                       Открыть объект
                     </a>
                     {canReopen ? (
-                      <button type="button" className="ghost-btn" onClick={() => onPartnerConfirmReservation(reservation.id)}>
+                      <button type="button" className="ghost-btn manager-reservation-primary" onClick={() => onPartnerConfirmReservation(reservation.id)}>
                         Подтвердить снова
                       </button>
                     ) : canCancel ? (

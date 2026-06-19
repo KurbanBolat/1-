@@ -628,13 +628,18 @@ test("manager reservations dashboard exposes kpis and resets filters", async ({ 
 
   await page.locator(".manager-tab-strip .view-toggle-btn").nth(1).click();
   await expect(page.locator(".manager-reservation-kpis article")).toHaveCount(4);
+  await expect(page.locator(".manager-reservation-queue button")).toHaveCount(5);
   await expect(page.locator(".payment-pill").first()).toBeVisible();
   await expect(page.locator(".manager-room-pill").first()).toBeVisible();
+  await expect(page.locator(".manager-guest-actions a").first()).toBeVisible();
 
   const reservationSelects = page.locator(".manager-reservations select");
   const statusSelect = reservationSelects.nth(0);
   const paymentSelect = reservationSelects.nth(1);
   await expect(paymentSelect).toContainText(/Возврат/);
+
+  await page.getByRole("button", { name: /оплаченные/i }).click();
+  await expect(paymentSelect).toHaveValue("paid");
 
   await statusSelect.selectOption("confirmed");
   await paymentSelect.selectOption("paid");
