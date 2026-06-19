@@ -1063,6 +1063,7 @@ test("room service order moves from guest to manager and back to guest status", 
   await expect(guestInStay).toContainText(menuItemName);
   await expect(guestInStay.locator(".in-stay-service-summary article")).toHaveCount(3);
   await expect(guestInStay.locator(".in-stay-chat-head")).toContainText("Сервисы уже привязаны к подтвержденной брони.");
+  await expect(guestInStay.locator(".in-stay-chat-form .ai-voice-btn")).toBeVisible();
   const chatForm = guestInStay.locator(".in-stay-chat-form");
   await chatForm.locator("input").fill(`закажи ${menuItemName} в номер`);
   await chatForm.getByRole("button", { name: /Отправить/i }).click();

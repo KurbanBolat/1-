@@ -10835,7 +10835,7 @@ body:has(.sp-shell) {
 
 .sp-stay-page .in-stay-chat-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 132px;
+  grid-template-columns: minmax(0, 1fr) 50px 132px;
   gap: 10px;
   padding-top: 10px;
   border-top: 1px solid #edf0f6;
@@ -10868,6 +10868,29 @@ body:has(.sp-shell) {
 .sp-stay-page .in-stay-chat-form button {
   background: #0f7fa4;
   box-shadow: 0 12px 24px rgba(15, 127, 164, 0.18);
+}
+
+.sp-stay-page .in-stay-chat-form .ai-voice-btn {
+  min-width: 50px;
+  width: 50px;
+  padding: 0;
+  border: 1px solid #d8e2f0;
+  background: #ffffff;
+  color: #6844ff;
+  display: grid;
+  place-items: center;
+  box-shadow: none;
+}
+
+.sp-stay-page .in-stay-chat-form .ai-voice-btn.is-listening {
+  border-color: #b8a8ff;
+  background: #f3edff;
+  color: #5f3ffc;
+  box-shadow: 0 0 0 4px rgba(112, 74, 255, 0.12);
+}
+
+.sp-stay-page .in-stay-chat .ai-voice-status {
+  margin: -4px 0 0;
 }
 
 .sp-stay-page .in-stay-workspace {
@@ -11235,7 +11258,21 @@ body:has(.sp-shell) {
   }
 
   .sp-stay-page .in-stay-chat-form {
-    grid-template-columns: 1fr;
+    grid-template-columns: 50px minmax(0, 1fr);
+  }
+
+  .sp-stay-page .in-stay-chat-form input {
+    grid-column: 1 / -1;
+  }
+
+  .sp-stay-page .in-stay-chat-form .ai-voice-btn {
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .sp-stay-page .in-stay-chat-form button[type="submit"] {
+    grid-column: 2;
   }
 
   .sp-stay-page .in-stay-chat .ai-message p {

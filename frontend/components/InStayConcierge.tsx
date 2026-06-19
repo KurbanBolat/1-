@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 
 import {
@@ -49,6 +49,25 @@ type ConciergeMessage = {
   role: "assistant" | "user";
   text: string;
   action?: ConciergeAction;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onstart: (() => void) | null;
+  onresult: ((event: { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort?: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+type SpeechRecognitionWindow = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
 };
 
 const MENU_PREVIEW_LIMIT = 8;
@@ -166,6 +185,12 @@ function matchesSearchQuery(query: string, target: string): boolean {
   );
 }
 
+function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
+  if (typeof window === "undefined") return null;
+  const speechWindow = window as SpeechRecognitionWindow;
+  return speechWindow.webkitSpeechRecognition ?? speechWindow.SpeechRecognition ?? null;
+}
+
 function sortMenuItemsForDisplay(items: MenuItem[]): MenuItem[] {
   return [...items].sort((left, right) => {
     const order = (left.sort_order ?? 0) - (right.sort_order ?? 0);
@@ -243,6 +268,14 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           postPaymentIntro: "Бронь подтверждена. Я уже вижу эту бронь: могу показать рестораны отеля, забронировать столик или собрать room service.",
           chatHeadHint: "Выберите быстрый сценарий или напишите запрос.",
           postPaymentHeadHint: "Сервисы уже привязаны к подтвержденной брони.",
+          voiceInput: "Голосовой ввод",
+          voiceSpeak: "Сказать запрос",
+          voiceStop: "Остановить запись",
+          voiceUnsupported: "Голосовой ввод не поддерживается этим браузером",
+          voiceAllowMic: "Разрешите доступ к микрофону в браузере.",
+          voiceNoSpeech: "Речь не распознана. Попробуйте ещё раз.",
+          voiceUnavailable: "Голосовой ввод сейчас недоступен.",
+          voiceListening: "Слушаю... говорите запрос.",
           transferUnavailable: "Трансфер пока не подключен к API. Сейчас могу помочь с рестораном отеля или заказом в номер.",
           roomService: "Room service",
           activeRequests: "Заявки в работе",
@@ -308,6 +341,14 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           postPaymentIntro: "Booking confirmed. I can see this reservation and can help with hotel restaurants, table booking, or room service.",
           chatHeadHint: "Pick a quick flow or write your request.",
           postPaymentHeadHint: "Services are attached to the confirmed reservation.",
+          voiceInput: "Voice input",
+          voiceSpeak: "Speak request",
+          voiceStop: "Stop recording",
+          voiceUnsupported: "Voice input is not supported by this browser",
+          voiceAllowMic: "Allow microphone access in the browser.",
+          voiceNoSpeech: "No speech detected. Try again.",
+          voiceUnavailable: "Voice input is unavailable right now.",
+          voiceListening: "Listening... speak your request.",
           transferUnavailable: "Transfer is not connected to the API yet. I can help with hotel restaurants or room service now.",
           roomService: "Room service",
           activeRequests: "Active requests",
@@ -363,6 +404,10 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
   const [restaurantQuery, setRestaurantQuery] = useState("");
   const [showAllMenu, setShowAllMenu] = useState(false);
   const [showAllRestaurants, setShowAllRestaurants] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceListening, setVoiceListening] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const voiceRecognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   function isTransientNetworkError(error: unknown): boolean {
     if (!(error instanceof Error)) return false;
@@ -429,6 +474,14 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
   useEffect(() => {
     void refresh();
   }, [listingId, reservationId, guestEmail, accessToken]);
+
+  useEffect(() => {
+    setVoiceSupported(Boolean(getSpeechRecognitionConstructor()));
+    return () => {
+      voiceRecognitionRef.current?.abort?.();
+      voiceRecognitionRef.current = null;
+    };
+  }, []);
 
   const selectedItems = useMemo<RoomServiceOrderItemIn[]>(() => {
     return menu
@@ -1077,6 +1130,66 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
     appendAssistant(fallbackTaskMessage());
   }
 
+  function voiceErrorMessage(error?: string): string {
+    if (error === "not-allowed" || error === "service-not-allowed") return text.voiceAllowMic;
+    if (error === "no-speech") return text.voiceNoSpeech;
+    return text.voiceUnavailable;
+  }
+
+  function toggleVoiceInput() {
+    if (loading || chatLoading || busyActionKey) return;
+
+    if (voiceListening) {
+      voiceRecognitionRef.current?.stop();
+      setVoiceListening(false);
+      return;
+    }
+
+    const Recognition = getSpeechRecognitionConstructor();
+    if (!Recognition) {
+      setVoiceSupported(false);
+      setVoiceError(text.voiceUnsupported);
+      return;
+    }
+
+    const recognition = new Recognition();
+    const baseInput = chatInput.trim();
+    recognition.lang = lang === "ru" ? "ru-RU" : "en-US";
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.onstart = () => {
+      setVoiceError(null);
+      setVoiceListening(true);
+    };
+    recognition.onresult = (event) => {
+      let transcript = "";
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        transcript += event.results[index][0].transcript;
+      }
+      const cleanTranscript = transcript.trim();
+      if (cleanTranscript) {
+        setChatInput([baseInput, cleanTranscript].filter(Boolean).join(" ").slice(0, 1000));
+      }
+    };
+    recognition.onerror = (event) => {
+      setVoiceError(voiceErrorMessage(event.error));
+      setVoiceListening(false);
+    };
+    recognition.onend = () => {
+      setVoiceListening(false);
+      voiceRecognitionRef.current = null;
+    };
+
+    voiceRecognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
+      setVoiceError(voiceErrorMessage());
+      setVoiceListening(false);
+      voiceRecognitionRef.current = null;
+    }
+  }
+
   function onConciergeSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     void submitConciergeMessage(chatInput);
@@ -1174,11 +1287,27 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           </div>
         ) : null}
         <form className="ai-concierge-form in-stay-chat-form" onSubmit={onConciergeSubmit}>
-          <input suppressHydrationWarning value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder={text.chatPlaceholder} />
+          <input suppressHydrationWarning value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder={text.chatPlaceholder} maxLength={1000} />
+          <button
+            type="button"
+            className={`ai-voice-btn${voiceListening ? " is-listening" : ""}`}
+            onClick={toggleVoiceInput}
+            disabled={loading || chatLoading || Boolean(busyActionKey) || !voiceSupported}
+            aria-label={voiceListening ? text.voiceStop : text.voiceInput}
+            title={!voiceSupported ? text.voiceUnsupported : voiceListening ? text.voiceStop : text.voiceSpeak}
+          >
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M10 3.5a2.5 2.5 0 0 0-2.5 2.5v4a2.5 2.5 0 0 0 5 0V6A2.5 2.5 0 0 0 10 3.5Z" />
+              <path d="M5.5 9.5v.4a4.5 4.5 0 0 0 9 0v-.4M10 14.5v2M7.5 16.5h5" />
+            </svg>
+          </button>
           <button type="submit" disabled={loading || chatLoading || Boolean(busyActionKey) || chatInput.trim().length === 0}>
             {chatLoading ? text.actionBusy : text.chatSend}
           </button>
         </form>
+        {voiceListening || voiceError ? (
+          <p className={`ai-voice-status${voiceError ? " is-error" : ""}`}>{voiceError || text.voiceListening}</p>
+        ) : null}
       </section>
       {loading ? <p className="desc">{text.loading}</p> : null}
 
