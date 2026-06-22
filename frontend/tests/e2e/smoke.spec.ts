@@ -450,7 +450,7 @@ test("public legal pages render localized content and footer links", async ({ pa
   for (const item of pages) {
     await page.goto(`${item.path}?lang=ru&currency=KZT`);
     await expect(page.getByRole("heading", { level: 1, name: item.heading })).toBeVisible();
-    await expect(page.locator(".legal-updated")).toContainText("12 июня 2026");
+    await expect(page.locator(".legal-updated")).toContainText("18 июня 2026");
     await expect(page.locator(".site-footer")).toContainText("Для отелей");
     await expect(page.locator(".site-footer a[href*='currency=KZT']").first()).toBeVisible();
   }
@@ -617,6 +617,25 @@ test("checkout required-field errors are readable in russian", async ({ page }) 
   await ensureCheckoutReady(page);
   await page.getByRole("button", { name: /подтвердить бронирование/i }).click();
   await expect(page.locator(".form-status")).toContainText(/заполните обязательные поля/i);
+});
+
+test("checkout recovers from stale room type links", async ({ page }) => {
+  const listingId = 286;
+  const room = await findBookableRoomFromApi(page, listingId);
+  if (!room) {
+    test.skip(true, "No bookable room range available for stale room recovery test");
+    return;
+  }
+
+  await page.goto(
+    `/checkout?listing_id=${listingId}&room_type_id=999999&check_in=${room.checkIn}&check_out=${room.checkOut}&guests=2&lang=ru&currency=KZT`,
+  );
+
+  await expect(page.locator(".checkout-main")).toBeVisible({ timeout: 15000 });
+  await expect(page.locator(".checkout-room-recovery")).toContainText(/категория номера уже недоступна/i);
+  await expect(page.locator(".checkout-room-recovery a")).toContainText(/выбрать другой номер/i);
+  await expect(page.locator(".checkout-room-summary")).toContainText(/выбранный номер/i);
+  await expect(page.locator("body")).not.toContainText("Something went wrong");
 });
 
 test("manager reservations dashboard exposes kpis and resets filters", async ({ page }) => {
@@ -808,13 +827,18 @@ test("ai concierge stage drives CTA visibility", async ({ page }) => {
 
 test("ai concierge booking reaches account and stay services", async ({ page }) => {
   const guestEmail = `ai_regression_${Date.now()}@example.com`;
+  const room = await findBookableRoomFromApi(page, 286);
+  if (!room) {
+    test.skip(true, "No bookable Dubai room range available for AI booking test");
+    return;
+  }
 
   await page.goto("/?lang=ru&currency=KZT&city=Dubai&guests=2");
   const chatForm = page.locator(".ai-concierge-form");
   await expect(chatForm).toBeVisible();
 
   const chatInput = chatForm.locator("input").first();
-  await chatInput.fill("Dubai hotel 2026-06-13 to 2026-06-16 for 2 guests");
+  await chatInput.fill(`Dubai hotel ${room.checkIn} to ${room.checkOut} for 2 guests`);
   await chatInput.press("Enter");
 
   const firstBookButton = page.locator(".ai-apply-btn").first();

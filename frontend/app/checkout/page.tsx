@@ -59,6 +59,11 @@ const t = {
     selectedDates: "Selected dates",
     selectedTariff: "Selected tariff",
     roomFallback: "Room category",
+    recoveredRoomNotice: "The selected room category is no longer available. Checkout is opened for this stay so you can continue or choose another room.",
+    checkoutUnavailableTitle: "Checkout is temporarily unavailable",
+    checkoutUnavailableText: "We could not refresh the price for these dates. Choose another room or return to the main search.",
+    chooseAnotherRoom: "Choose another room",
+    goHome: "Go home",
   },
   ru: {
     back: "Назад к объекту",
@@ -109,6 +114,11 @@ const t = {
     selectedDates: "Выбранные даты",
     selectedTariff: "Выбранный тариф",
     roomFallback: "Категория номера",
+    recoveredRoomNotice: "Выбранная категория номера уже недоступна. Открыли оформление по объекту, чтобы вы могли продолжить или выбрать другой номер.",
+    checkoutUnavailableTitle: "Оформление временно недоступно",
+    checkoutUnavailableText: "Не удалось обновить цену для этих дат. Выберите другой номер или вернитесь к поиску.",
+    chooseAnotherRoom: "Выбрать другой номер",
+    goHome: "На главную",
   },
 } as const;
 
@@ -143,8 +153,28 @@ export default async function CheckoutPage({
     redirect(`/?lang=${lang}&currency=${currency}`);
   }
 
-  const listing = await getListing(listingId);
-  const quote = await getListingQuote({ listing_id: listingId, check_in: checkIn, check_out: checkOut, guests, tariff, room_type_id: roomTypeId });
+  let listing: Awaited<ReturnType<typeof getListing>>;
+  try {
+    listing = await getListing(listingId);
+  } catch {
+    redirect(`/?lang=${lang}&currency=${currency}`);
+  }
+
+  let quote: Awaited<ReturnType<typeof getListingQuote>> | null = null;
+  let recoveredFromRoomType = false;
+  try {
+    quote = await getListingQuote({ listing_id: listingId, check_in: checkIn, check_out: checkOut, guests, tariff, room_type_id: roomTypeId });
+  } catch {
+    if (roomTypeId) {
+      try {
+        quote = await getListingQuote({ listing_id: listingId, check_in: checkIn, check_out: checkOut, guests, tariff });
+        recoveredFromRoomType = true;
+      } catch {
+        quote = null;
+      }
+    }
+  }
+
   const stayBackParams = new URLSearchParams({
     lang,
     currency,
@@ -159,6 +189,28 @@ export default async function CheckoutPage({
     { key: "smart", label: tr.smart, hint: tr.smartHint },
     { key: "flex", label: tr.flex, hint: tr.flexHint },
   ];
+
+  if (!quote) {
+    return (
+      <StayPilotShell lang={lang} currency={currency} active="checkout">
+        <div className="sp-transaction-page">
+          <Link href={`/stays/${listingId}?${stayBackParams.toString()}#available-rooms`} className="sp-back-link">
+            {tr.back}
+          </Link>
+          <section className="property-detail checkout-recovery-card">
+            <h1>{tr.checkoutUnavailableTitle}</h1>
+            <p>{tr.checkoutUnavailableText}</p>
+            <div className="checkout-recovery-actions">
+              <Link href={`/stays/${listingId}?${stayBackParams.toString()}#available-rooms`} className="primary">
+                {tr.chooseAnotherRoom}
+              </Link>
+              <Link href={`/?lang=${lang}&currency=${currency}`}>{tr.goHome}</Link>
+            </div>
+          </section>
+        </div>
+      </StayPilotShell>
+    );
+  }
 
   return (
     <StayPilotShell lang={lang} currency={currency} active="checkout">
@@ -178,6 +230,7 @@ export default async function CheckoutPage({
           initialQuote={quote}
           listingTitle={listing.title}
           tariffOptions={tariffOptions}
+          recoveryNotice={recoveredFromRoomType ? tr.recoveredRoomNotice : undefined}
           copy={{
             unavailable: tr.unavailable,
             unavailableAction: tr.unavailableAction,

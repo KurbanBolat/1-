@@ -116,6 +116,7 @@ export default function CheckoutShell({
   listingTitle,
   expVariant,
   tariffOptions,
+  recoveryNotice,
   copy,
 }: {
   listingId: number;
@@ -129,6 +130,7 @@ export default function CheckoutShell({
   listingTitle: string;
   expVariant: "a" | "b";
   tariffOptions: TariffOption[];
+  recoveryNotice?: string;
   copy: Copy;
 }) {
   const router = useRouter();
@@ -287,6 +289,12 @@ export default function CheckoutShell({
       <article className="property-detail checkout-main">
         <h1>{copy.completeBooking}</h1>
         <p className="detail-location">{quote.room_type_name ? `${listingTitle} · ${quote.room_type_name}` : listingTitle}</p>
+        {recoveryNotice ? (
+          <div className="checkout-room-recovery" role="status">
+            {recoveryNotice}
+            <Link href={`/stays/${listingId}?${availableRoomsParams}#available-rooms`}>{copy.unavailableAction}</Link>
+          </div>
+        ) : null}
 
         <section className="checkout-room-summary">
           <div className="checkout-room-summary-head">
