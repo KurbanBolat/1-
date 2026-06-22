@@ -513,6 +513,17 @@ test("home search preserves dates and opens available rooms", async ({ page }) =
   await expect(page.locator(".available-room-table-head")).toContainText(/Категория номера|Room category/i);
 });
 
+test("stay gallery keeps absolute photo urls intact", async ({ page }) => {
+  await page.goto("/stays/286?lang=ru&currency=KZT&check_in=2026-06-23&check_out=2026-06-25&guests=2");
+  await expect(page.locator(".stay-gallery")).toBeVisible({ timeout: 15000 });
+
+  const srcs = await page
+    .locator(".stay-gallery img")
+    .evaluateAll((imgs) => imgs.map((img) => (img as HTMLImageElement).currentSrc || (img as HTMLImageElement).src));
+  expect(srcs.length).toBeGreaterThan(0);
+  expect(srcs.some((src) => src.includes("localhost:8000https://"))).toBe(false);
+});
+
 test("manager page opens login or manager content", async ({ page }) => {
   await page.goto("/manager?lang=en&currency=USD");
   await expect(page.locator("body")).toContainText(/findapart|manager|login|partner|token/i);

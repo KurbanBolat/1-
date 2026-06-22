@@ -15924,5 +15924,32 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
   main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-topbar-actions a {
     min-height: 44px;
   }
+
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search label {
+    min-height: 58px;
+  }
+
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search input,
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-hero-search select,
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .date-range-picker-hero .date-range-input-shell input {
+    min-height: 40px;
+    font-size: 14px;
+  }
+
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .date-range-picker-hero .date-range-field:first-child {
+    grid-column: 1;
+  }
+
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .date-range-picker-hero .date-range-field:last-child {
+    grid-column: 2;
+  }
+
+  main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspace) .sp-categories a,
+  .sp-stay-page .available-room-cta,
+  .sp-transaction-page .sp-back-link,
+  .sp-stay-page .sp-back-link,
+  .sp-account-page .sp-back-link {
+    min-height: 44px;
+  }
 }
 

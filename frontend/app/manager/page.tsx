@@ -10,6 +10,7 @@ import ManagerNotificationsSection from "../../components/manager/ManagerNotific
 import ManagerReservationsSection from "../../components/manager/ManagerReservationsSection";
 import ManagerRoomTypesSection from "../../components/manager/ManagerRoomTypesSection";
 import ManagerSupportTicketsSection from "../../components/manager/ManagerSupportTicketsSection";
+import { resolveMediaUrl } from "../../lib/media";
 
 import {
   createInStayMenuItem,
@@ -1549,7 +1550,7 @@ export default function ManagerPage() {
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={() => void onDropPhoto(photo.id)}
                   >
-                    <img src={`${API_URL}${photo.file_url}`} alt={`Фото ${photo.id}`} />
+                    <img src={resolveMediaUrl(photo.file_url) || ""} alt={`Фото ${photo.id}`} />
                     <div className="manager-photo-actions">
                       <div className="manager-photo-order">
                         <button type="button" className="ghost-btn" onClick={() => onMovePhoto(photo.id, "left")}>

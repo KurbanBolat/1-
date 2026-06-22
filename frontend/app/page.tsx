@@ -8,6 +8,7 @@ import CityMapPanel from "../components/CityMapPanel";
 import DateRangePicker from "../components/DateRangePicker";
 import HomeChatRail from "../components/HomeChatRail";
 import { resolveTrustVariant } from "../lib/explainability";
+import { resolveMediaUrl } from "../lib/media";
 
 type Lang = "en" | "ru";
 type Currency = "KZT" | "USD";
@@ -37,7 +38,6 @@ type SearchParams = {
 };
 
 const USD_RATE = 500;
-const API_MEDIA_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const STAYPILOT_HERO_IMAGE =
   "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1800&q=86";
 const STAYPILOT_FALLBACK_IMAGES = [
@@ -119,8 +119,7 @@ function SpIcon({ name }: { name: SpIconName }) {
 }
 
 function mediaUrl(path: string | null | undefined): string | null {
-  if (!path) return null;
-  return /^https?:\/\//i.test(path) ? path : `${API_MEDIA_BASE}${path}`;
+  return resolveMediaUrl(path);
 }
 
 function showcaseImage(index: number, path?: string | null): string {

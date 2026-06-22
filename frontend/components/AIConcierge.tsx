@@ -27,6 +27,7 @@ import {
 } from "../lib/api";
 import { humanSuggestionReason } from "../lib/explainability";
 import { getReservationAccessToken, rememberReservationAccess } from "../lib/guestAccess";
+import { resolveMediaUrl } from "../lib/media";
 import { useSoftRedirect } from "../hooks/useSoftRedirect";
 import DateRangePicker from "./DateRangePicker";
 
@@ -172,7 +173,6 @@ type SpeechRecognitionWindow = Window & {
 
 const USD_RATE = 500;
 const MAX_FILTER_PRICE_KZT = 2_000_000;
-const API_MEDIA_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const MAX_CHAT_SUGGESTIONS = 3;
 const MAX_CHAT_ALTERNATIVES = 3;
 const AI_FALLBACK_IMAGES = [
@@ -208,8 +208,7 @@ const CITY_LABELS_RU: Record<string, string> = {
 };
 
 function aiMediaUrl(path: string | null | undefined, fallbackSeed: number): string {
-  if (path) return /^https?:\/\//i.test(path) ? path : `${API_MEDIA_BASE}${path}`;
-  return AI_FALLBACK_IMAGES[Math.abs(fallbackSeed) % AI_FALLBACK_IMAGES.length];
+  return resolveMediaUrl(path) || AI_FALLBACK_IMAGES[Math.abs(fallbackSeed) % AI_FALLBACK_IMAGES.length];
 }
 
 function localizeCityName(city: string | undefined, lang: Lang): string {

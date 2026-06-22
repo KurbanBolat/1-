@@ -17,12 +17,12 @@ import {
   type RoomAvailabilityWindow,
   type RoomTypeAvailability,
 } from "../../../lib/api";
+import { resolveMediaUrl } from "../../../lib/media";
 
 type Lang = "en" | "ru";
 type Currency = "KZT" | "USD";
 
 const USD_RATE = 500;
-const API_MEDIA_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const STAY_FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1200&q=84",
   "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=900&q=82",
@@ -433,7 +433,7 @@ export default async function StayDetails({
       orderedPhotos.length > 0
         ? orderedPhotos.map((photo) => ({
             id: photo.id,
-            url: `${API_MEDIA_BASE}${photo.file_url}`,
+            url: resolveMediaUrl(photo.file_url) || "",
             alt: displayTitle,
           }))
         : STAY_FALLBACK_IMAGES.map((url, index) => ({
