@@ -38,6 +38,7 @@ export default function HomeChatRail({
   openLabel,
   searchLabel,
   resultsLabel,
+  defaultCollapsed = false,
   children,
 }: {
   title: string;
@@ -47,9 +48,10 @@ export default function HomeChatRail({
   openLabel: string;
   searchLabel: string;
   resultsLabel: string;
+  defaultCollapsed?: boolean;
   children: ReactNode;
 }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [menuOpen, setMenuOpen] = useState(false);
 
   if (collapsed) {

@@ -1576,6 +1576,31 @@ export default function AIConcierge({
   }, [latestAnswer, lang, resultInteractionBlocked]);
   const lastMessage = messages[messages.length - 1];
   const chatDatePickerVisible = Boolean(lastMessage && shouldRenderChatDatePicker(lastMessage, messages.length - 1));
+  const starterPrompts = useMemo(
+    () =>
+      lang === "ru"
+        ? [
+            `Дубай, 2 гостя, до ${currency === "USD" ? "$180" : "90 000 KZT"}`,
+            "Отель с видом на море",
+            "Покажи бюджетные варианты",
+          ]
+        : [
+            `Dubai, 2 guests, up to ${currency === "USD" ? "$180" : "90 000 KZT"}`,
+            "Sea-view hotel",
+            "Show budget options",
+          ],
+    [currency, lang],
+  );
+  const liveState = useMemo(() => {
+    if (voiceListening) return lang === "ru" ? "Слушаю голосовой запрос" : "Listening for your request";
+    if (loading || assistantTyping) return tr.thinking;
+    if (paymentDraft) return lang === "ru" ? "Бронь готова, жду оплату" : "Booking is ready, waiting for payment";
+    if (bookingModeActive) return lang === "ru" ? "Собираю данные гостя для брони" : "Collecting guest details";
+    if (latestAnswer?.data?.suggestions.length) return lang === "ru" ? "Нашёл варианты с доступными номерами" : "Found options with available rooms";
+    if (latestAnswer?.data?.alternatives.length) return lang === "ru" ? "Подобрал ближайшие свободные даты" : "Found nearby available dates";
+    return lang === "ru" ? "Готов подобрать проживание по каталогу" : "Ready to search stays from the catalog";
+  }, [assistantTyping, bookingModeActive, lang, latestAnswer, loading, paymentDraft, tr.thinking, voiceListening]);
+  const liveSource = lang === "ru" ? "Каталог, цены и свободные номера StayPilot" : "StayPilot catalog, prices and live room availability";
 
   const storageKey = useMemo(() => `findapart_ai_memory_${pathname}_${lang}_${currency}`, [pathname, lang, currency]);
   const {
@@ -3928,6 +3953,11 @@ ${tr.bookingDetails}`;
         </p>
       ) : null}
 
+      <div className={`ai-live-state${loading || assistantTyping || voiceListening ? " is-active" : ""}`}>
+        <span>{liveState}</span>
+        <small>{liveSource}</small>
+      </div>
+
       {bookingModeActive ? (
         <section className="ai-booking-mode">
           <strong>{tr.bookingModeTitle}</strong>
@@ -3948,6 +3978,16 @@ ${tr.bookingDetails}`;
         <div className="ai-followups">
           {stageQuickPrompts.map((prompt) => (
             <button key={prompt} type="button" className="ai-followup-chip" onClick={() => onFollowUp(prompt)}>
+              {prompt}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {!isRail && messages.length === 0 ? (
+        <div className="ai-starter-prompts" aria-label={lang === "ru" ? "Быстрые запросы" : "Quick prompts"}>
+          {starterPrompts.map((prompt) => (
+            <button key={prompt} type="button" onClick={() => onFollowUp(prompt)} disabled={loading}>
               {prompt}
             </button>
           ))}
@@ -4219,7 +4259,10 @@ ${tr.bookingDetails}`;
         ))}
         {assistantTyping ? (
           <article className="ai-message ai-message-assistant">
-            <p>{lang === "ru" ? "Секунду, подбираю..." : "One moment, preparing options..."}</p>
+            <p className="ai-typing-bubble">
+              {lang === "ru" ? "Секунду, подбираю" : "One moment, preparing"}
+              <span aria-hidden="true">...</span>
+            </p>
           </article>
         ) : null}
       </div>

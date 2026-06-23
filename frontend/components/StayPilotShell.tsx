@@ -188,6 +188,8 @@ export default function StayPilotShell({
     { key: "support", icon: "headphones", label: isRu ? "Поддержка 24/7" : "24/7 support", href: `/?lang=${lang}&currency=${currency}#ai` },
   ];
 
+  const primaryNavItems = navItems.filter((item) => ["home", "search", "hotels", "apartments", "villas"].includes(item.key));
+
   return (
     <div className={shellClassName}>
       <aside className="sp-left-rail">
@@ -201,7 +203,7 @@ export default function StayPilotShell({
           </span>
         </Link>
         <nav className="sp-side-nav" aria-label={isRu ? "Навигация" : "Navigation"}>
-          {navItems.map((item) => (
+          {primaryNavItems.map((item) => (
             <Link key={item.key} href={item.href} className={active === item.key ? "active" : ""}>
               <ShellIcon name={item.icon} />
               {item.label}

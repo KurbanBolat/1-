@@ -332,13 +332,37 @@ export default function CheckoutShell({
           {!quote.available ? <p className="warn-text checkout-room-warning">{copy.unavailable}</p> : null}
         </section>
 
-        <h3>{copy.bookingDetails}</h3>
-        <div className="pill-row">
-          <span suppressHydrationWarning>{checkInBadge}</span>
-          <span suppressHydrationWarning>{checkOutBadge}</span>
-          <span>
-            {quote.guests} {copy.guests}
-          </span>
+        <h3>{copy.tariff}</h3>
+        <div className="tariff-grid">
+          {tariffOptions.map((item) => (
+            <Link
+              key={item.key}
+              href={buildTariffHref(item.key)}
+              className={`tariff-card ${item.key === quote.tariff_plan ? "active" : ""}`}
+            >
+              <strong>{item.label}</strong>
+              <small>{item.hint}</small>
+            </Link>
+          ))}
+        </div>
+
+        <div id="checkout-reservation">
+          <ReservationForm
+            listingId={listingId}
+            listingTitle={listingTitle}
+            lang={lang}
+            currency={currency}
+            lockedBooking={{ checkIn: quote.check_in, checkOut: quote.check_out, guests: quote.guests }}
+            roomTypeId={quote.room_type_id || undefined}
+            tariffPlan={quote.tariff_plan}
+            quoteToken={quote.quote_token || undefined}
+            expVariant={expVariant}
+            quoteExpired={quoteExpired}
+            bookingUnavailable={!quote.available}
+            bookingUnavailableMessage={copy.unavailable}
+            quoteRefreshing={isPending || autoRefreshing}
+            onRefreshQuote={() => refreshQuote("retry")}
+          />
         </div>
 
         <section className="checkout-adjust-card">
@@ -377,20 +401,6 @@ export default function CheckoutShell({
           </button>
         </section>
 
-        <h3>{copy.tariff}</h3>
-        <div className="tariff-grid">
-          {tariffOptions.map((item) => (
-            <Link
-              key={item.key}
-              href={buildTariffHref(item.key)}
-              className={`tariff-card ${item.key === quote.tariff_plan ? "active" : ""}`}
-            >
-              <strong>{item.label}</strong>
-              <small>{item.hint}</small>
-            </Link>
-          ))}
-        </div>
-
         <div className={`quote-lock-card ${quoteExpired ? "expired" : ""}`}>
           <div className="quote-lock-meta">
             <span>{copy.lockTitle}</span>
@@ -406,25 +416,6 @@ export default function CheckoutShell({
           >
             {isPending || autoRefreshing ? copy.refreshingQuote : quoteExpired ? copy.lockExpiredAction : copy.refreshQuote}
           </button>
-        </div>
-
-        <div id="checkout-reservation">
-          <ReservationForm
-            listingId={listingId}
-            listingTitle={listingTitle}
-            lang={lang}
-            currency={currency}
-            lockedBooking={{ checkIn: quote.check_in, checkOut: quote.check_out, guests: quote.guests }}
-            roomTypeId={quote.room_type_id || undefined}
-            tariffPlan={quote.tariff_plan}
-            quoteToken={quote.quote_token || undefined}
-            expVariant={expVariant}
-            quoteExpired={quoteExpired}
-            bookingUnavailable={!quote.available}
-            bookingUnavailableMessage={copy.unavailable}
-            quoteRefreshing={isPending || autoRefreshing}
-            onRefreshQuote={() => refreshQuote("retry")}
-          />
         </div>
       </article>
 

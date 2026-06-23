@@ -901,24 +901,12 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         </div>
 
         <nav className="sp-side-nav" aria-label="Primary">
-          <Link href={quickFilterLink(searchParams, { page: "1" })} className="active"><SpIcon name="home" />{lang === "ru" ? "Главная" : "Home"}</Link>
+          <Link href={quickFilterLink(searchParams, { page: "1", property_type: undefined })} className={!searchParams.property_type ? "active" : ""}><SpIcon name="home" />{lang === "ru" ? "Главная" : "Home"}</Link>
           <a href="#search"><SpIcon name="search" />{lang === "ru" ? "Поиск" : "Search"}</a>
-          <a href="#results"><SpIcon name="hotel" />{lang === "ru" ? "Отели" : "Hotels"}</a>
-          <a href="#results"><SpIcon name="apartment" />{lang === "ru" ? "Апартаменты" : "Apartments"}</a>
-          <a href="#results"><SpIcon name="villa" />{lang === "ru" ? "Виллы" : "Villas"}</a>
-          <a href="#results"><SpIcon name="tag" />{lang === "ru" ? "Спецпредложения" : "Deals"}</a>
-          <a href="#results"><SpIcon name="restaurant" />{lang === "ru" ? "Рестораны" : "Restaurants"}</a>
-          <a href="#results"><SpIcon name="car" />{lang === "ru" ? "Трансфер" : "Transfer"}</a>
-          <a href="#results"><SpIcon name="bell" />{lang === "ru" ? "Сервисы в отеле" : "Hotel services"}</a>
-          <a href="#ai"><SpIcon name="headphones" />{lang === "ru" ? "Поддержка 24/7" : "24/7 support"}</a>
+          <Link href={quickFilterLink(searchParams, { property_type: "hotel" })} className={searchParams.property_type === "hotel" ? "active" : ""}><SpIcon name="hotel" />{lang === "ru" ? "Отели" : "Hotels"}</Link>
+          <Link href={quickFilterLink(searchParams, { property_type: "apartment" })} className={searchParams.property_type === "apartment" ? "active" : ""}><SpIcon name="apartment" />{lang === "ru" ? "Апартаменты" : "Apartments"}</Link>
+          <Link href={quickFilterLink(searchParams, { property_type: "villa" })} className={searchParams.property_type === "villa" ? "active" : ""}><SpIcon name="villa" />{lang === "ru" ? "Виллы" : "Villas"}</Link>
         </nav>
-
-        <div className="sp-left-promo">
-          <span className="sp-left-promo-mark"><SpIcon name="sparkle" /></span>
-          <h4>{lang === "ru" ? "AI-консьерж" : "AI Concierge"}</h4>
-          <p>{lang === "ru" ? "Подберу идеальный вариант и помогу забронировать за вас." : "I will shortlist and help you book in seconds."}</p>
-          <a href="#ai">{lang === "ru" ? "Начать чат" : "Start chat"}</a>
-        </div>
       </aside>
 
       <div className="sp-main-col">
@@ -926,7 +914,6 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           <div className="sp-topbar-actions">
             <Link href={langToggleHref}><SpIcon name="globe" />{lang === "ru" ? "Русский" : "English"}<SpIcon name="chevron" /></Link>
             <Link href={currencyToggleHref}>{currency}<SpIcon name="chevron" /></Link>
-            <Link href="#favorites"><SpIcon name="heart" />{lang === "ru" ? "Избранное" : "Favorites"}</Link>
             <Link href={`/account?lang=${lang}&currency=${currency}`}><SpIcon name="calendar" />{lang === "ru" ? "Мои бронирования" : "My bookings"}</Link>
             <Link href={`/for-hotels?lang=${lang}&currency=${currency}`}><SpIcon name="briefcase" />{lang === "ru" ? "Для отелей" : "For hotels"}</Link>
           </div>
@@ -1186,6 +1173,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         openLabel={lang === "ru" ? "Открыть AI-консьерж" : "Open AI concierge"}
         searchLabel={lang === "ru" ? "Изменить поиск" : "Adjust search"}
         resultsLabel={lang === "ru" ? "Смотреть варианты" : "View stays"}
+        defaultCollapsed
       >
         <AIConcierge
           lang={lang}

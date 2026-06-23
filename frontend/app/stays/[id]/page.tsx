@@ -521,58 +521,43 @@ export default async function StayDetails({
         {roomOptions.length > 0 ? (
           <div className="available-room-list">
             <p className="available-rooms-next-step">{tr.availableRoomsNextStep}</p>
-            <div className="available-room-table-head" aria-hidden="true">
-              <span>{tr.roomCategory}</span>
-              <span>{tr.roomOccupancy}</span>
-              <span>{tr.roomWindow}</span>
-              <span>{tr.roomTotalLabel}</span>
-              <span>{tr.roomSelect}</span>
-            </div>
             {roomOptions.map(({ room, window }, index) => {
               const nightlyRate = formatPrice(room.nightly_price, currency, lang);
               const totalForWindow = formatPrice(room.nightly_price * Math.max(window.nights, 1), currency, lang);
               const lowInventory = window.available_count <= 3;
               return (
-                <article key={`${room.id}-${window.check_in}-${window.check_out}`} className="available-room-row">
-                  <div className="available-room-details">
+                <article key={`${room.id}-${window.check_in}-${window.check_out}`} className="available-room-card">
+                  <div className="available-room-card-main">
                     <div className="available-room-titleline">
                       <span>{index === 0 && !selectedRangeValid ? tr.nearestWindow : tr.roomOption}</span>
                       <small className={lowInventory ? "low-stock" : undefined}>{formatRoomInventoryBadge(window.available_count, lang)}</small>
                     </div>
-                    <b>{room.name}</b>
+                    <h3>{room.name}</h3>
                     <div className="available-room-facts">
                       <span>{formatBedroomsCount(room.bedrooms, lang)}</span>
                       <span>{room.bathrooms} {tr.bathrooms}</span>
+                      <span>{tr.upTo} {room.max_guests} {tr.guests.toLowerCase()}</span>
+                      <span>{formatNightsCount(window.nights, lang)}</span>
                     </div>
                     <div className="available-room-benefits">
                       <span>{tr.noPrepayment}</span>
                       <span>{tr.freeCancellation}</span>
                     </div>
                   </div>
-                  <div className="available-room-occupancy">
-                    <span>{tr.roomOccupancy}</span>
-                    <b>{room.max_guests}</b>
-                    <small>{tr.upTo} {room.max_guests} {tr.guests.toLowerCase()}</small>
-                  </div>
-                  <div className="available-room-window">
-                    <span>{tr.roomWindow}</span>
-                    <b>{formatRange(window.check_in, window.check_out, lang)}</b>
-                    <small>{formatNightsCount(window.nights, lang)}</small>
-                  </div>
-                  <div className="available-room-price">
-                    <span>{tr.roomTotalLabel}</span>
+                  <div className="available-room-booking">
+                    <span>{formatRange(window.check_in, window.check_out, lang)}</span>
                     <b>{totalForWindow}</b>
                     <small>
-                      {nightlyRate} {tr.perNight}
+                      {formatNightsCount(window.nights, lang)} · {nightlyRate} {tr.perNight}
                     </small>
+                    <Link
+                      href={availabilityRoomHref(room, window)}
+                      className="available-room-cta"
+                      aria-label={`${tr.bookNow}: ${room.name}, ${formatRange(window.check_in, window.check_out, lang)}`}
+                    >
+                      {tr.bookNow}
+                    </Link>
                   </div>
-                  <Link
-                    href={availabilityRoomHref(room, window)}
-                    className="available-room-cta"
-                    aria-label={`${tr.bookNow}: ${room.name}, ${formatRange(window.check_in, window.check_out, lang)}`}
-                  >
-                    {tr.bookNow}
-                  </Link>
                 </article>
               );
             })}

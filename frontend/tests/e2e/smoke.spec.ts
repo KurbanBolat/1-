@@ -166,6 +166,16 @@ async function resolveBookingScope(page: Page): Promise<Locator> {
   return page.locator("main");
 }
 
+async function openAiConcierge(page: Page): Promise<Locator> {
+  const reopen = page.locator(".sp-chat-reopen");
+  if ((await reopen.count()) > 0 && (await reopen.first().isVisible().catch(() => false))) {
+    await reopen.first().click();
+  }
+  const chatForm = page.locator(".ai-concierge-form");
+  await expect(chatForm).toBeVisible({ timeout: 10000 });
+  return chatForm;
+}
+
 async function proceedToCheckout(page: Page, _continueButtonName: RegExp, scope?: Locator): Promise<void> {
   const bookingScope = scope ?? (await resolveBookingScope(page));
   for (let attempt = 1; attempt <= 3; attempt += 1) {
@@ -510,7 +520,7 @@ test("home search preserves dates and opens available rooms", async ({ page }) =
 
   await page.goto(selected.href);
   await expect(page).toHaveURL(/\/stays\/\d+.*#available-rooms/);
-  await expect(page.locator(".available-room-table-head")).toContainText(/Категория номера|Room category/i);
+  await expect(page.locator(".available-room-card").first()).toContainText(/Забронировать|Book/i);
 });
 
 test("stay gallery keeps absolute photo urls intact", async ({ page }) => {
@@ -547,7 +557,7 @@ test("booking flow works end-to-end", async ({ page }) => {
     continueButtonName: /continue to checkout/i,
     scope: bookingPanel,
   });
-  await expect(page.locator(".available-room-table-head")).toContainText(/Room category/i);
+  await expect(page.locator(".available-room-card").first()).toContainText(/Book|Reserve/i);
   const firstRoomHref = await page.locator('.available-room-cta[href*="/checkout"]').first().getAttribute("href");
   expect(firstRoomHref).toContain("room_type_id=");
   await proceedToCheckout(page, /continue to checkout/i, bookingPanel);
@@ -813,8 +823,7 @@ test("ai concierge stage drives CTA visibility", async ({ page }) => {
 
   await page.goto("/?lang=en&currency=USD&e2e_stage=1");
 
-  const chatForm = page.locator(".ai-concierge-form");
-  await expect(chatForm).toBeVisible();
+  const chatForm = await openAiConcierge(page);
 
   const chatInput = chatForm.locator("input").first();
   await chatInput.click();
@@ -845,8 +854,7 @@ test("ai concierge booking reaches account and stay services", async ({ page }) 
   }
 
   await page.goto("/?lang=ru&currency=KZT&city=Dubai&guests=2");
-  const chatForm = page.locator(".ai-concierge-form");
-  await expect(chatForm).toBeVisible();
+  const chatForm = await openAiConcierge(page);
 
   const chatInput = chatForm.locator("input").first();
   await chatInput.fill(`Dubai hotel ${room.checkIn} to ${room.checkOut} for 2 guests`);
