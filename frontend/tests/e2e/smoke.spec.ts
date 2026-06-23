@@ -442,7 +442,8 @@ test("hotel landing presents B2B product and opens demo", async ({ page }) => {
   await page.goto("/for-hotels?lang=ru&currency=KZT");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("AI-консьерж для отелей");
   await expect(page.locator(".hotel-site-product")).toContainText("AI-консьерж");
-  await expect(page.locator(".hotel-site-mini-proof")).toContainText("24 e2e flows");
+  await expect(page.locator(".hotel-site-mini-proof")).toContainText("24 e2e-сценария");
+  await expect(page.locator("body")).not.toContainText(/guest app|checkout|in-stay|room service/i);
   await expect(page.locator(".hotel-site-hero a").filter({ hasText: "Открыть демо" }).first()).toHaveAttribute(
     "href",
     "/?lang=ru&currency=KZT&city=Dubai&guests=2",
@@ -470,8 +471,9 @@ test("demo guide presents buyer scenarios and working entry links", async ({ pag
   await page.goto("/demo?lang=ru&currency=KZT");
   await expect(page.getByRole("heading", { level: 1, name: "Демо-сценарии StayPilot" })).toBeVisible();
   await expect(page.locator(".demo-guide-grid")).toContainText("AI-подбор и поиск");
-  await expect(page.locator(".demo-guide-grid")).toContainText("Manager workspace");
+  await expect(page.locator(".demo-guide-grid")).toContainText("Панель менеджера");
   await expect(page.locator(".demo-guide-script")).toContainText("10-минутный сценарий показа");
+  await expect(page.locator("body")).not.toContainText(/room service|in-stay|room-type availability|Manager workspace|checkout/i);
   await expect(page.getByRole("link", { name: "Открыть гостевое демо" })).toHaveAttribute(
     "href",
     "/?lang=ru&currency=KZT&city=Dubai&guests=2",

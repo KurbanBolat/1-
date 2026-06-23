@@ -896,7 +896,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           <div className="sp-brand-mark"><SpIcon name="sparkle" /></div>
           <div>
             <strong>StayPilot</strong>
-            <small>AI Concierge for Hotels</small>
+            <small>{lang === "ru" ? "AI-консьерж для отелей" : "AI Concierge for Hotels"}</small>
           </div>
         </div>
 
@@ -1155,7 +1155,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           <article>
             <span className="sp-feature-icon"><SpIcon name="calendar" /></span>
             <h4>{lang === "ru" ? "Мгновенное подтверждение" : "Instant confirmation"}</h4>
-            <p>{lang === "ru" ? "Бронируйте за секунды и мгновенно получайте подтверждение на email" : "Book in seconds and get confirmation instantly."}</p>
+            <p>{lang === "ru" ? "Бронируйте за секунды и мгновенно получайте подтверждение на почту" : "Book in seconds and get confirmation instantly."}</p>
           </article>
           <article>
             <span className="sp-feature-icon"><SpIcon name="headphones" /></span>

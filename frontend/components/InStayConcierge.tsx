@@ -249,7 +249,7 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           emptyBookings: "Бронирований столика пока нет",
           emptyBookingUpdates: "Обновлений пока нет",
           catalogPartialLoad: "Меню и рестораны загружены. История заказов временно недоступна.",
-          catalogLoadFailed: "Не удалось загрузить in-stay сервисы. Нажмите «Обновить».",
+          catalogLoadFailed: "Не удалось загрузить сервисы проживания. Нажмите «Обновить».",
           date: "Дата",
           time: "Время",
           guests: "Гостей",
@@ -265,7 +265,7 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           chatPlaceholder: "Например: хочу бургер или забронируй столик на вечер",
           chatSend: "Отправить",
           chatIntro: "Помогу с заказом еды в номер и бронью столика в ресторане.",
-          postPaymentIntro: "Бронь подтверждена. Я уже вижу эту бронь: могу показать рестораны отеля, забронировать столик или собрать room service.",
+          postPaymentIntro: "Бронь подтверждена. Я уже вижу эту бронь: могу показать рестораны отеля, забронировать столик или собрать заказ в номер.",
           chatHeadHint: "Выберите быстрый сценарий или напишите запрос.",
           postPaymentHeadHint: "Сервисы уже привязаны к подтвержденной брони.",
           voiceInput: "Голосовой ввод",
@@ -277,7 +277,7 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           voiceUnavailable: "Голосовой ввод сейчас недоступен.",
           voiceListening: "Слушаю... говорите запрос.",
           transferUnavailable: "Трансфер пока не подключен к API. Сейчас могу помочь с рестораном отеля или заказом в номер.",
-          roomService: "Room service",
+          roomService: "Еда в номер",
           activeRequests: "Заявки в работе",
           activeRequestsHint: "заказы и брони",
           orderDraft: "Черновик заказа",
@@ -296,7 +296,7 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
           restaurantListIntro: "Доступные рестораны отеля:",
           draftEmpty: "В черновике пока нет блюд. Напишите, что хотите заказать, или выберите позицию из меню.",
           noConnectedRestaurants: "Рестораны у этого объекта пока не подключены, но я могу собрать заказ в номер из доступного меню.",
-          servicesUnavailable: "Пока не вижу подключённых in-stay сервисов для этого объекта. Нажмите «Обновить» или попросите менеджера добавить меню и рестораны.",
+          servicesUnavailable: "Пока не вижу подключённых сервисов проживания для этого объекта. Нажмите «Обновить» или попросите менеджера добавить меню и рестораны.",
           menuSearchPlaceholder: "Найти блюдо",
           restaurantSearchPlaceholder: "Найти ресторан",
           showMore: "Показать еще",
@@ -846,12 +846,12 @@ export default function InStayConcierge({ listingId, reservationId, guestEmail, 
     }
     if (menu.length > 0) {
       return lang === "ru"
-        ? "Рестораны пока не подключены, зато room service доступен. Могу показать меню или добавить блюдо в заказ."
+        ? "Рестораны пока не подключены, зато еда в номер доступна. Могу показать меню или добавить блюдо в заказ."
         : "Restaurants are not connected yet, but room service is available. I can show the menu or add an item to your order.";
     }
     if (restaurants.length > 0) {
       return lang === "ru"
-        ? "Меню room service пока недоступно, но могу забронировать столик в ресторане отеля."
+        ? "Меню доставки в номер пока недоступно, но могу забронировать столик в ресторане отеля."
         : "Room-service menu is unavailable, but I can reserve a table at the hotel restaurant.";
     }
     return text.servicesUnavailable;

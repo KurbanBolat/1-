@@ -1,5 +1,24 @@
 import { expect, test } from "@playwright/test";
 
+const MOJIBAKE_MARKERS = [
+  "\u0420\u203A",
+  "\u0420\u045C",
+  "\u0420\u045F",
+  "\u0420\u0402",
+  "\u0420\u2018",
+  "\u0420\u040B",
+  "\u0420\u040E",
+  "\u0420\u0403",
+  "\u0421\u040A",
+  "\u0421\u2039",
+  "\u0421\u040F",
+  "\u0421\u2021",
+  "\u0421\u201A",
+  "\u0421\u0402",
+  "\u0421\u0453",
+  "\u0421\u2020",
+];
+
 test("account page shows clean RU localization without mojibake", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/account?lang=ru&currency=KZT");
@@ -9,11 +28,10 @@ test("account page shows clean RU localization without mojibake", async ({ page 
   await expect(page.getByRole("link", { name: /Назад к поиску/i })).toBeVisible();
 
   const body = page.locator("body");
-  await expect(body).not.toContainText("Р вЂєР ");
-  await expect(body).not.toContainText("РІР‚Сћ");
-  await expect(body).not.toContainText("РІвЂ С’");
-  await expect(body).not.toContainText("Рќ");
-  await expect(body).not.toContainText("Рџ");
+  for (const marker of MOJIBAKE_MARKERS) {
+    await expect(body).not.toContainText(marker);
+  }
+  await expect(body).not.toContainText(/Room service|in-stay/i);
 });
 
 test("account page explains secure access when email has no token", async ({ page }) => {

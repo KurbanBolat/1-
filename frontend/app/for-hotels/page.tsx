@@ -20,7 +20,7 @@ const HOTEL_IMAGES = [
 export const metadata: Metadata = {
   title: "StayPilot для отелей - AI-консьерж и прямые бронирования",
   description:
-    "B2B-презентация StayPilot: AI-консьерж для отелей, прямые бронирования, in-stay сервисы и готовая продуктовая база для запуска.",
+    "B2B-презентация StayPilot: AI-консьерж для отелей, прямые бронирования, сервисы проживания и готовая продуктовая база для запуска.",
 };
 
 function normalizeLang(value?: string): Lang {
@@ -117,7 +117,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
         "StayPilot объединяет витрину отеля, умный подбор, бронирование, оплату и сервисы во время проживания в одном понятном интерфейсе.",
       secondary: "Посмотреть для отеля",
       proofTitle: "Готовая база для запуска, пилота или продажи",
-      proofSubtitle: "Проект уже покрывает ключевой путь гостя: поиск, выбор номера, бронь, оплата, аккаунт и in-stay сервисы.",
+      proofSubtitle: "Проект уже покрывает ключевой путь гостя: поиск, выбор номера, бронь, оплата, аккаунт и сервисы проживания.",
       sectionValue: "Что получает отель",
       sectionValueSub: "Меньше ручной нагрузки на команду и больше контроля над гостевым опытом.",
       sectionFlow: "Как это работает",
@@ -132,7 +132,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
       room: "Deluxe King Room",
       available: "Свободно: 4 номера",
       book: "Забронировать",
-      footerNote: "Шаблон продукта для демо, пилота и дальнейшей production-настройки.",
+      footerNote: "Шаблон продукта для демо, пилота и дальнейшей продакшен-настройки.",
       privacy: "Конфиденциальность",
       terms: "Условия",
       refunds: "Возвраты",
@@ -206,7 +206,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
       title: lang === "ru" ? "Сервисы после брони" : "Services after booking",
       text:
         lang === "ru"
-          ? "Room service, рестораны, трансфер и события связаны с аккаунтом гостя и менеджерской панелью."
+          ? "Еда в номер, рестораны, трансфер и события связаны с аккаунтом гостя и менеджерской панелью."
           : "Room service, restaurants, transfers, and events connect to the guest account and manager workspace.",
     },
     {
@@ -251,11 +251,11 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
   ];
 
   const buyerItems = [
-    lang === "ru" ? "Рабочий guest app: каталог, поиск, AI-чат, бронь, checkout, аккаунт" : "Working guest app: catalog, search, AI chat, booking, checkout, account",
-    lang === "ru" ? "Manager workspace: объекты, номера, доступность, заказы, рестораны" : "Manager workspace: properties, rooms, availability, orders, restaurants",
-    lang === "ru" ? "64 backend теста и 24 e2e сценария для критичных путей" : "64 backend tests and 24 e2e scenarios for critical flows",
+    lang === "ru" ? "Рабочее гостевое приложение: каталог, поиск, AI-чат, бронь, оформление и аккаунт" : "Working guest app: catalog, search, AI chat, booking, checkout, account",
+    lang === "ru" ? "Панель менеджера: объекты, номера, доступность, заказы и рестораны" : "Manager workspace: properties, rooms, availability, orders, restaurants",
+    lang === "ru" ? "64 backend-теста и 24 e2e-сценария для критичных путей" : "64 backend tests and 24 e2e scenarios for critical flows",
     lang === "ru" ? "GitHub Actions, миграции, SQLite dev-режим и Postgres-ready архитектура" : "GitHub Actions, migrations, SQLite dev mode, and Postgres-ready architecture",
-    lang === "ru" ? "OpenAI-ready консьерж с fallback-логикой и сохранением состояния" : "OpenAI-ready concierge with fallback logic and state persistence",
+    lang === "ru" ? "Консьерж готов к OpenAI-интеграции, с резервной логикой и сохранением состояния" : "OpenAI-ready concierge with fallback logic and state persistence",
     lang === "ru" ? "Демо-данные, локальный запуск и понятная зона дальнейшей интеграции" : "Demo data, local run path, and clear integration surface",
   ];
 
@@ -268,7 +268,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
           </span>
           <span>
             <b>StayPilot</b>
-            <small>AI Concierge for Hotels</small>
+            <small>{lang === "ru" ? "AI-консьерж для отелей" : "AI Concierge for Hotels"}</small>
           </span>
         </Link>
 
@@ -307,9 +307,9 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
           </a>
           </div>
           <div className="hotel-site-mini-proof" aria-label={copy.proofTitle}>
-            <span>64 backend tests</span>
-            <span>24 e2e flows</span>
-            <span>CI ready</span>
+            <span>{lang === "ru" ? "64 backend-теста" : "64 backend tests"}</span>
+            <span>{lang === "ru" ? "24 e2e-сценария" : "24 e2e flows"}</span>
+            <span>{lang === "ru" ? "CI готов" : "CI ready"}</span>
           </div>
         </div>
 
@@ -344,7 +344,7 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
               </span>
               <div>
                 <b>AI-консьерж</b>
-                <small>Online</small>
+                <small>{lang === "ru" ? "Онлайн" : "Online"}</small>
               </div>
             </div>
             <p className="hotel-site-chat-user">{copy.guestQuestion}</p>
@@ -361,20 +361,20 @@ export default function ForHotelsPage({ searchParams }: { searchParams: PageSear
         </div>
         <div className="hotel-site-proof-grid">
           <span>
-            <b>Guest app</b>
-            <small>Search, booking, account</small>
+            <b>{lang === "ru" ? "Гостевое приложение" : "Guest app"}</b>
+            <small>{lang === "ru" ? "Поиск, бронь, аккаунт" : "Search, booking, account"}</small>
           </span>
           <span>
-            <b>Manager</b>
-            <small>Inventory and operations</small>
+            <b>{lang === "ru" ? "Менеджер" : "Manager"}</b>
+            <small>{lang === "ru" ? "Номера и операции" : "Inventory and operations"}</small>
           </span>
           <span>
-            <b>AI-ready</b>
-            <small>OpenAI integration surface</small>
+            <b>{lang === "ru" ? "Готов к AI" : "AI-ready"}</b>
+            <small>{lang === "ru" ? "Поверхность для OpenAI" : "OpenAI integration surface"}</small>
           </span>
           <span>
             <b>QA</b>
-            <small>Unit, API and e2e coverage</small>
+            <small>{lang === "ru" ? "Unit, API и e2e-покрытие" : "Unit, API and e2e coverage"}</small>
           </span>
         </div>
       </section>

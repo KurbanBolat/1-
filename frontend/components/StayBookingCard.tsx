@@ -138,7 +138,7 @@ export default function StayBookingCard({
           invalidGuests: `Количество гостей: от 1 до ${maxGuests}`,
           fixFields: "Проверьте даты и заполните обязательные поля",
           applyingSearch: "Показываем номера...",
-          dynamicPricingNotice: "Финальная сумма подтверждается на checkout и может включать динамическую цену.",
+          dynamicPricingNotice: "Финальная сумма подтверждается при оформлении и может включать динамическую цену.",
         }
       : {
           checkInStep: "1. Check-in",

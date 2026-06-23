@@ -569,7 +569,7 @@ export default function ManagerInStaySection({
         </div>
         <div className="manager-instay-kpis">
           <article>
-            <span>Новые room service</span>
+            <span>Новые заказы в номер</span>
             <b>{inStaySummary.waitingOrders}</b>
             <small>{inStaySummary.inProgressOrders} в работе</small>
           </article>
@@ -590,7 +590,7 @@ export default function ManagerInStaySection({
           </article>
         </div>
 
-        <div className="manager-instay-action-strip" aria-label="Сводка in-stay действий">
+        <div className="manager-instay-action-strip" aria-label="Сводка сервисов проживания">
           <span>
             <b>{inStaySummary.needsAction}</b>
             Требует действий
@@ -601,7 +601,7 @@ export default function ManagerInStaySection({
           </span>
           <span>
             <b>{priorityRoomOrders[0] ? `#${priorityRoomOrders[0].id}` : "-"}</b>
-            Приоритет room service
+            Приоритет заказов в номер
           </span>
           <span>
             <b>{priorityTableBookings[0] ? `#${priorityTableBookings[0].id}` : "-"}</b>
@@ -609,11 +609,11 @@ export default function ManagerInStaySection({
           </span>
         </div>
 
-        <section className="manager-service-command-center" aria-label="Единая очередь in-stay">
+        <section className="manager-service-command-center" aria-label="Единая очередь сервисов проживания">
           <div className="manager-service-command-head">
             <div>
               <span>Операционная очередь</span>
-              <h4>Единая очередь in-stay</h4>
+              <h4>Единая очередь сервисов проживания</h4>
               <p>Room service и столики отсортированы по срочности, старые заявки поднимаются выше.</p>
             </div>
           </div>
@@ -642,7 +642,7 @@ export default function ManagerInStaySection({
                 )}
               </article>
             ))}
-            {serviceCommandItems.length === 0 ? <p className="desc">Единая очередь пустая: новых room service заказов и активных заявок на столики нет.</p> : null}
+            {serviceCommandItems.length === 0 ? <p className="desc">Единая очередь пустая: новых заказов в номер и активных заявок на столики нет.</p> : null}
           </div>
         </section>
 
@@ -676,7 +676,7 @@ export default function ManagerInStaySection({
                 </div>
               </>
             ) : (
-              <p className="desc">Открытых заказов room service нет.</p>
+              <p className="desc">Открытых заказов в номер нет.</p>
             )}
           </article>
 
@@ -717,7 +717,7 @@ export default function ManagerInStaySection({
         <div className="manager-instay-queue">
           <article>
             <div className="manager-instay-queue-head">
-              <h4>Очередь room service</h4>
+              <h4>Очередь заказов в номер</h4>
               <span>{priorityRoomOrders.length}</span>
             </div>
             <div className="manager-list manager-instay-compact-list">
@@ -1216,7 +1216,7 @@ export default function ManagerInStaySection({
           {filteredRestaurantBookingEvents.length === 0 ? <p className="desc">По текущим фильтрам уведомлений нет.</p> : null}
         </div>
 
-        <h4>Заказы room service</h4>
+        <h4>Заказы в номер</h4>
         <div className="manager-toolbar">
           <select value={orderStatusFilter} onChange={(e) => onOrderStatusFilterChange(e.target.value as OrderStatus)}>
             <option value="all">Все статусы</option>

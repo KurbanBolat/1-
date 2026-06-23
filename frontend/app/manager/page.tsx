@@ -256,7 +256,7 @@ export default function ManagerPage() {
       const rows = await getInStayMenuForListing(listingId, false);
       setInStayMenuItems(rows);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Не удалось загрузить меню in-stay");
+      setStatus(error instanceof Error ? error.message : "Не удалось загрузить меню сервисов проживания");
     }
   }
 
@@ -281,7 +281,7 @@ export default function ManagerPage() {
       });
       setInStayOrders(rows);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Не удалось загрузить заказы room service");
+      setStatus(error instanceof Error ? error.message : "Не удалось загрузить заказы в номер");
     }
   }
 
@@ -1234,7 +1234,7 @@ export default function ManagerPage() {
                 <small>High priority, не закрытые</small>
               </article>
               <article className="manager-funnel-card">
-                <span>Новые заказы in-stay</span>
+                <span>Новые заявки проживания</span>
                 <b>{slaSummary.waitingRoomService}</b>
                 <small>Room service: submitted/accepted</small>
               </article>

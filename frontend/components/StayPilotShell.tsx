@@ -199,7 +199,7 @@ export default function StayPilotShell({
           </span>
           <span>
             <strong>StayPilot</strong>
-            <small>AI Concierge for Hotels</small>
+            <small>{isRu ? "AI-консьерж для отелей" : "AI Concierge for Hotels"}</small>
           </span>
         </Link>
         <nav className="sp-side-nav" aria-label={isRu ? "Навигация" : "Navigation"}>
@@ -250,54 +250,54 @@ export default function StayPilotShell({
       </div>
 
       {layout === "workspace" ? null : (
-      <aside className="sp-right-rail sp-transaction-rail">
-        <div className="sp-chat-head">
-          <div className="sp-chat-avatar">
-            <ShellIcon name="spark" />
+        <aside className="sp-right-rail sp-transaction-rail">
+          <div className="sp-chat-head">
+            <div className="sp-chat-avatar">
+              <ShellIcon name="spark" />
+            </div>
+            <div>
+              <h3>{isRu ? "AI-консьерж" : "AI concierge"}</h3>
+              <span>{isRu ? "Онлайн" : "Online"}</span>
+            </div>
+            <button type="button" aria-label={isRu ? "Меню" : "Menu"}>
+              ...
+            </button>
           </div>
-          <div>
-            <h3>{isRu ? "AI-консьерж" : "AI concierge"}</h3>
-            <span>{isRu ? "Онлайн" : "Online"}</span>
+          <article className="sp-transaction-assistant">
+            <span>
+              <ShellIcon name="message" />
+            </span>
+            <p>
+              {isRu
+                ? "Проверяю детали брони, оплату и сервисы отеля. После подтверждения сразу покажу рестораны и сервисы проживания."
+                : "I keep booking, payment and hotel services connected. After confirmation I can show restaurants and in-stay options."}
+            </p>
+          </article>
+          <div className="sp-transaction-rail-list">
+            <article>
+              <ShellIcon name="card" />
+              <strong>{isRu ? "Без скрытых платежей" : "No hidden fees"}</strong>
+              <small>{isRu ? "Итог виден до оплаты" : "Total shown before payment"}</small>
+            </article>
+            <article>
+              <ShellIcon name="shield" />
+              <strong>{isRu ? "Безопасная оплата" : "Secure payment"}</strong>
+              <small>{isRu ? "Токен доступа сохраняется" : "Access token is preserved"}</small>
+            </article>
+            <article>
+              <ShellIcon name="restaurant" />
+              <strong>{isRu ? "Сервисы после оплаты" : "Post-payment services"}</strong>
+              <small>{isRu ? "Рестораны и доставка в номер" : "Restaurants and room service"}</small>
+            </article>
           </div>
-          <button type="button" aria-label={isRu ? "Меню" : "Menu"}>
-            ...
-          </button>
-        </div>
-        <article className="sp-transaction-assistant">
-          <span>
-            <ShellIcon name="message" />
-          </span>
-          <p>
-            {isRu
-              ? "Проверяю детали брони, оплату и сервисы отеля. После подтверждения сразу покажу рестораны и in-stay опции."
-              : "I keep booking, payment and hotel services connected. After confirmation I can show restaurants and in-stay options."}
+          <div className="sp-transaction-chat-input">
+            <span>{isRu ? "Напишите сообщение..." : "Write a message..."}</span>
+            <button type="button" aria-label={isRu ? "Отправить" : "Send"} />
+          </div>
+          <p className="sp-transaction-disclaimer">
+            {isRu ? "AI может допускать ошибки. Проверяйте важную информацию." : "AI can make mistakes. Verify important information."}
           </p>
-        </article>
-        <div className="sp-transaction-rail-list">
-          <article>
-            <ShellIcon name="card" />
-            <strong>{isRu ? "Без скрытых платежей" : "No hidden fees"}</strong>
-            <small>{isRu ? "Итог виден до оплаты" : "Total shown before payment"}</small>
-          </article>
-          <article>
-            <ShellIcon name="shield" />
-            <strong>{isRu ? "Безопасная оплата" : "Secure payment"}</strong>
-            <small>{isRu ? "Токен доступа сохраняется" : "Access token is preserved"}</small>
-          </article>
-          <article>
-            <ShellIcon name="restaurant" />
-            <strong>{isRu ? "Сервисы после оплаты" : "Post-payment services"}</strong>
-            <small>{isRu ? "Рестораны и room service" : "Restaurants and room service"}</small>
-          </article>
-        </div>
-        <div className="sp-transaction-chat-input">
-          <span>{isRu ? "Напишите сообщение..." : "Write a message..."}</span>
-          <button type="button" aria-label={isRu ? "Отправить" : "Send"} />
-        </div>
-        <p className="sp-transaction-disclaimer">
-          {isRu ? "AI может допускать ошибки. Проверяйте важную информацию." : "AI can make mistakes. Verify important information."}
-        </p>
-      </aside>
+        </aside>
       )}
     </div>
   );
