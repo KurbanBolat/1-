@@ -160,6 +160,20 @@ body {
   box-shadow: none;
 }
 
+@media (max-width: 900px) {
+  .topnav-nav {
+    display: none;
+  }
+
+  .topnav {
+    width: calc(100vw - 16px);
+  }
+
+  .topnav-tools {
+    flex-shrink: 0;
+  }
+}
+
 a {
   text-decoration: none;
   color: inherit;

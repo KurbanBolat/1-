@@ -928,7 +928,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             <h1>
               {lang === "ru" ? (
                 <>
-                  Путешествуйте с комфортом,
+                  Путешествуйте с комфортом,{" "}
                   <br />а мы позаботимся обо всём
                 </>
               ) : (
