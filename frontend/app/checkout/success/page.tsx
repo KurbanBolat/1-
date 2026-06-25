@@ -77,7 +77,7 @@ const t = {
   },
   ru: {
     title: "Бронирование подтверждено",
-    subtitle: "Ваше бронирование успешно создано.",
+    subtitle: "Бронь подтверждена и оплачена.",
     titleFailed: "Оплата не прошла",
     subtitleFailed: "Черновик брони сохранен. Вы можете повторить оплату.",
     titlePending: "Оплата ожидает подтверждения",
@@ -120,8 +120,8 @@ const t = {
     reservationDraft: "Черновик",
     reservationPendingPayment: "Ожидает оплаты",
     reservationConfirmed: "Подтверждена",
-    reservationCheckedIn: "Заезд",
-    reservationCheckedOut: "Выезд",
+    reservationCheckedIn: "Заселен",
+    reservationCheckedOut: "Выселен",
     reservationCancelled: "Отменена",
     reservationExpired: "Истекла",
     flowTitle: "Этапы бронирования",
@@ -240,7 +240,7 @@ export default async function CheckoutSuccessPage({
   const isPending = paymentStatus === "pending" || reservationStatus === "pending_payment";
   const isFailed = paymentStatus === "failed";
   const resultState = isPaid ? "paid" : isPending ? "pending" : "failed";
-  const resultMark = isPaid ? "OK" : isPending ? "..." : "!";
+  const resultMark = isPaid ? "✓" : isPending ? "…" : "!";
   const resultTitle = isPaid ? tr.resultPaidTitle : isPending ? tr.resultPendingTitle : tr.resultFailedTitle;
   const resultCopy = isPaid ? tr.resultPaidCopy : isPending ? tr.resultPendingCopy : tr.resultFailedCopy;
   const paymentStatusText = paymentStatus ? paymentStatusLabel(paymentStatus, tr) : "";

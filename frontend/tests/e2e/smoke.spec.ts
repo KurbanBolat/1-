@@ -22,6 +22,10 @@ function e2eApiBase(): string {
   return process.env.E2E_API_BASE || "http://localhost:8000";
 }
 
+async function fillDateTextbox(scope: Page | Locator, label: RegExp, value: string): Promise<void> {
+  await scope.getByRole("textbox", { name: label }).fill(value);
+}
+
 function cookieValueFromSetCookie(headers: string[], name: string): string {
   const prefix = `${name}=`;
   const raw = headers.find((header) => header.startsWith(prefix));
@@ -132,8 +136,8 @@ async function applyBookableDatesFromApi(
 ): Promise<boolean> {
   const range = await findBookableRangeFromApi(page, listingId);
   if (!range) return false;
-  await scope.getByLabel(labels.checkInLabel).fill(range.checkIn);
-  await scope.getByLabel(labels.checkOutLabel).fill(range.checkOut);
+  await fillDateTextbox(scope, labels.checkInLabel, range.checkIn);
+  await fillDateTextbox(scope, labels.checkOutLabel, range.checkOut);
   await page.waitForTimeout(80);
   const searchButton = scope.getByRole("button", { name: /show rooms|показать номера|continue to checkout|перейти к оформлению/i });
   if (!(await searchButton.isEnabled())) return false;
@@ -153,8 +157,8 @@ async function pickBookableDates(
   if (!listingId) throw new Error("Could not resolve listing id from stay URL");
   const range = await findBookableRangeFromApi(page, listingId);
   if (!range) throw new Error("Could not find a bookable room range from API");
-  await scope.getByLabel(opts.checkInLabel).fill(range.checkIn);
-  await scope.getByLabel(opts.checkOutLabel).fill(range.checkOut);
+  await fillDateTextbox(scope, opts.checkInLabel, range.checkIn);
+  await fillDateTextbox(scope, opts.checkOutLabel, range.checkOut);
   const searchButton = scope.getByRole("button", { name: /show rooms|показать номера|continue to checkout|перейти к оформлению/i });
   await expect(searchButton).toBeEnabled();
   await searchButton.click();
@@ -601,7 +605,7 @@ test("booking flow works end-to-end", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/checkout\/payment\?/);
   await expect(page.locator(".payment-booking-summary")).toContainText(/Payment summary/i);
-  await expect(page.locator(".payment-route-card")).toContainText(/Payment route/i);
+  await expect(page.locator(".payment-route-card")).toContainText(/Payment steps/i);
   await expect(page.locator(".payment-route-step")).toHaveCount(3);
   await expect(page.locator(".payment-method-card")).toHaveCount(3);
   const successParams = await payUntilConfirmed(page);
