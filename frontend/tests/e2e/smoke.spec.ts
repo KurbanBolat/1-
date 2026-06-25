@@ -107,6 +107,23 @@ async function findBookableRoomFromApi(
   return null;
 }
 
+async function chooseDateFromOpenCalendar(page: Page, isoDate: string): Promise<void> {
+  for (let attempt = 0; attempt < 14; attempt += 1) {
+    const day = page.locator(`.date-range-popover .date-range-day[data-date="${isoDate}"]`).first();
+    if ((await day.count()) > 0 && (await day.isVisible().catch(() => false))) {
+      await expect(day).toBeEnabled();
+      await day.click();
+      return;
+    }
+
+    const nextMonth = page.getByRole("button", { name: /следующий месяц|next month/i }).first();
+    await expect(nextMonth).toBeEnabled();
+    await nextMonth.click();
+  }
+
+  throw new Error(`Could not find calendar date ${isoDate}`);
+}
+
 async function applyBookableDatesFromApi(
   page: Page,
   scope: Locator,
@@ -491,38 +508,50 @@ test("home search preserves dates and opens available rooms", async ({ page }) =
         .filter((href): href is string => Boolean(href))
         .slice(0, 12),
     );
-  let selected: { listingId: number; checkIn: string; checkOut: string; href: string } | null = null;
+  let selected: { listingId: number; checkIn: string; checkOut: string } | null = null;
 
   for (const href of candidateHrefs) {
     const listingId = Number(href.match(/\/stays\/(\d+)/)?.[1] || "0");
     if (!listingId) continue;
     const room = await findBookableRoomFromApi(page, listingId);
     if (!room) continue;
-    await page.goto(`/?lang=ru&currency=KZT&guests=2&check_in=${room.checkIn}&check_out=${room.checkOut}`);
-    const link = page.locator(`.property-card .actions a[href*="/stays/${listingId}"]`).first();
-    if ((await link.count()) === 0) continue;
-    const nextHref = await link.getAttribute("href");
-    if (!nextHref) continue;
-    selected = { listingId, checkIn: room.checkIn, checkOut: room.checkOut, href: nextHref };
+    selected = { listingId, checkIn: room.checkIn, checkOut: room.checkOut };
     break;
   }
 
-  if (!selected) throw new Error("Could not find a bookable stay on the filtered home page");
-  expect(selected.href).toContain(`check_in=${selected.checkIn}`);
-  expect(selected.href).toContain(`check_out=${selected.checkOut}`);
-  expect(selected.href).toContain("guests=2");
-  expect(selected.href).toContain("#available-rooms");
+  if (!selected) throw new Error("Could not find a bookable stay on the home page");
 
-  await page.locator('input[name="guests"]').fill("4");
+  await page.goto("/?lang=ru&currency=KZT&guests=2");
+  await page.locator(".sp-hero-search").getByLabel(/Заезд/i).click();
+  await expect(page.locator(".date-range-guidance")).toContainText("Выберите дату заезда");
+  await chooseDateFromOpenCalendar(page, selected.checkIn);
+  await expect(page.locator(".date-range-guidance")).toContainText("Теперь выберите дату выезда");
+  await chooseDateFromOpenCalendar(page, selected.checkOut);
+  await expect(page.locator(".date-range-popover")).toHaveCount(0);
+  await expect
+    .poll(() => page.locator('input[name="check_in"]').evaluate((input) => (input as HTMLInputElement).value))
+    .toBe(selected.checkIn);
+  await expect
+    .poll(() => page.locator('input[name="check_out"]').evaluate((input) => (input as HTMLInputElement).value))
+    .toBe(selected.checkOut);
+
   await page.locator(".sp-hero-search").getByRole("button", { name: /найти|search/i }).click();
 
-  await expect.poll(() => new URL(page.url()).searchParams.get("guests")).toBe("4");
+  await expect.poll(() => new URL(page.url()).searchParams.get("guests")).toBe("2");
   await expect.poll(() => new URL(page.url()).searchParams.get("check_in")).toBe(selected.checkIn);
   await expect.poll(() => new URL(page.url()).searchParams.get("check_out")).toBe(selected.checkOut);
 
-  await page.goto(selected.href);
+  const firstResultHref = await page.locator(".property-card .actions a").first().getAttribute("href");
+  expect(firstResultHref).toContain(`check_in=${selected.checkIn}`);
+  expect(firstResultHref).toContain(`check_out=${selected.checkOut}`);
+  expect(firstResultHref).toContain("guests=2");
+  expect(firstResultHref).toContain("#available-rooms");
+
+  await page.goto(`/stays/${selected.listingId}?lang=ru&currency=KZT&check_in=${selected.checkIn}&check_out=${selected.checkOut}&guests=2#available-rooms`);
   await expect(page).toHaveURL(/\/stays\/\d+.*#available-rooms/);
   await expect(page.locator(".available-room-card").first()).toContainText(/Забронировать|Book/i);
+  await expect(page.locator(".available-room-date-pair").first()).toContainText(/Заезд|Check-in/i);
+  await expect(page.locator(".available-room-date-pair").first()).toContainText(/Выезд|Check-out/i);
 });
 
 test("stay gallery keeps absolute photo urls intact", async ({ page }) => {

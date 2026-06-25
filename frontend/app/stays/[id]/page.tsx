@@ -545,7 +545,17 @@ export default async function StayDetails({
                     </div>
                   </div>
                   <div className="available-room-booking">
-                    <span>{formatRange(window.check_in, window.check_out, lang)}</span>
+                    <div className="available-room-date-pair" aria-label={`${tr.roomWindow}: ${formatRange(window.check_in, window.check_out, lang)}`}>
+                      <span>
+                        <small>{tr.checkIn}</small>
+                        <strong>{formatDay(window.check_in, lang)}</strong>
+                      </span>
+                      <span>
+                        <small>{tr.checkOut}</small>
+                        <strong>{formatDay(window.check_out, lang)}</strong>
+                      </span>
+                    </div>
+                    <span>{tr.roomTotalLabel}</span>
                     <b>{totalForWindow}</b>
                     <small>
                       {formatNightsCount(window.nights, lang)} · {nightlyRate} {tr.perNight}

@@ -357,7 +357,7 @@ export default function StayBookingCard({
       <div className="booking-selection">
         <span>
           <b>{labels.selectedRange}:</b>{" "}
-          {checkIn && checkOut ? `${formatHumanDate(checkIn)} -> ${formatHumanDate(checkOut)}` : labels.completeDates}
+          {checkIn && checkOut ? `${formatHumanDate(checkIn)} - ${formatHumanDate(checkOut)}` : labels.completeDates}
         </span>
         <span>
           <b>{labels.nights}:</b> {nights > 0 ? nights : "-"}

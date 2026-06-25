@@ -128,6 +128,16 @@ function monthTitle(monthKey: string, lang: Lang): string {
   return capitalize(lang === "ru" ? formatted.replace(/\sг\.$/, "") : formatted);
 }
 
+function formatAccessibleDay(isoDate: string, lang: Lang): string {
+  const locale = lang === "ru" ? "ru-RU" : "en-GB";
+  return new Intl.DateTimeFormat(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(`${isoDate}T00:00:00`));
+}
+
 function CalendarIcon() {
   return (
     <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -208,6 +218,12 @@ export default function DateRangePicker({
           nextMonth: "Следующий месяц",
           clear: "Удалить",
           today: "Сегодня",
+          chooseCheckIn: "Выберите дату заезда",
+          chooseCheckOut: "Теперь выберите дату выезда",
+          selected: "Выбрано",
+          noDates: "Даты не выбраны",
+          startLabel: "заезд",
+          endLabel: "выезд",
           weekdays: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
         }
       : {
@@ -217,6 +233,12 @@ export default function DateRangePicker({
           nextMonth: "Next month",
           clear: "Clear",
           today: "Today",
+          chooseCheckIn: "Choose check-in date",
+          chooseCheckOut: "Now choose check-out date",
+          selected: "Selected",
+          noDates: "No dates selected",
+          startLabel: "check-in",
+          endLabel: "check-out",
           weekdays: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
         };
 
@@ -263,8 +285,9 @@ export default function DateRangePicker({
   }
 
   function openCalendar(field: DateField) {
-    const focusDate = field === "checkOut" ? checkOut || checkIn || effectiveMinDate : checkIn || effectiveMinDate;
-    setActiveField(field);
+    const nextField = field === "checkOut" && !checkIn ? "checkIn" : field;
+    const focusDate = nextField === "checkOut" ? checkOut || checkIn || effectiveMinDate : checkIn || effectiveMinDate;
+    setActiveField(nextField);
     setCalendarMonth(monthKeyFromIso(focusDate));
     setIsOpen(true);
   }
@@ -279,10 +302,6 @@ export default function DateRangePicker({
         checkIn: isoDate,
         checkOut: checkOut && checkOut > isoDate ? checkOut : hasAutoCheckOut ? autoCheckOut : "",
       });
-      if (variant === "hero" && closeOnComplete && hasAutoCheckOut) {
-        setIsOpen(false);
-        return;
-      }
       setActiveField("checkOut");
       setCalendarMonth(monthKeyFromIso(hasAutoCheckOut ? autoCheckOut : isoDate));
       return;
@@ -345,6 +364,9 @@ export default function DateRangePicker({
     return formatDisplayDate(isoDate);
   }
 
+  const selectedRangeLabel =
+    checkIn && checkOut ? `${formatDisplayDate(checkIn)} - ${formatDisplayDate(checkOut)}` : labels.noDates;
+
   function renderField(field: DateField, label: string, step: string | undefined, error: string | undefined, inputRef: RefObject<HTMLInputElement> | undefined) {
     const isCheckIn = field === "checkIn";
     const isoDate = isCheckIn ? checkIn : checkOut;
@@ -368,6 +390,7 @@ export default function DateRangePicker({
         </span>
         <span className="date-range-input-shell">
           <input
+            suppressHydrationWarning
             ref={inputRef}
             type="text"
             inputMode="numeric"
@@ -434,6 +457,13 @@ export default function DateRangePicker({
             </div>
           </div>
 
+          <div className="date-range-guidance" aria-live="polite">
+            <strong>{activeField === "checkIn" ? labels.chooseCheckIn : labels.chooseCheckOut}</strong>
+            <span>
+              {labels.selected}: {selectedRangeLabel}
+            </span>
+          </div>
+
           <div className="date-range-weekdays" aria-hidden="true">
             {labels.weekdays.map((weekday) => (
               <span key={weekday}>{weekday}</span>
@@ -451,8 +481,16 @@ export default function DateRangePicker({
                 <button
                   key={day.iso}
                   type="button"
+                  data-date={day.iso}
                   disabled={isDisabled}
                   aria-pressed={isRangeStart || isRangeEnd}
+                  aria-label={[
+                    formatAccessibleDay(day.iso, lang),
+                    isRangeStart ? labels.startLabel : "",
+                    isRangeEnd ? labels.endLabel : "",
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
                   className={[
                     "date-range-day",
                     day.inCurrentMonth ? "" : "is-outside",

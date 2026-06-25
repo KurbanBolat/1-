@@ -14903,6 +14903,28 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
   margin-bottom: 12px;
 }
 
+.date-range-guidance {
+  display: grid;
+  gap: 3px;
+  margin: -4px 0 10px;
+  padding: 8px 10px;
+  border: 1px solid #e5efff;
+  background: #f7fbff;
+}
+
+.date-range-guidance strong {
+  color: #172033;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.date-range-guidance span {
+  color: #5e6b7f;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
 .date-range-month,
 .date-range-nav button,
 .date-range-footer button,
@@ -15018,6 +15040,7 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
   border-color: #166de0;
   background: #166de0;
   color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.34);
 }
 
 .date-range-day.is-today:not(.is-start):not(.is-end) {
@@ -16478,7 +16501,7 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
 .sp-stay-page .available-room-card {
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(210px, 0.34fr);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.38fr);
   overflow: hidden;
   border: 1px solid var(--sp-line-soft);
   border-radius: var(--sp-radius-panel);
@@ -16543,6 +16566,40 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
   text-align: right;
 }
 
+.sp-stay-page .available-room-card .available-room-date-pair {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.sp-stay-page .available-room-card .available-room-date-pair span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding: 8px 9px;
+  border: 1px solid #e0e7f1;
+  background: #ffffff;
+  text-align: left;
+}
+
+.sp-stay-page .available-room-card .available-room-date-pair small {
+  color: var(--sp-muted-text);
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.sp-stay-page .available-room-card .available-room-date-pair strong {
+  color: var(--sp-text);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
 .sp-stay-page .available-room-card .available-room-booking > span {
   color: var(--sp-muted-text);
   font-size: 11px;
@@ -16565,15 +16622,25 @@ main.container-home > .sp-shell:not(.sp-shell-transaction):not(.sp-shell-workspa
 }
 
 .sp-stay-page .available-room-card .available-room-cta {
+  grid-area: auto;
+  grid-column: 1 / -1;
   width: 100%;
+  max-width: none;
+  justify-self: stretch;
   min-height: 42px;
   margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
   border-radius: var(--sp-radius-control);
   background: linear-gradient(135deg, var(--sp-accent) 0%, var(--sp-accent-strong) 100%);
   color: var(--sp-surface);
   box-shadow: var(--sp-shadow-accent);
   font-size: 12px;
   font-weight: 900;
+  line-height: 1.15;
+  text-align: center;
 }
 
 .sp-stay-page .available-room-card .available-room-cta:hover {
