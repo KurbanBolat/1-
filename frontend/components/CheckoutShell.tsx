@@ -314,7 +314,7 @@ export default function CheckoutShell({
               <span>{copy.selectedDates}</span>
               <b suppressHydrationWarning>
                 {checkInBadge}
-                {" -> "}
+                {" - "}
                 {checkOutBadge}
               </b>
             </div>

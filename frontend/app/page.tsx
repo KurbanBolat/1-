@@ -819,7 +819,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   if (explicitCheckIn || explicitCheckOut) {
     activeFilters.push({
       key: "dates",
-      label: `${tr.datesLabel}: ${formatUiDate(explicitCheckIn, lang)} -> ${formatUiDate(explicitCheckOut, lang)}`,
+      label: `${tr.datesLabel}: ${formatUiDate(explicitCheckIn, lang)} - ${formatUiDate(explicitCheckOut, lang)}`,
       href: quickFilterLink(searchParams, { check_in: undefined, check_out: undefined }),
     });
   }

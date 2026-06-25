@@ -102,7 +102,7 @@ export default function CheckoutPaymentPage({
   const expVariant = searchParams.exp_variant === "b" ? "b" : "a";
   const accessToken = searchParams.access_token || "";
   const tr = t[lang];
-  const periodLabel = checkIn && checkOut ? `${formatIsoDate(checkIn, lang)} -> ${formatIsoDate(checkOut, lang)}` : "";
+  const periodLabel = checkIn && checkOut ? `${formatIsoDate(checkIn, lang)} - ${formatIsoDate(checkOut, lang)}` : "";
   const editCheckoutParams = new URLSearchParams({
     listing_id: String(listingId),
     check_in: checkIn,

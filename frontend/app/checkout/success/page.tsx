@@ -249,7 +249,7 @@ export default async function CheckoutSuccessPage({
   const attemptStatusText = attemptStatus ? paymentStatusLabel(attemptStatus, tr) : "";
   const periodLabel =
     checkIn && checkOut
-      ? `${formatIsoDate(checkIn, lang)} -> ${formatIsoDate(checkOut, lang)}`
+      ? `${formatIsoDate(checkIn, lang)} - ${formatIsoDate(checkOut, lang)}`
       : "";
   const detailsActive = true;
   const draftActive = Boolean(reservationStatus || paymentStatus);

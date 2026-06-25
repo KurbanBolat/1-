@@ -686,7 +686,14 @@ test("checkout recovers from stale room type links", async ({ page }) => {
   await expect(page.locator(".checkout-main")).toBeVisible({ timeout: 15000 });
   await expect(page.locator(".checkout-room-recovery")).toContainText(/категория номера уже недоступна/i);
   await expect(page.locator(".checkout-room-recovery a")).toContainText(/выбрать другой номер/i);
+  await expect(page.locator(".checkout-room-recovery a")).not.toHaveAttribute("href", /room_type_id=999999/);
   await expect(page.locator(".checkout-room-summary")).toContainText(/выбранный номер/i);
+  await expect(page.locator(".checkout-room-summary")).not.toContainText("->");
+  await expect(page.locator(".quote-lock-card")).not.toContainText(/квот/i);
+
+  await page.getByRole("button", { name: /применить изменения/i }).click();
+  await expect(page.locator(".checkout-toast")).toContainText(/цена обновлена/i);
+  await expect.poll(() => new URL(page.url()).searchParams.get("room_type_id")).toBeNull();
   await expect(page.locator("body")).not.toContainText("Something went wrong");
 });
 

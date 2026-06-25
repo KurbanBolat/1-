@@ -97,14 +97,14 @@ const t = {
     smartHint: "Баланс гибкости и стоимости",
     flexHint: "Максимальная гибкость, удобная отмена",
     lockTitle: "Фиксация цены",
-    lockExpired: "Фиксация истекла. Обновите квоту перед подтверждением.",
+    lockExpired: "Фиксация цены истекла. Обновите цену перед подтверждением.",
     lockActive: "Цена зафиксирована для текущих дат и гостей.",
     lockExpiredAction: "Обновить и разблокировать",
     refreshQuote: "Обновить цену",
     refreshingQuote: "Обновляем...",
-    quoteRefreshed: "Квота обновлена.",
+    quoteRefreshed: "Цена обновлена.",
     quoteAutoRefreshed: "Фиксация цены обновлена автоматически.",
-    quoteRefreshFailed: "Не удалось обновить квоту. Попробуйте снова.",
+    quoteRefreshFailed: "Не удалось обновить цену. Попробуйте снова.",
     adjustTitle: "Изменить даты и гостей",
     applyAdjustments: "Применить изменения",
     checkInLabel: "Заезд",
@@ -162,6 +162,7 @@ export default async function CheckoutPage({
 
   let quote: Awaited<ReturnType<typeof getListingQuote>> | null = null;
   let recoveredFromRoomType = false;
+  let activeRoomTypeId = roomTypeId;
   try {
     quote = await getListingQuote({ listing_id: listingId, check_in: checkIn, check_out: checkOut, guests, tariff, room_type_id: roomTypeId });
   } catch {
@@ -169,8 +170,10 @@ export default async function CheckoutPage({
       try {
         quote = await getListingQuote({ listing_id: listingId, check_in: checkIn, check_out: checkOut, guests, tariff });
         recoveredFromRoomType = true;
+        activeRoomTypeId = quote.room_type_id || undefined;
       } catch {
         quote = null;
+        activeRoomTypeId = undefined;
       }
     }
   }
@@ -183,7 +186,7 @@ export default async function CheckoutPage({
     check_out: checkOut,
     guests: String(guests),
   });
-  if (roomTypeId) stayBackParams.set("room_type_id", String(roomTypeId));
+  if (activeRoomTypeId) stayBackParams.set("room_type_id", String(activeRoomTypeId));
   const tariffOptions: Array<{ key: Tariff; label: string; hint: string }> = [
     { key: "basic", label: tr.basic, hint: tr.basicHint },
     { key: "smart", label: tr.smart, hint: tr.smartHint },
@@ -223,7 +226,7 @@ export default async function CheckoutPage({
           checkIn={checkIn}
           checkOut={checkOut}
           guests={guests}
-          roomTypeId={roomTypeId}
+          roomTypeId={activeRoomTypeId}
           lang={lang}
           currency={currency}
           expVariant={expVariant}
