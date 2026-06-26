@@ -3114,6 +3114,58 @@ button:hover {
   line-height: 1.1;
 }
 
+.manager-reservation-toolbar {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #d9e4ef;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.manager-reservation-action-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.manager-reservation-action-strip span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding: 8px 9px;
+  border: 1px solid #e7edf5;
+  border-radius: 10px;
+  background: #f8fbff;
+  color: #68798e;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.manager-reservation-action-strip b {
+  color: #182334;
+  font-size: 17px;
+  line-height: 1.1;
+}
+
+.manager-reservation-sort {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.manager-reservation-sort > span {
+  color: #64758a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.manager-reservation-sort .view-toggle {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .manager-reservation-list {
   display: grid;
   gap: 8px;
@@ -3179,6 +3231,81 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.manager-reservation-signal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 9px;
+  border: 1px solid #dbe7f2;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-reservation-signal span {
+  color: #182334;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.manager-reservation-signal small {
+  color: #64758a;
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.manager-reservation-signal.danger {
+  border-color: #f5c9c7;
+  background: #fff7f6;
+}
+
+.manager-reservation-signal.danger span {
+  color: #8b2f2f;
+}
+
+.manager-reservation-signal.warning {
+  border-color: #f4d59f;
+  background: #fffaf0;
+}
+
+.manager-reservation-signal.warning span {
+  color: #8a4b06;
+}
+
+.manager-reservation-signal.success {
+  border-color: #b6e7cf;
+  background: #f4fcf8;
+}
+
+.manager-reservation-signal.success span {
+  color: #0d6641;
+}
+
+.manager-reservation-empty {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 14px;
+  border: 1px dashed #cfd8e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.manager-reservation-empty b {
+  color: #182334;
+  font-size: 14px;
+}
+
+.manager-reservation-empty p {
+  margin: 0;
+  color: #64758a;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .payment-pill,
@@ -12644,9 +12771,11 @@ body:has(.sp-shell) {
 .sp-manager-page .manager-fin-card,
 .sp-manager-page .manager-funnel-card,
 .sp-manager-page .manager-reservation-command,
+.sp-manager-page .manager-reservation-toolbar,
 .sp-manager-page .manager-filter-summary,
 .sp-manager-page .manager-item,
 .sp-manager-page .manager-reservation-item,
+.sp-manager-page .manager-reservation-empty,
 .sp-manager-page .manager-performance-item,
 .sp-manager-page .manager-photo-item,
 .sp-manager-page .manager-occupancy-day,
@@ -12944,6 +13073,7 @@ body:has(.sp-shell) {
   .sp-manager-page .manager-fin-grid,
   .sp-manager-page .manager-availability-controls,
   .sp-manager-page .manager-reservation-queue,
+  .sp-manager-page .manager-reservation-action-strip,
   .sp-manager-page .manager-room-type-actions,
   .sp-manager-page .manager-room-type-item,
   .sp-manager-page .manager-photo-order {
@@ -12996,6 +13126,25 @@ body:has(.sp-shell) {
   .sp-manager-page .manager-editor-head {
     display: grid;
     justify-items: start;
+  }
+
+  .sp-manager-page .manager-reservation-sort,
+  .sp-manager-page .manager-reservation-signal {
+    display: grid;
+    justify-items: start;
+  }
+
+  .sp-manager-page .manager-reservation-sort .view-toggle {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .sp-manager-page .manager-reservation-sort .view-toggle-btn {
+    flex: 1 1 100%;
+  }
+
+  .sp-manager-page .manager-reservation-signal small {
+    text-align: left;
   }
 
   .sp-account-page .account-booking-card {
@@ -13155,6 +13304,23 @@ body:has(.sp-shell) {
 .sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-period-toggle .view-toggle-btn.active {
   background: #ffffff;
   color: #6844ff;
+}
+
+.sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-reservation-action-strip {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-reservation-sort {
+  display: grid;
+  justify-content: stretch;
+}
+
+.sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-reservation-sort .view-toggle {
+  width: 100%;
+}
+
+.sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-reservation-sort .view-toggle-btn {
+  flex: 1 1 92px;
 }
 
 .sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-reservations,
