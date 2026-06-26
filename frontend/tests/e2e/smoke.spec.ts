@@ -745,6 +745,35 @@ test("manager reservations dashboard exposes kpis and resets filters", async ({ 
   await expect(paymentSelect).toHaveValue("all");
 });
 
+test("manager communications dashboard exposes queues and readable notifications", async ({ page }) => {
+  await loginManagerByApi(page);
+  await page.goto("/manager?lang=ru&currency=KZT");
+  await expect(page).toHaveURL(/\/manager/);
+
+  await page.getByRole("button", { name: /коммуникации/i }).click();
+
+  const notifications = page.locator("section.manager-notifications").filter({ hasText: /Уведомления/i }).first();
+  await expect(notifications).toBeVisible();
+  await expect(notifications).toContainText(/Уведомления/);
+  await expect(notifications).not.toContainText(/РЈРІ|РџСЂ|вЂў/);
+  await expect(notifications.locator(".manager-notification-summary article")).toHaveCount(3);
+
+  const communications = page.locator("section.manager-communications");
+  await expect(communications).toBeVisible();
+  await expect(communications.locator(".manager-communication-kpis article")).toHaveCount(4);
+  await expect(communications.locator(".manager-communication-queue button")).toHaveCount(5);
+  await expect(communications.locator(".manager-communication-focus")).toBeVisible();
+
+  const communicationSelects = communications.locator("select");
+  await communications.locator(".manager-communication-queue button").filter({ hasText: /^Ошибки/ }).click();
+  await expect(communicationSelects.nth(1)).toHaveValue("failed");
+
+  await communications.locator(".manager-communication-queue button").filter({ hasText: /^Email/ }).click();
+  await expect(communicationSelects.nth(0)).toHaveValue("email");
+  await expect(communicationSelects.nth(1)).toHaveValue("all");
+  await expect(communications.getByRole("button", { name: /повторить ошибки \(/i })).toBeVisible();
+});
+
 test("partner manager shows cancellation terms preview and cancellation result", async ({ page }) => {
   await loginManagerByApi(page);
   const { listingId, range, roomTypeId } = await pickBookableManagerListingFromApi(page);

@@ -1787,6 +1787,45 @@ button:hover {
   background: #fff;
 }
 
+.manager-notification-summary,
+.manager-communication-kpis {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.manager-communication-kpis {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.manager-notification-summary article,
+.manager-communication-kpis article {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 1px solid #d9e4ef;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-notification-summary span,
+.manager-notification-summary small,
+.manager-communication-kpis span,
+.manager-communication-kpis small {
+  color: #64758a;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.manager-notification-summary b,
+.manager-communication-kpis b {
+  color: #111827;
+  font-size: 19px;
+  line-height: 1.1;
+}
+
 .manager-notification-list {
   margin-top: 10px;
   display: grid;
@@ -1805,6 +1844,136 @@ button:hover {
 .manager-notification-item.unread {
   border-color: #78a9cf;
   box-shadow: 0 0 0 2px rgba(68, 131, 179, 0.12);
+}
+
+.manager-notification-empty {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px dashed #cfd8e6;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.manager-notification-empty b {
+  color: #182334;
+  font-size: 14px;
+}
+
+.manager-notification-empty p {
+  margin: 0;
+  color: #64758a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.manager-communication-dashboard {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #d9e4ef;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.manager-communication-focus {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid #dbe7f2;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-communication-focus span {
+  color: #6844ff;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.manager-communication-focus b {
+  color: #182334;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.manager-communication-focus p {
+  margin: 0;
+  color: #64758a;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.manager-communication-focus.danger {
+  border-color: #f5c9c7;
+  background: #fff7f6;
+}
+
+.manager-communication-focus.danger b {
+  color: #8b2f2f;
+}
+
+.manager-communication-focus.success {
+  border-color: #b6e7cf;
+  background: #f4fcf8;
+}
+
+.manager-communication-focus.success b {
+  color: #0d6641;
+}
+
+.manager-communication-queue {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 8px;
+}
+
+.manager-communication-queue button {
+  min-width: 0;
+  min-height: 64px;
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 1px solid #dfe7f1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #293246;
+  text-align: left;
+  box-shadow: none;
+}
+
+.manager-communication-queue button span {
+  color: #293246;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.manager-communication-queue button b {
+  color: #111827;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.manager-communication-queue button small {
+  color: #64758a;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.manager-communication-queue button.active {
+  border-color: #cfc4ff;
+  background: #f4f0ff;
+  color: #6844ff;
+}
+
+.manager-communication-queue button.active span,
+.manager-communication-queue button.active b {
+  color: #6844ff;
 }
 
 .manager-communications .manager-communications-filters {
@@ -1837,6 +2006,46 @@ button:hover {
   border-top: 1px dashed #c8ddf1;
   display: grid;
   gap: 2px;
+}
+
+.manager-comm-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.manager-comm-head b {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.manager-comm-signal {
+  flex: 0 0 auto;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border: 1px solid #dce5ef;
+  border-radius: 999px;
+  background: #f5f7fb;
+  color: #41546d;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.manager-comm-signal.danger {
+  border-color: #f5c9c7;
+  background: #fdebea;
+  color: #8b2f2f;
+}
+
+.manager-comm-signal.success {
+  border-color: #b6e7cf;
+  background: #e2f8ef;
+  color: #0d6641;
 }
 
 .manager-notification-actions {
@@ -12772,10 +12981,12 @@ body:has(.sp-shell) {
 .sp-manager-page .manager-funnel-card,
 .sp-manager-page .manager-reservation-command,
 .sp-manager-page .manager-reservation-toolbar,
+.sp-manager-page .manager-communication-dashboard,
 .sp-manager-page .manager-filter-summary,
 .sp-manager-page .manager-item,
 .sp-manager-page .manager-reservation-item,
 .sp-manager-page .manager-reservation-empty,
+.sp-manager-page .manager-notification-empty,
 .sp-manager-page .manager-performance-item,
 .sp-manager-page .manager-photo-item,
 .sp-manager-page .manager-occupancy-day,
@@ -13074,6 +13285,9 @@ body:has(.sp-shell) {
   .sp-manager-page .manager-availability-controls,
   .sp-manager-page .manager-reservation-queue,
   .sp-manager-page .manager-reservation-action-strip,
+  .sp-manager-page .manager-notification-summary,
+  .sp-manager-page .manager-communication-kpis,
+  .sp-manager-page .manager-communication-queue,
   .sp-manager-page .manager-room-type-actions,
   .sp-manager-page .manager-room-type-item,
   .sp-manager-page .manager-photo-order {
@@ -13129,7 +13343,8 @@ body:has(.sp-shell) {
   }
 
   .sp-manager-page .manager-reservation-sort,
-  .sp-manager-page .manager-reservation-signal {
+  .sp-manager-page .manager-reservation-signal,
+  .sp-manager-page .manager-comm-head {
     display: grid;
     justify-items: start;
   }
@@ -13307,6 +13522,15 @@ body:has(.sp-shell) {
 }
 
 .sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-reservation-action-strip {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-notification-summary,
+.sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-communication-kpis {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sp-shell-workspace .sp-manager-page .manager-grid > aside.property-detail .manager-communication-queue {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
