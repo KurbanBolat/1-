@@ -10066,6 +10066,8 @@ body:has(.sp-shell) {
 
 .sp-transaction-page .payment-booking-summary,
 .sp-transaction-page .payment-method-panel,
+.sp-transaction-page .payment-context-card,
+.sp-transaction-page .payment-recovery-card,
 .sp-transaction-page .success-result-card,
 .sp-transaction-page .success-booking-summary {
   margin-top: 14px;
@@ -10135,6 +10137,43 @@ body:has(.sp-shell) {
   color: #5f6b7d;
   font-size: 12px;
   line-height: 1.45;
+}
+
+.sp-transaction-page #payment-actions {
+  scroll-margin-top: 24px;
+}
+
+.sp-transaction-page .payment-context-card {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  background: #ffffff;
+}
+
+.sp-transaction-page .payment-context-card div {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid #edf0f6;
+  border-radius: 10px;
+  background: #fbfcff;
+}
+
+.sp-transaction-page .payment-context-card span {
+  color: #747d8f;
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.sp-transaction-page .payment-context-card b {
+  overflow-wrap: anywhere;
+  color: #171b28;
+  font-size: 13px;
+  line-height: 1.25;
 }
 
 .sp-transaction-page .payment-provider-note {
@@ -10398,34 +10437,65 @@ body:has(.sp-shell) {
   background: linear-gradient(135deg, #f9fffc 0%, #f6fbff 100%);
 }
 
-.sp-transaction-page .payment-redirect-card > div:first-child {
+.sp-transaction-page .payment-recovery-card {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-color: #ffd4c8;
+  background: linear-gradient(135deg, #fff8f6 0%, #fffaf7 100%);
+}
+
+.sp-transaction-page .payment-redirect-card > div:first-child,
+.sp-transaction-page .payment-recovery-card > div:first-child {
   min-width: 0;
   display: grid;
   gap: 3px;
 }
 
-.sp-transaction-page .payment-redirect-actions {
+.sp-transaction-page .payment-redirect-actions,
+.sp-transaction-page .payment-recovery-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
 }
 
-.sp-transaction-page .payment-redirect-actions button {
+.sp-transaction-page .payment-redirect-actions button,
+.sp-transaction-page .payment-recovery-actions button,
+.sp-transaction-page .payment-recovery-actions a {
   min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0 13px;
   border: 1px solid #e7dcff !important;
   border-radius: 12px;
   background: #ffffff !important;
   color: #6844ff !important;
   box-shadow: none !important;
+  font-size: 12px;
+  font-weight: 850;
 }
 
-.sp-transaction-page .payment-redirect-actions button.primary {
+.sp-transaction-page .payment-redirect-actions button.primary,
+.sp-transaction-page .payment-recovery-actions button:first-child {
   border: 0 !important;
   background: linear-gradient(135deg, #6745ff 0%, #7e49fb 100%) !important;
   color: #ffffff !important;
   box-shadow: 0 12px 24px rgba(104, 68, 255, 0.22) !important;
+}
+
+.sp-transaction-page .payment-recovery-card b {
+  color: #171b28;
+  font-size: 13px;
+}
+
+.sp-transaction-page .payment-recovery-card span {
+  color: #7a3b2b;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .sp-transaction-page .success-result-card {
@@ -10730,6 +10800,7 @@ body:has(.sp-shell) {
   .sp-transaction-page .tariff-grid,
   .sp-transaction-page .checkout-room-summary-grid,
   .sp-transaction-page .payment-booking-grid,
+  .sp-transaction-page .payment-context-card,
   .sp-transaction-page .payment-method-grid,
   .sp-transaction-page .payment-route-steps,
   .sp-transaction-page .success-booking-grid {
@@ -10742,18 +10813,22 @@ body:has(.sp-shell) {
     grid-template-columns: 1fr;
   }
 
-  .sp-transaction-page .payment-redirect-card {
+  .sp-transaction-page .payment-redirect-card,
+  .sp-transaction-page .payment-recovery-card {
     display: grid;
     align-items: stretch;
   }
 
   .sp-transaction-page .payment-redirect-actions,
+  .sp-transaction-page .payment-recovery-actions,
   .sp-transaction-page .success-priority-actions {
     min-width: 0;
     justify-content: stretch;
   }
 
   .sp-transaction-page .payment-redirect-actions button,
+  .sp-transaction-page .payment-recovery-actions button,
+  .sp-transaction-page .payment-recovery-actions a,
   .sp-transaction-page .success-priority-actions a {
     width: 100%;
   }

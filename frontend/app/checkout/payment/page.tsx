@@ -25,6 +25,7 @@ const t = {
     secureCopy: "Reservation access token is kept in the payment link and reused for account and in-stay services.",
     editBooking: "Edit dates and guests",
     back: "Back to stay",
+    payNow: "Pay now",
   },
   ru: {
     title: "Оплата бронирования",
@@ -41,6 +42,7 @@ const t = {
     secureCopy: "Токен доступа к брони сохраняется в платежной ссылке и используется для кабинета и сервисов проживания.",
     editBooking: "Изменить даты и гостей",
     back: "Назад к объекту",
+    payNow: "Оплатить",
   },
 } as const;
 
@@ -207,6 +209,13 @@ export default function CheckoutPaymentPage({
             expVariant={expVariant}
           />
         </section>
+        <a href="#payment-actions" className="checkout-mobile-action payment-mobile-action">
+          <span>
+            <small>{tr.amountDue}</small>
+            <b>{formatPrice(total, currency, lang)}</b>
+          </span>
+          <strong>{tr.payNow}</strong>
+        </a>
       </div>
     </StayPilotShell>
   );

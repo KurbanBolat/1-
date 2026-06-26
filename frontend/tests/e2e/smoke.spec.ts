@@ -742,6 +742,39 @@ test("checkout recovers from stale room type links", async ({ page }) => {
   await expect(page.locator("body")).not.toContainText("Something went wrong");
 });
 
+test("payment page exposes mobile amount and recovery actions", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const params = new URLSearchParams({
+    reservation_id: "999999999",
+    listing_id: "286",
+    title: "Address Beach Resort",
+    check_in: "2026-06-27",
+    check_out: "2026-06-29",
+    guests: "2",
+    guest_email: `payment_recovery_${Date.now()}@example.com`,
+    total: "144000",
+    room_type_id: "856",
+    room_type_name: "Deluxe Sea View",
+    lang: "ru",
+    currency: "KZT",
+  });
+
+  await page.goto(`/checkout/payment?${params.toString()}`);
+  await expect(page.locator(".payment-mobile-action")).toBeVisible();
+  await expect(page.locator(".payment-mobile-action")).toContainText(/К оплате/i);
+  await expect(page.locator(".payment-mobile-action")).toContainText(/144\s*000|144 000/i);
+  await page.locator(".payment-mobile-action").click();
+  await expect(page.locator("#payment-actions")).toBeVisible();
+  await expect(page.locator(".payment-context-card")).toContainText(/Deluxe Sea View/);
+  await expect(page.getByRole("button", { name: /Оплатить.*144/i })).toBeVisible();
+
+  await page.getByRole("button", { name: /Оплатить/i }).click();
+  await expect(page.locator(".payment-recovery-card")).toContainText(/Оплата не завершилась/i);
+  await expect(page.locator(".payment-recovery-card")).toContainText(/Изменить бронь/i);
+  await expect(page.locator(".form-status.error")).toContainText(/Бронирование не найдено/i);
+  await expect(page.locator("body")).not.toContainText(/Рџ|РЈ|вЂ|�/);
+});
+
 test("manager reservations dashboard exposes kpis and resets filters", async ({ page }) => {
   await page.goto("/login?lang=ru&currency=KZT");
   await page.getByLabel(/email/i).fill("admin@local.dev");

@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ApiError, attemptReservationPayment, getReservationPayment, type ReservationPayment } from "../lib/api";
 import { fireAnalyticsEvent } from "../lib/analyticsClient";
@@ -49,6 +49,7 @@ export default function PaymentStepForm({
   const [status, setStatus] = useState("");
   const [statusKind, setStatusKind] = useState<"idle" | "error" | "progress">("idle");
   const [paymentSnapshot, setPaymentSnapshot] = useState<ReservationPayment | null>(null);
+  const recoveryRef = useRef<HTMLElement | null>(null);
   const {
     pendingUrl: pendingResultRedirect,
     hasPendingRedirect: hasPendingResultRedirect,
@@ -63,9 +64,14 @@ export default function PaymentStepForm({
   const text =
     lang === "ru"
       ? {
+          amountDue: "К оплате",
           method: "Способ оплаты",
           methodTitle: "Выберите способ оплаты",
           methodHint: "Платеж привязан к текущей брони и выбранной категории номера.",
+          contextTitle: "Перед оплатой",
+          contextAmount: "Сумма",
+          contextRoom: "Номер",
+          contextDates: "Даты",
           demoPaymentTitle: "Защищенная оплата",
           demoPaymentHint: "В текущей среде списание не выполняется: бронь подтверждается через защищенный платежный сценарий.",
           livePaymentTitle: "Платежный провайдер",
@@ -116,13 +122,23 @@ export default function PaymentStepForm({
           paymentSuccessRedirect: "Оплата прошла. Перенаправляем к результату...",
           providerPendingHint: "Финальный статус обновится после ответа платежного провайдера.",
           reservationNotFound: "Бронирование не найдено.",
+          recoveryTitle: "Оплата не завершилась",
+          recoveryHint: "Бронь сохранена. Можно повторить оплату, выбрать другой способ или изменить параметры брони.",
+          retryPayment: "Повторить оплату",
+          editBooking: "Изменить бронь",
+          selectedMethod: "Выбран способ",
           stayHere: "Остаться на странице",
           goNow: "Перейти сейчас",
         }
       : {
+          amountDue: "Amount due",
           method: "Payment method",
           methodTitle: "Choose payment method",
           methodHint: "Payment is attached to the current reservation and selected room category.",
+          contextTitle: "Before payment",
+          contextAmount: "Amount",
+          contextRoom: "Room",
+          contextDates: "Dates",
           demoPaymentTitle: "Protected payment",
           demoPaymentHint: "In this environment no real charge is made; the reservation is confirmed through a protected payment flow.",
           livePaymentTitle: "Payment provider",
@@ -173,6 +189,11 @@ export default function PaymentStepForm({
           paymentSuccessRedirect: "Payment successful. Redirecting to result...",
           providerPendingHint: "The final status will update after the payment provider webhook arrives.",
           reservationNotFound: "Reservation not found.",
+          recoveryTitle: "Payment was not completed",
+          recoveryHint: "The reservation is saved. Retry payment, choose another method, or edit booking details.",
+          retryPayment: "Retry payment",
+          editBooking: "Edit booking",
+          selectedMethod: "Selected method",
           stayHere: "Stay on page",
           goNow: "Go now",
         };
@@ -184,6 +205,21 @@ export default function PaymentStepForm({
   const isMockPaymentMode = PAYMENT_MODE === "mock";
   const paymentIsFinal = paymentSnapshot?.payment_status === "paid" || paymentSnapshot?.payment_status === "failed";
   const paymentIsFailed = paymentSnapshot?.payment_status === "failed";
+  const selectedMethodLabel = methodOptions.find((option) => option.value === method)?.label || text.card;
+  const amountLabel = formatPrice(total);
+  const payButtonLabel = total > 0 ? `${text.payNow} · ${amountLabel}` : text.payNow;
+  const editBookingParams = new URLSearchParams({
+    listing_id: String(listingId),
+    check_in: checkIn,
+    check_out: checkOut,
+    guests: String(guests),
+    lang,
+    currency,
+    exp_variant: expVariant,
+  });
+  if (roomTypeId) editBookingParams.set("room_type_id", roomTypeId);
+  if (roomTypeName) editBookingParams.set("room_type_name", roomTypeName);
+  const editBookingHref = `/checkout?${editBookingParams.toString()}`;
   const routeSteps = [
     {
       key: "method",
@@ -202,6 +238,13 @@ export default function PaymentStepForm({
     },
   ];
 
+  useEffect(() => {
+    if (statusKind !== "error") return;
+    window.requestAnimationFrame(() => {
+      recoveryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }, [statusKind, status]);
+
   function generateIdempotencyKey(): string {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
       return crypto.randomUUID();
@@ -217,6 +260,14 @@ export default function PaymentStepForm({
 
   function resolveAccessToken(): string {
     return accessToken || getReservationAccessToken(reservationId) || "";
+  }
+
+  function formatPrice(valueKzt: number): string {
+    const locale = lang === "ru" ? "ru-RU" : "en-US";
+    if (currency === "USD") {
+      return new Intl.NumberFormat(locale, { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(valueKzt / 500);
+    }
+    return new Intl.NumberFormat(locale, { style: "currency", currency: "KZT", maximumFractionDigits: 0 }).format(valueKzt);
   }
 
   function reservationStatusLabel(value?: ReservationPayment["reservation_status"]): string {
@@ -343,10 +394,32 @@ export default function PaymentStepForm({
   }
 
   return (
-    <div className="booking-form">
+    <div className="booking-form" id="payment-actions">
       <section className={`payment-provider-note ${isMockPaymentMode ? "demo" : "live"}`}>
         <b>{isMockPaymentMode ? text.demoPaymentTitle : text.livePaymentTitle}</b>
         <span>{isMockPaymentMode ? text.demoPaymentHint : text.livePaymentHint}</span>
+      </section>
+      <section className="payment-context-card" aria-label={text.contextTitle}>
+        <div>
+          <span>{text.contextAmount}</span>
+          <b>{amountLabel}</b>
+        </div>
+        {roomTypeName ? (
+          <div>
+            <span>{text.contextRoom}</span>
+            <b>{roomTypeName}</b>
+          </div>
+        ) : null}
+        <div>
+          <span>{text.contextDates}</span>
+          <b>
+            {checkIn} - {checkOut}
+          </b>
+        </div>
+        <div>
+          <span>{text.selectedMethod}</span>
+          <b>{selectedMethodLabel}</b>
+        </div>
       </section>
       <section className="payment-route-card" aria-label={text.routeTitle}>
         <div className="payment-route-head">
@@ -394,7 +467,7 @@ export default function PaymentStepForm({
         </div>
       </fieldset>
       <button type="button" className={processing ? "btn-loading" : ""} onClick={onPay} disabled={processing}>
-        {processing ? text.paying : text.payNow}
+        {processing ? text.paying : payButtonLabel}
       </button>
       {paymentSnapshot ? (
         <section className="payment-flow-state">
@@ -425,6 +498,20 @@ export default function PaymentStepForm({
             <button type="button" className="primary" onClick={redirectResultNow}>
               {text.goNow}
             </button>
+          </div>
+        </section>
+      ) : null}
+      {statusKind === "error" ? (
+        <section ref={recoveryRef} className="payment-recovery-card" aria-live="polite">
+          <div>
+            <b>{text.recoveryTitle}</b>
+            <span>{text.recoveryHint}</span>
+          </div>
+          <div className="payment-recovery-actions">
+            <button type="button" onClick={onPay} disabled={processing}>
+              {processing ? text.paying : text.retryPayment}
+            </button>
+            <a href={editBookingHref}>{text.editBooking}</a>
           </div>
         </section>
       ) : null}
