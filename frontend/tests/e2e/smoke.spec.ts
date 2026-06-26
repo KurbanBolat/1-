@@ -718,7 +718,11 @@ test("manager reservations dashboard exposes kpis and resets filters", async ({ 
   const reservationSelects = page.locator(".manager-reservations select");
   const statusSelect = reservationSelects.nth(0);
   const paymentSelect = reservationSelects.nth(1);
+  await expect(paymentSelect).toContainText(/Требует внимания/);
   await expect(paymentSelect).toContainText(/Возврат/);
+
+  await page.getByRole("button", { name: /нужна оплата/i }).click();
+  await expect(paymentSelect).toHaveValue("attention");
 
   await page.getByRole("button", { name: /оплаченные/i }).click();
   await expect(paymentSelect).toHaveValue("paid");

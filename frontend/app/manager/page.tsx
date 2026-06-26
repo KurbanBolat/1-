@@ -155,7 +155,7 @@ export default function ManagerPage() {
   const [abSummary, setAbSummary] = useState<PartnerAbSummary | null>(null);
   const [summaryPeriodDays, setSummaryPeriodDays] = useState<7 | 30 | 90>(30);
   const [reservationStatusFilter, setReservationStatusFilter] = useState<"all" | "draft" | "pending_payment" | "confirmed" | "checked_in" | "checked_out" | "cancelled" | "expired">("all");
-  const [reservationPaymentFilter, setReservationPaymentFilter] = useState<"all" | "pending" | "paid" | "failed" | "refunded">("all");
+  const [reservationPaymentFilter, setReservationPaymentFilter] = useState<"all" | "attention" | "pending" | "paid" | "failed" | "refunded">("all");
   const [reservationListingFilter, setReservationListingFilter] = useState<"all" | number>("all");
   const [reservationGuestQuery, setReservationGuestQuery] = useState("");
   const [reservationCheckInFrom, setReservationCheckInFrom] = useState("");
@@ -312,16 +312,20 @@ export default function ManagerPage() {
     try {
       const rows = await getPartnerReservations(currentToken, {
         status: reservationStatusFilter === "all" ? undefined : reservationStatusFilter,
-        payment_status: reservationPaymentFilter === "all" ? undefined : reservationPaymentFilter,
+        payment_status: reservationPaymentFilter === "all" || reservationPaymentFilter === "attention" ? undefined : reservationPaymentFilter,
         listing_id: reservationListingFilter === "all" ? undefined : reservationListingFilter,
         guest_query: reservationGuestQuery.trim() || undefined,
         check_in_from: reservationCheckInFrom || undefined,
         check_out_to: reservationCheckOutTo || undefined,
       });
-      setReservations(rows);
+      const filteredRows =
+        reservationPaymentFilter === "attention"
+          ? rows.filter((row) => row.payment_status === "pending" || row.payment_status === "failed")
+          : rows;
+      setReservations(filteredRows);
       setCancellationTermsByReservation((prev) => {
         const next: Record<number, CancellationTerms> = {};
-        for (const row of rows) {
+        for (const row of filteredRows) {
           if (prev[row.id]) next[row.id] = prev[row.id];
         }
         return next;

@@ -7,7 +7,7 @@ import type { CancellationTerms, Listing, PartnerOpsSummary, PartnerReservation 
 type ReservationStatusFilter = "all" | "draft" | "pending_payment" | "confirmed" | "checked_in" | "checked_out" | "cancelled" | "expired";
 type Lang = "en" | "ru";
 type Currency = "KZT" | "USD";
-type ReservationPaymentFilter = "all" | "pending" | "paid" | "failed" | "refunded";
+type ReservationPaymentFilter = "all" | "attention" | "pending" | "paid" | "failed" | "refunded";
 type ReservationListingFilter = "all" | number;
 type SummaryPeriodDays = 7 | 30 | 90;
 type ReservationQueueKey = "all" | "needs_payment" | "paid" | "confirmed" | "refunded";
@@ -171,9 +171,9 @@ export default function ManagerReservationsSection({
     {
       key: "needs_payment",
       label: "Нужна оплата",
-      hint: "Ожидают платеж",
+      hint: "Ожидают или ошибка",
       count: filteredSummary.pendingPayment + filteredSummary.failedPayment,
-      active: reservationPaymentFilter === "pending",
+      active: reservationPaymentFilter === "attention",
     },
     {
       key: "paid",
@@ -205,7 +205,7 @@ export default function ManagerReservationsSection({
     }
     if (key === "needs_payment") {
       setReservationStatusFilter("all");
-      setReservationPaymentFilter("pending");
+      setReservationPaymentFilter("attention");
       return;
     }
     if (key === "paid") {
@@ -296,6 +296,7 @@ export default function ManagerReservationsSection({
                 onChange={(e) => setReservationPaymentFilter(e.target.value as ReservationPaymentFilter)}
               >
                 <option value="all">Все оплаты</option>
+                <option value="attention">Требует внимания</option>
                 <option value="pending">Ожидает оплаты</option>
                 <option value="paid">Оплачено</option>
                 <option value="failed">Ошибка оплаты</option>
@@ -385,7 +386,7 @@ export default function ManagerReservationsSection({
             <article>
               <span>Нужны действия</span>
               <b>{filteredSummary.pendingPayment + filteredSummary.failedPayment}</b>
-              <small>{filteredSummary.pendingPayment} ждут оплату</small>
+              <small>{filteredSummary.pendingPayment} ждут оплату, {filteredSummary.failedPayment} ошибок</small>
             </article>
             <article>
               <span>Категории</span>
