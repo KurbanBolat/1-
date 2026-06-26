@@ -300,6 +300,13 @@ function addDays(isoDate: string, days: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+function nightsBetween(checkIn: string, checkOut: string): number {
+  const from = new Date(`${checkIn}T00:00:00Z`);
+  const to = new Date(`${checkOut}T00:00:00Z`);
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return 0;
+  return Math.round((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 function formatDay(isoDate: string, lang: Lang): string {
   const locale = lang === "ru" ? "ru-RU" : "en-US";
   return new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short" }).format(new Date(`${isoDate}T00:00:00`));
@@ -452,6 +459,7 @@ export default async function StayDetails({
         selectedCheckOut > selectedCheckIn &&
         selectedCheckIn >= fromDate,
     );
+    const selectedStayNights = selectedRangeValid ? Math.max(1, nightsBetween(selectedCheckIn, selectedCheckOut)) : 0;
     const roomAvailabilityFrom = selectedRangeValid ? selectedCheckIn : fromDate;
     const roomAvailabilityTo = selectedRangeValid ? selectedCheckOut : addDays(fromDate, 60);
     const roomAvailability = await getListingRoomAvailability({
@@ -466,13 +474,13 @@ export default async function StayDetails({
     );
     const roomOptions = (selectedRangeValid
       ? roomAvailability.room_types.flatMap((room) => {
-          const exactWindow = room.available_windows.find(
+          const matchingWindow = room.available_windows.find(
             (window) =>
-              window.check_in === selectedCheckIn &&
-              window.check_out === selectedCheckOut &&
+              window.check_in <= selectedCheckIn &&
+              window.check_out >= selectedCheckOut &&
               window.available_count > 0,
           );
-          return exactWindow ? [{ room, window: exactWindow }] : [];
+          return matchingWindow ? [{ room, window: matchingWindow }] : [];
         })
       : availableRoomTypes.flatMap((room) =>
           room.available_windows.slice(0, 2).map((window) => ({
@@ -522,8 +530,11 @@ export default async function StayDetails({
           <div className="available-room-list">
             <p className="available-rooms-next-step">{tr.availableRoomsNextStep}</p>
             {roomOptions.map(({ room, window }, index) => {
+              const displayCheckIn = selectedRangeValid ? selectedCheckIn : window.check_in;
+              const displayNights = selectedRangeValid ? selectedStayNights : Math.min(Math.max(window.nights, 1), 2);
+              const displayCheckOut = selectedRangeValid ? selectedCheckOut : addDays(window.check_in, displayNights);
               const nightlyRate = formatPrice(room.nightly_price, currency, lang);
-              const totalForWindow = formatPrice(room.nightly_price * Math.max(window.nights, 1), currency, lang);
+              const totalForWindow = formatPrice(room.nightly_price * displayNights, currency, lang);
               const lowInventory = window.available_count <= 3;
               return (
                 <article key={`${room.id}-${window.check_in}-${window.check_out}`} className="available-room-card">
@@ -544,21 +555,22 @@ export default async function StayDetails({
                       <span>{tr.freeCancellation}</span>
                     </div>
                   </div>
-                  <div className="available-room-booking">
-                    <div className="available-room-date-pair" aria-label={`${tr.roomWindow}: ${formatRange(window.check_in, window.check_out, lang)}`}>
+                  <div className="available-room-booking" data-check-in={displayCheckIn} data-check-out={displayCheckOut}>
+                    <div className="available-room-date-pair" aria-label={`${tr.roomWindow}: ${formatRange(displayCheckIn, displayCheckOut, lang)}`}>
                       <span>
                         <small>{tr.checkIn}</small>
-                        <strong>{formatDay(window.check_in, lang)}</strong>
+                        <strong>{formatDay(displayCheckIn, lang)}</strong>
                       </span>
                       <span>
                         <small>{tr.checkOut}</small>
-                        <strong>{formatDay(window.check_out, lang)}</strong>
+                        <strong>{formatDay(displayCheckOut, lang)}</strong>
                       </span>
                     </div>
                     <span>{tr.roomTotalLabel}</span>
                     <b>{totalForWindow}</b>
                     <small>
-                      {formatNightsCount(window.nights, lang)} · {nightlyRate} {tr.perNight}
+                      {formatNightsCount(displayNights, lang)} · {nightlyRate} {tr.perNight}
+                      {!selectedRangeValid && window.check_out > displayCheckOut ? ` · ${tr.availableUntil} ${formatDay(window.check_out, lang)}` : ""}
                     </small>
                     <Link
                       href={availabilityRoomHref(room, window)}

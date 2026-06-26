@@ -556,6 +556,47 @@ test("home search preserves dates and opens available rooms", async ({ page }) =
   await expect(page.locator(".available-room-card").first()).toContainText(/Забронировать|Book/i);
   await expect(page.locator(".available-room-date-pair").first()).toContainText(/Заезд|Check-in/i);
   await expect(page.locator(".available-room-date-pair").first()).toContainText(/Выезд|Check-out/i);
+  const selectedRoomHref = await page.locator('.available-room-cta[href*="/checkout"]').first().getAttribute("href");
+  const selectedRoomCheckout = new URL(selectedRoomHref || "", "http://localhost:3000");
+  expect(selectedRoomCheckout.searchParams.get("check_in")).toBe(selected.checkIn);
+  expect(selectedRoomCheckout.searchParams.get("check_out")).toBe(selected.checkOut);
+});
+
+test("available room cards keep displayed dates aligned with checkout link", async ({ page }) => {
+  await page.goto("/?lang=ru&currency=KZT");
+  const candidateHrefs = await page
+    .locator(".property-card .actions a")
+    .evaluateAll((els) =>
+      els
+        .map((el) => el.getAttribute("href"))
+        .filter((href): href is string => Boolean(href))
+        .slice(0, 12),
+    );
+
+  for (const href of candidateHrefs) {
+    const listingId = Number(href.match(/\/stays\/(\d+)/)?.[1] || "0");
+    if (!listingId) continue;
+    await page.goto(`/stays/${listingId}?lang=ru&currency=KZT#available-rooms`);
+    const roomCard = page.locator(".available-room-card").first();
+    if ((await roomCard.count()) === 0 || !(await roomCard.isVisible().catch(() => false))) continue;
+
+    const booking = roomCard.locator(".available-room-booking").first();
+    const checkIn = await booking.getAttribute("data-check-in");
+    const checkOut = await booking.getAttribute("data-check-out");
+    expect(checkIn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(checkOut).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+    const ctaHref = await roomCard.locator('.available-room-cta[href*="/checkout"]').first().getAttribute("href");
+    const checkout = new URL(ctaHref || "", "http://localhost:3000");
+    expect(checkout.searchParams.get("check_in")).toBe(checkIn);
+    expect(checkout.searchParams.get("check_out")).toBe(checkOut);
+    await expect(roomCard.locator(".available-room-date-pair")).toContainText(/Заезд/i);
+    await expect(roomCard.locator(".available-room-date-pair")).toContainText(/Выезд/i);
+    await expect(page.locator("body")).not.toContainText(/Рџ|РЈ|вЂ|�/);
+    return;
+  }
+
+  throw new Error("Could not find a stay with visible available room cards");
 });
 
 test("stay gallery keeps absolute photo urls intact", async ({ page }) => {
