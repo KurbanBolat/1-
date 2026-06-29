@@ -12573,6 +12573,87 @@ body:has(.sp-shell) {
   align-items: start;
 }
 
+.sp-account-page .account-entry-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #edf0f6;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fbfcff 0%, #f7f9ff 100%);
+}
+
+.sp-account-page .account-entry-panel h2 {
+  margin: 6px 0 0;
+  color: #111827;
+  font-size: clamp(20px, 1.7vw, 26px);
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.sp-account-page .account-entry-panel p {
+  max-width: 660px;
+  margin: 8px 0 0;
+  color: #626b7c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.sp-account-page .account-entry-points {
+  display: grid;
+  gap: 8px;
+}
+
+.sp-account-page .account-entry-points span {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid #e8ecf4;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #3f4758;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.sp-account-page .account-email-field {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.sp-account-page .account-email-field span {
+  color: #6f7788;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.sp-account-page .account-empty-state {
+  display: grid;
+  gap: 5px;
+  padding: 13px 14px;
+  border: 1px dashed #dfe5f0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.sp-account-page .account-empty-state b {
+  color: #171b28;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.sp-account-page .account-empty-state span {
+  color: #6f7788;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .sp-account-page .account-focus-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 220px;
@@ -13438,6 +13519,15 @@ body:has(.sp-shell) {
   }
 
   .sp-account-page .account-booking-card {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-account-page .account-entry-panel {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .sp-account-page .account-entry-points {
     grid-template-columns: 1fr;
   }
 

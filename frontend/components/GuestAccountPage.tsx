@@ -65,6 +65,17 @@ type Translations = {
   profilePhone: string;
   saveProfile: string;
   profileSaved: string;
+  entryKicker: string;
+  entryTitle: string;
+  entryCopy: string;
+  entryPointBookings: string;
+  entryPointPayments: string;
+  entryPointServices: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  emptyTitle: string;
+  emptyInitialCopy: string;
+  emptyNoResultsCopy: string;
   email: string;
   load: string;
   loading: string;
@@ -123,6 +134,17 @@ const RU_TRANSLATIONS: Translations = {
   profilePhone: "Телефон",
   saveProfile: "Сохранить профиль",
   profileSaved: "Профиль сохранен",
+  entryKicker: "Защищенный доступ",
+  entryTitle: "Найдите бронь по email",
+  entryCopy: "После оплаты кабинет открывается по ссылке с токеном. Если токен уже сохранен в браузере, достаточно указать email.",
+  entryPointBookings: "Детали брони",
+  entryPointPayments: "Оплата и отмена",
+  entryPointServices: "AI-сервисы проживания",
+  emailLabel: "Email бронирования",
+  emailPlaceholder: "guest@example.com",
+  emptyTitle: "Введите email, чтобы открыть брони",
+  emptyInitialCopy: "Здесь появятся подтвержденные брони, платежи, условия отмены и сервисы проживания.",
+  emptyNoResultsCopy: "Проверьте email или откройте кабинет по ссылке из подтверждения оплаты.",
   email: "Email, который указывали при бронировании",
   load: "Показать брони",
   loading: "Загружаю...",
@@ -182,6 +204,17 @@ const EN_TRANSLATIONS: Translations = {
   profilePhone: "Phone",
   saveProfile: "Save profile",
   profileSaved: "Profile saved",
+  entryKicker: "Secure access",
+  entryTitle: "Find bookings by email",
+  entryCopy: "After payment, the account opens through a link with an access token. If the token is saved in this browser, email is enough.",
+  entryPointBookings: "Booking details",
+  entryPointPayments: "Payment and cancellation",
+  entryPointServices: "AI in-stay services",
+  emailLabel: "Booking email",
+  emailPlaceholder: "guest@example.com",
+  emptyTitle: "Enter email to open bookings",
+  emptyInitialCopy: "Confirmed stays, payments, cancellation terms, and in-stay services will appear here.",
+  emptyNoResultsCopy: "Check the email or open the account from the payment confirmation link.",
   email: "Email used for booking",
   load: "Show bookings",
   loading: "Loading...",
@@ -338,6 +371,7 @@ export default function GuestAccountPage({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<ReservationView[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   const [paymentByReservation, setPaymentByReservation] = useState<Record<number, ReservationPayment>>({});
   const [termsByReservation, setTermsByReservation] = useState<Record<number, CancellationTerms>>({});
   const [inStayByReservation, setInStayByReservation] = useState<Record<number, ReservationInStayState>>({});
@@ -506,6 +540,7 @@ export default function GuestAccountPage({
 
   async function loadReservations(guestEmailRaw?: string) {
     const normalized = (guestEmailRaw ?? email).trim().toLowerCase();
+    setHasSearched(true);
     if (!normalized) {
       setError(tr.requiredEmail);
       return;
@@ -670,6 +705,19 @@ export default function GuestAccountPage({
         <h1>{tr.title}</h1>
         <p className="desc">{tr.subtitle}</p>
 
+        <section className="account-entry-panel" aria-label={tr.entryTitle}>
+          <div>
+            <span className="account-focus-kicker">{tr.entryKicker}</span>
+            <h2>{tr.entryTitle}</h2>
+            <p>{tr.entryCopy}</p>
+          </div>
+          <div className="account-entry-points" aria-label={tr.entryKicker}>
+            <span>{tr.entryPointBookings}</span>
+            <span>{tr.entryPointPayments}</span>
+            <span>{tr.entryPointServices}</span>
+          </div>
+        </section>
+
         <form
           className="account-toolbar"
           onSubmit={(event) => {
@@ -677,20 +725,31 @@ export default function GuestAccountPage({
             void loadReservations();
           }}
         >
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder={tr.email}
-            required
-          />
+          <label className="account-email-field" htmlFor="account-email">
+            <span>{tr.emailLabel}</span>
+            <input
+              id="account-email"
+              suppressHydrationWarning
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder={tr.emailPlaceholder}
+              autoComplete="email"
+              required
+            />
+          </label>
           <button type="submit" disabled={loading}>
             {loading ? tr.loading : tr.load}
           </button>
         </form>
 
         {error ? <p className="field-error">{error}</p> : null}
-        {items.length === 0 && !loading ? <p className="desc">{tr.empty}</p> : null}
+        {items.length === 0 && !loading && !error ? (
+          <section className="account-empty-state" aria-live="polite">
+            <b>{hasSearched ? tr.empty : tr.emptyTitle}</b>
+            <span>{hasSearched ? tr.emptyNoResultsCopy : tr.emptyInitialCopy}</span>
+          </section>
+        ) : null}
 
         {highlightedReservation ? (
           <section className="account-focus-card">
@@ -985,12 +1044,14 @@ export default function GuestAccountPage({
           <p className="desc">{tr.profileHint}</p>
           <div className="account-profile-grid">
             <input
+              suppressHydrationWarning
               type="text"
               value={profileName}
               onChange={(event) => setProfileName(event.target.value)}
               placeholder={tr.profileName}
             />
             <input
+              suppressHydrationWarning
               type="text"
               value={profilePhone}
               onChange={(event) => setProfilePhone(event.target.value)}

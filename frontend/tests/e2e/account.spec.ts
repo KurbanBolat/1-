@@ -24,6 +24,8 @@ test("account page shows clean RU localization without mojibake", async ({ page 
   await page.goto("/account?lang=ru&currency=KZT");
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Личный кабинет гостя");
+  await expect(page.getByText("Введите email, чтобы открыть брони")).toBeVisible();
+  await expect(page.getByText("По этому email брони не найдены.")).toHaveCount(0);
   await expect(page.getByText("Профиль гостя")).toBeVisible();
   await expect(page.getByRole("link", { name: /Назад к поиску/i })).toBeVisible();
 
@@ -42,5 +44,6 @@ test("account page explains secure access when email has no token", async ({ pag
   await page.getByRole("button", { name: /Показать брони/i }).click();
 
   await expect(page.locator(".field-error")).toContainText("по ссылке с токеном доступа");
+  await expect(page.getByText("По этому email брони не найдены.")).toHaveCount(0);
   await expect(page.locator("body")).not.toContainText("Reservation access token is required");
 });
